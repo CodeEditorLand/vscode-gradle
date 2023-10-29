@@ -1,16 +1,10 @@
 {
   "name": "vscode-gradle",
   "displayName": "Gradle Tasks",
-  "description": "Type definitions for the Gradle Tasks vscode extension",
   "version": "0.0.1",
-  "author": {
-    "name": "Nikola Hristov",
-    "email": "nikola@nikolahristov.tech",
-    "url": "https://nikolahristov.tech"
-  },
-  "maintainers": [
-    "Richard Willis <willis.rh@gmail.com>"
-  ],
+  "private": "false",
+  "description": "Type definitions for the Gradle Tasks vscode extension",
+  "homepage": "https://github.com/CodeEditorLand/CodeEditorLand#readme",
   "bugs": {
     "url": "https://github.com/CodeEditorLand/CodeEditorLand/issues"
   },
@@ -19,12 +13,18 @@
     "url": "git+https://github.com/CodeEditorLand/CodeEditorLand.git"
   },
   "license": "MIT",
+  "author": {
+    "name": "Nikola Hristov",
+    "email": "nikola@nikolahristov.tech",
+    "url": "https://nikolahristov.tech"
+  },
+  "maintainers": [
+    "Richard Willis <willis.rh@gmail.com>"
+  ],
+  "publisher": "playform",
+  "type": "module",
   "main": "./index.js",
   "types": "./index.ts",
-  "engines": {
-    "node": "14.15.4",
-    "npm": "6.14.10"
-  },
   "scripts": {
     "compile": "tsc -p .",
     "prepublishOnly": "TypeScriptESBuild Source/**/*.ts"
@@ -44,9 +44,10 @@
     "typescript": "5.2.2",
     "typescript-esbuild": "0.3.1"
   },
-  "homepage": "https://github.com/CodeEditorLand/CodeEditorLand#readme",
-  "type": "module",
-  "private": "false",
+  "engines": {
+    "node": "14.15.4",
+    "npm": "6.14.10"
+  },
   "publishConfig": {
     "access": "public"
   }
