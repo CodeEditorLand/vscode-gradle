@@ -29,6 +29,7 @@ import org.eclipse.lsp4j.jsonrpc.messages.Either;
 public class MavenCentralCompletionHandler {
 	private static String sequence = "2";
 	private static String URL_BASIC_SEARCH = "https://search.maven.org/solrsearch/select?q=";
+
 	private enum DependencyCompletionKind {
 		GROUPID, ARTIFACTID, VERSION
 	}
@@ -38,13 +39,13 @@ public class MavenCentralCompletionHandler {
 		String validText = LSPUtils.getStringBeforePosition(dependency.getText(), dependency.getRange(), position);
 		String[] validTexts = validText.split(":", -1);
 		switch (validTexts.length) {
-			case 1 :
+			case 1:
 				return getGroupIdCompletions(validTexts[0], range);
-			case 2 :
+			case 2:
 				return getArtifactIdCompletions(validTexts[0], range);
-			case 3 :
+			case 3:
 				return getVersionCompletions(validTexts[0], validTexts[1], range);
-			default :
+			default:
 				return Collections.emptyList();
 		}
 	}

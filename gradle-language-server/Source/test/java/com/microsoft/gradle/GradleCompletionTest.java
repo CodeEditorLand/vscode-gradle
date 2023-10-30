@@ -115,11 +115,11 @@ public class GradleCompletionTest {
 		String projectPath = GradleTestConstants.testPath.resolve("app").normalize().toString();
 		GradleField field1 = new GradleField("sourceCompatibility", false);
 		GradleField field2 = new GradleField("targetCompatibility", false);
-		GradleMethod method1 = new GradleMethod("withJavadocJar", new String[]{}, false);
-		GradleMethod method2 = new GradleMethod("getToolchain", new String[]{}, false);
-		GradleClosure closure = new GradleClosure("java", new GradleMethod[]{method1, method2},
-				new GradleField[]{field1, field2});
-		GradleClosure[] closures = {closure};
+		GradleMethod method1 = new GradleMethod("withJavadocJar", new String[] {}, false);
+		GradleMethod method2 = new GradleMethod("getToolchain", new String[] {}, false);
+		GradleClosure closure = new GradleClosure("java", new GradleMethod[] { method1, method2 },
+				new GradleField[] { field1, field2 });
+		GradleClosure[] closures = { closure };
 		arguments.add(gson.toJsonTree(projectPath, String.class));
 		arguments.add(gson.toJsonTree(closures, GradleClosure[].class));
 		params.setArguments(arguments);

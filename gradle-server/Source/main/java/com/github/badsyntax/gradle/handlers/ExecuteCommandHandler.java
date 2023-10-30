@@ -25,7 +25,7 @@ public class ExecuteCommandHandler {
 	public void run() {
 		String command = req.getCommand();
 		switch (command) {
-			case GET_NORMALIZED_PACKAGE_NAME :
+			case GET_NORMALIZED_PACKAGE_NAME:
 				List<String> arguments = req.getArgumentsList();
 				if (arguments == null || arguments.size() != 1) {
 					replyWithError(new Exception("illegal Arguments"));

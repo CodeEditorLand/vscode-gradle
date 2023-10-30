@@ -68,11 +68,11 @@ public class MavenLocalCompletionHandler {
 		String validText = LSPUtils.getStringBeforePosition(dependency.getText(), dependency.getRange(), position);
 		String[] validTexts = validText.split(":", -1);
 		switch (validTexts.length) {
-			case 1 :
+			case 1:
 				return getGroupIdCompletions(validTexts[0], range);
-			case 2 :
+			case 2:
 				return getArtifactIdCompletions(validTexts[0], validTexts[1], range);
-			default :
+			default:
 				// Do not provide local results for version
 				return Collections.emptyList();
 		}

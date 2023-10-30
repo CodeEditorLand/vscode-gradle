@@ -39,127 +39,126 @@ import ch.epfl.scala.bsp4j.TaskStartParams;
 
 public class GradleBuildClient implements BuildClient {
 
-    /**
-     * The task name for the build server.
-     */
-    private static final String BUILD_SERVER_TASK = "Build Server Task";
+	/**
+	 * The task name for the build server.
+	 */
+	private static final String BUILD_SERVER_TASK = "Build Server Task";
 
-    /**
-     * Client command to append build logs to the output channel.
-     */
-    private static final String CLIENT_APPEND_BUILD_LOG_CMD = "_java.gradle.buildServer.appendBuildLog";
+	/**
+	 * Client command to append build logs to the output channel.
+	 */
+	private static final String CLIENT_APPEND_BUILD_LOG_CMD = "_java.gradle.buildServer.appendBuildLog";
 
-    /**
-     * Client command to append event logs to the output channel.
-     */
-    private static final String CLIENT_BUILD_LOG_CMD = "_java.gradle.buildServer.log";
+	/**
+	 * Client command to append event logs to the output channel.
+	 */
+	private static final String CLIENT_BUILD_LOG_CMD = "_java.gradle.buildServer.log";
 
-    /**
-     * Client command to send telemetry data to the LS client.
-     */
+	/**
+	 * Client command to send telemetry data to the LS client.
+	 */
 
-    private final JavaLanguageClient lsClient;
+	private final JavaLanguageClient lsClient;
 
-    public GradleBuildClient() {
-        this.lsClient = JavaLanguageServerPlugin.getProjectsManager().getConnection();
-    }
+	public GradleBuildClient() {
+		this.lsClient = JavaLanguageServerPlugin.getProjectsManager().getConnection();
+	}
 
-    @Override
-    public void onBuildLogMessage(LogMessageParams params) {
-        MessageType type = params.getType();
-        if (type == MessageType.LOG) {
-            Utils.sendTelemetry(this.lsClient, params.getMessage());
-        } else {
-            this.lsClient.sendNotification(new ExecuteCommandParams(CLIENT_BUILD_LOG_CMD,
-                    Arrays.asList(params.getMessage())));
-        }
-    }
+	@Override
+	public void onBuildLogMessage(LogMessageParams params) {
+		MessageType type = params.getType();
+		if (type == MessageType.LOG) {
+			Utils.sendTelemetry(this.lsClient, params.getMessage());
+		} else {
+			this.lsClient.sendNotification(new ExecuteCommandParams(CLIENT_BUILD_LOG_CMD,
+					Arrays.asList(params.getMessage())));
+		}
+	}
 
-    @Override
-    public void onBuildPublishDiagnostics(PublishDiagnosticsParams arg0) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'onBuildPublishDiagnostics'");
-    }
+	@Override
+	public void onBuildPublishDiagnostics(PublishDiagnosticsParams arg0) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'onBuildPublishDiagnostics'");
+	}
 
-    @Override
-    public void onBuildShowMessage(ShowMessageParams arg0) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'onBuildShowMessage'");
-    }
+	@Override
+	public void onBuildShowMessage(ShowMessageParams arg0) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'onBuildShowMessage'");
+	}
 
-    @Override
-    public void onBuildTargetDidChange(DidChangeBuildTarget params) {
-        Set<IProject> projects = new HashSet<>();
-        for (BuildTargetEvent event : params.getChanges()) {
-            BuildTargetIdentifier id = event.getTarget();
-            URI uri = Utils.getUriWithoutQuery(id.getUri());
-            IProject project = ProjectUtils.getProjectFromUri(uri.toString());
-            if (project != null) {
-                projects.add(project);
-            }
-        }
+	@Override
+	public void onBuildTargetDidChange(DidChangeBuildTarget params) {
+		Set<IProject> projects = new HashSet<>();
+		for (BuildTargetEvent event : params.getChanges()) {
+			BuildTargetIdentifier id = event.getTarget();
+			URI uri = Utils.getUriWithoutQuery(id.getUri());
+			IProject project = ProjectUtils.getProjectFromUri(uri.toString());
+			if (project != null) {
+				projects.add(project);
+			}
+		}
 
-        if (projects.isEmpty()) {
-            return;
-        }
+		if (projects.isEmpty()) {
+			return;
+		}
 
-        // Update projects in a new thread to avoid blocking the IO queue,
-        // since some BSP requests will be sent during project updates.
-        CompletableFuture.runAsync(() -> {
-            GradleBuildServerBuildSupport buildSupport = new GradleBuildServerBuildSupport();
-            for (IProject project : projects) {
-                try {
-                    buildSupport.update(project, true, new NullProgressMonitor());
-                } catch (CoreException e) {
-                    JavaLanguageServerPlugin.log(e);
-                }
-            }
-        });
-    }
+		// Update projects in a new thread to avoid blocking the IO queue,
+		// since some BSP requests will be sent during project updates.
+		CompletableFuture.runAsync(() -> {
+			GradleBuildServerBuildSupport buildSupport = new GradleBuildServerBuildSupport();
+			for (IProject project : projects) {
+				try {
+					buildSupport.update(project, true, new NullProgressMonitor());
+				} catch (CoreException e) {
+					JavaLanguageServerPlugin.log(e);
+				}
+			}
+		});
+	}
 
+	@Override
+	public void onBuildTaskStart(TaskStartParams params) {
+		if (Objects.equals(params.getDataKind(), TaskDataKind.COMPILE_TASK)) {
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			Date now = new Date();
+			String msg = "> Build starts at " + dateFormat.format(now) + "\n" + params.getMessage();
+			lsClient.sendNotification(new ExecuteCommandParams(CLIENT_APPEND_BUILD_LOG_CMD, Arrays.asList(msg)));
+		} else {
+			Either<String, Integer> id = Either.forLeft(params.getTaskId().getId());
+			lsClient.createProgress(new WorkDoneProgressCreateParams(id));
+			WorkDoneProgressBegin workDoneProgressBegin = new WorkDoneProgressBegin();
+			workDoneProgressBegin.setTitle(BUILD_SERVER_TASK);
+			workDoneProgressBegin.setMessage(params.getMessage());
+			lsClient.notifyProgress(new ProgressParams(id, Either.forLeft(workDoneProgressBegin)));
+		}
+	}
 
-    @Override
-    public void onBuildTaskStart(TaskStartParams params) {
-        if (Objects.equals(params.getDataKind(), TaskDataKind.COMPILE_TASK)) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            Date now = new Date();
-            String msg = "> Build starts at " + dateFormat.format(now) + "\n" + params.getMessage();
-            lsClient.sendNotification(new ExecuteCommandParams(CLIENT_APPEND_BUILD_LOG_CMD, Arrays.asList(msg)));
-        } else {
-            Either<String, Integer> id = Either.forLeft(params.getTaskId().getId());
-            lsClient.createProgress(new WorkDoneProgressCreateParams(id));
-            WorkDoneProgressBegin workDoneProgressBegin = new WorkDoneProgressBegin();
-            workDoneProgressBegin.setTitle(BUILD_SERVER_TASK);
-            workDoneProgressBegin.setMessage(params.getMessage());
-            lsClient.notifyProgress(new ProgressParams(id, Either.forLeft(workDoneProgressBegin)));
-        }
-    }
+	@Override
+	public void onBuildTaskProgress(TaskProgressParams params) {
+		if (Objects.equals(params.getDataKind(), TaskDataKind.COMPILE_TASK)) {
+			lsClient.sendNotification(new ExecuteCommandParams(CLIENT_APPEND_BUILD_LOG_CMD,
+					Arrays.asList(params.getMessage())));
+		} else {
+			Either<String, Integer> id = Either.forLeft(params.getTaskId().getId());
+			WorkDoneProgressReport workDoneProgressReport = new WorkDoneProgressReport();
+			workDoneProgressReport.setMessage(StringUtils.isBlank(params.getMessage()) ? BUILD_SERVER_TASK
+					: BUILD_SERVER_TASK + " - " + params.getMessage());
+			lsClient.notifyProgress(new ProgressParams(id, Either.forLeft(workDoneProgressReport)));
+		}
+	}
 
-    @Override
-    public void onBuildTaskProgress(TaskProgressParams params) {
-        if (Objects.equals(params.getDataKind(), TaskDataKind.COMPILE_TASK)) {
-            lsClient.sendNotification(new ExecuteCommandParams(CLIENT_APPEND_BUILD_LOG_CMD,
-                    Arrays.asList(params.getMessage())));
-        } else {
-            Either<String, Integer> id = Either.forLeft(params.getTaskId().getId());
-            WorkDoneProgressReport workDoneProgressReport = new WorkDoneProgressReport();
-            workDoneProgressReport.setMessage(StringUtils.isBlank(params.getMessage()) ? BUILD_SERVER_TASK :
-                    BUILD_SERVER_TASK + " - " + params.getMessage());
-            lsClient.notifyProgress(new ProgressParams(id, Either.forLeft(workDoneProgressReport)));
-        }
-    }
-
-    @Override
-    public void onBuildTaskFinish(TaskFinishParams params) {
-        if (Objects.equals(params.getDataKind(), TaskDataKind.COMPILE_REPORT)) {
-            String msg = params.getMessage() + "\n------\n";
-            lsClient.sendNotification(new ExecuteCommandParams(CLIENT_APPEND_BUILD_LOG_CMD, Arrays.asList(msg)));
-        } else {
-            Either<String, Integer> id = Either.forLeft(params.getTaskId().getId());
-            WorkDoneProgressEnd workDoneProgressEnd = new WorkDoneProgressEnd();
-            workDoneProgressEnd.setMessage(StringUtils.isBlank(params.getMessage()) ? BUILD_SERVER_TASK :
-                    BUILD_SERVER_TASK + " - " + params.getMessage());
-            lsClient.notifyProgress(new ProgressParams(id, Either.forLeft(workDoneProgressEnd)));
-        }
-    }
+	@Override
+	public void onBuildTaskFinish(TaskFinishParams params) {
+		if (Objects.equals(params.getDataKind(), TaskDataKind.COMPILE_REPORT)) {
+			String msg = params.getMessage() + "\n------\n";
+			lsClient.sendNotification(new ExecuteCommandParams(CLIENT_APPEND_BUILD_LOG_CMD, Arrays.asList(msg)));
+		} else {
+			Either<String, Integer> id = Either.forLeft(params.getTaskId().getId());
+			WorkDoneProgressEnd workDoneProgressEnd = new WorkDoneProgressEnd();
+			workDoneProgressEnd.setMessage(StringUtils.isBlank(params.getMessage()) ? BUILD_SERVER_TASK
+					: BUILD_SERVER_TASK + " - " + params.getMessage());
+			lsClient.notifyProgress(new ProgressParams(id, Either.forLeft(workDoneProgressEnd)));
+		}
+	}
 }

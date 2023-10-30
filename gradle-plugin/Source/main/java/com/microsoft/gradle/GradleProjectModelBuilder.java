@@ -225,13 +225,13 @@ public class GradleProjectModelBuilder implements ToolingModelBuilder {
 	 * get task list and Project is used to get debug information.
 	 *
 	 * @param project
-	 *            the given org.gradle.api.Project model
+	 *                        the given org.gradle.api.Project model
 	 * @param rootProjectName
-	 *            the root project name
+	 *                        the root project name
 	 * @param gradleProject
-	 *            the given
-	 *            org.gradle.plugins.ide.internal.tooling.model.DefaultGradleProject
-	 *            model
+	 *                        the given
+	 *                        org.gradle.plugins.ide.internal.tooling.model.DefaultGradleProject
+	 *                        model
 	 * @return the task list of the corresponding project
 	 */
 	private List<GradleTask> getGradleTasks(Project project, String rootProjectName,

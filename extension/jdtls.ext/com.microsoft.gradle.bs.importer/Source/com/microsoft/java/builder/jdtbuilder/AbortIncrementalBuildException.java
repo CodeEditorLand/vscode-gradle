@@ -17,15 +17,16 @@ package com.microsoft.java.builder.jdtbuilder;
 
 /**
  * Exception thrown when an incremental builder cannot find a .class file.
- * Its possible the type can no longer be found because it was renamed inside its existing
+ * Its possible the type can no longer be found because it was renamed inside
+ * its existing
  * source file.
  */
 public class AbortIncrementalBuildException extends RuntimeException {
 
-protected String qualifiedTypeName;
-private static final long serialVersionUID = -8874662133883858502L; // backward compatible
+	protected String qualifiedTypeName;
+	private static final long serialVersionUID = -8874662133883858502L; // backward compatible
 
-public AbortIncrementalBuildException(String qualifiedTypeName) {
-	this.qualifiedTypeName = qualifiedTypeName;
-}
+	public AbortIncrementalBuildException(String qualifiedTypeName) {
+		this.qualifiedTypeName = qualifiedTypeName;
+	}
 }

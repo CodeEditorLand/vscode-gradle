@@ -41,6 +41,7 @@ public class ClasspathJMod extends ClasspathJar {
 	ClasspathJMod(String zipFilename, long lastModified, AccessRuleSet accessRuleSet, IPath externalAnnotationPath) {
 		super(zipFilename, lastModified, accessRuleSet, externalAnnotationPath, true);
 	}
+
 	@Override
 	IModule initializeModule() {
 		IModule mod = null;
@@ -66,14 +67,18 @@ public class ClasspathJMod extends ClasspathJar {
 	}
 
 	@Override
-	public NameEnvironmentAnswer findClass(String binaryFileName, String qualifiedPackageName, String moduleName, String qualifiedBinaryFileName,
-											boolean asBinaryOnly, Predicate<String> moduleNameFilter) {
-		if (!isPackage(qualifiedPackageName, moduleName)) return null; // most common case
-		if (moduleNameFilter != null && this.module != null && !moduleNameFilter.test(String.valueOf(this.module.name())))
+	public NameEnvironmentAnswer findClass(String binaryFileName, String qualifiedPackageName, String moduleName,
+			String qualifiedBinaryFileName,
+			boolean asBinaryOnly, Predicate<String> moduleNameFilter) {
+		if (!isPackage(qualifiedPackageName, moduleName))
+			return null; // most common case
+		if (moduleNameFilter != null && this.module != null
+				&& !moduleNameFilter.test(String.valueOf(this.module.name())))
 			return null;
 
 		try {
-			qualifiedBinaryFileName = new String(CharOperation.append(CLASSES_FOLDER, qualifiedBinaryFileName.toCharArray()));
+			qualifiedBinaryFileName = new String(
+					CharOperation.append(CLASSES_FOLDER, qualifiedBinaryFileName.toCharArray()));
 			IBinaryType reader = ClassFileReader.read(this.zipFile, qualifiedBinaryFileName);
 			if (reader != null) {
 				char[] modName = this.module == null ? null : this.module.name();
@@ -84,17 +89,19 @@ public class ClasspathJMod extends ClasspathJar {
 					else
 						modName = classReader.moduleName;
 				}
-				String fileNameWithoutExtension = qualifiedBinaryFileName.substring(0, qualifiedBinaryFileName.length() - SuffixConstants.SUFFIX_CLASS.length);
+				String fileNameWithoutExtension = qualifiedBinaryFileName.substring(0,
+						qualifiedBinaryFileName.length() - SuffixConstants.SUFFIX_CLASS.length);
 				return createAnswer(fileNameWithoutExtension, reader, modName);
 			}
 		} catch (IOException | ClassFormatException e) { // treat as if class file is missing
 		}
 		return null;
 	}
+
 	@Override
 	protected String readJarContent(final SimpleSet packageSet) {
 		String modInfo = null;
-		for (Enumeration<? extends ZipEntry> e = this.zipFile.entries(); e.hasMoreElements(); ) {
+		for (Enumeration<? extends ZipEntry> e = this.zipFile.entries(); e.hasMoreElements();) {
 			ZipEntry entry = e.nextElement();
 			char[] entryName = entry.getName().toCharArray();
 			int index = CharOperation.indexOf('/', entryName);

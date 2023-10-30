@@ -5,11 +5,18 @@ package com.microsoft.gradle.api;
 
 public interface GradleTask {
 	String getName();
+
 	String getGroup();
+
 	String getPath();
+
 	String getProject();
+
 	String getBuildFile();
+
 	String getRootProject();
+
 	String getDescription();
+
 	boolean getDebuggable();
 }

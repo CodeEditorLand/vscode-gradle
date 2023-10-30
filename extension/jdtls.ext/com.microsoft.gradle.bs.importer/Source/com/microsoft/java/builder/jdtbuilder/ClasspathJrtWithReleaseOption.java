@@ -61,8 +61,6 @@ public class ClasspathJrtWithReleaseOption extends ClasspathJrt {
 	private String modPathString;
 	CtSym ctSym;
 
-
-
 	public ClasspathJrtWithReleaseOption(String zipFilename, AccessRuleSet accessRuleSet, IPath externalAnnotationPath,
 			String release) throws CoreException {
 		super();
@@ -84,6 +82,7 @@ public class ClasspathJrtWithReleaseOption extends ClasspathJrt {
 		initialize();
 		loadModules();
 	}
+
 	/*
 	 * JDK 11 doesn't contain release 5. Hence
 	 * if the compliance is below 6, we simply return the lowest supported
@@ -101,12 +100,13 @@ public class ClasspathJrtWithReleaseOption extends ClasspathJrt {
 				return comp;
 			}
 			throw new CoreException(new Status(IStatus.ERROR, ClasspathJrtWithReleaseOption.class,
-						"Invalid value for --release argument:" + comp)); //$NON-NLS-1$
+					"Invalid value for --release argument:" + comp)); //$NON-NLS-1$
 		}
 	}
 
 	/**
-	 * Set up the paths where modules and regular classes need to be read. We need to deal with two different kind of
+	 * Set up the paths where modules and regular classes need to be read. We need
+	 * to deal with two different kind of
 	 * formats of cy.sym, see {@link CtSym} javadoc.
 	 *
 	 * @see CtSym
@@ -118,7 +118,7 @@ public class ClasspathJrtWithReleaseOption extends ClasspathJrt {
 		Path modPath = this.fs.getPath(this.releaseCode + (this.ctSym.isJRE12Plus() ? "" : "-modules")); //$NON-NLS-1$ //$NON-NLS-2$
 		if (Files.exists(modPath)) {
 			this.modulePath = modPath;
-			this.modPathString = this.zipFilename + "|"+ modPath.toString(); //$NON-NLS-1$
+			this.modPathString = this.zipFilename + "|" + modPath.toString(); //$NON-NLS-1$
 		}
 
 		if (!Files.exists(this.releasePath.resolve(this.releaseCode))) {
@@ -126,7 +126,7 @@ public class ClasspathJrtWithReleaseOption extends ClasspathJrt {
 			throw new CoreException(new Status(IStatus.ERROR, JavaCore.PLUGIN_ID, e.getMessage(), e));
 		}
 		if (Files.exists(this.fs.getPath(this.releaseCode, "system-modules"))) { //$NON-NLS-1$
-			this.fs = null;  // Fallback to default version, all classes are on jrt fs, not here.
+			this.fs = null; // Fallback to default version, all classes are on jrt fs, not here.
 		}
 	}
 
@@ -142,7 +142,8 @@ public class ClasspathJrtWithReleaseOption extends ClasspathJrt {
 		Map<String, SimpleSet> cache = PackageCache.computeIfAbsent(this.modPathString, key -> {
 			final Map<String, SimpleSet> packagesInModule = new HashMap<>();
 			try {
-				JRTUtil.walkModuleImage(this.jrtFile, this.release, new JrtPackageVisitor(packagesInModule), JRTUtil.NOTIFY_PACKAGES | JRTUtil.NOTIFY_MODULES);
+				JRTUtil.walkModuleImage(this.jrtFile, this.release, new JrtPackageVisitor(packagesInModule),
+						JRTUtil.NOTIFY_PACKAGES | JRTUtil.NOTIFY_MODULES);
 			} catch (IOException e) {
 				Util.log(e, "Failed to init packages for " + this.modPathString); //$NON-NLS-1$
 			}
@@ -166,7 +167,7 @@ public class ClasspathJrtWithReleaseOption extends ClasspathJrt {
 				try {
 					Files.walkFileTree(root, Collections.emptySet(), 2, new JRTUtil.AbstractFileVisitor<Path>() {
 						@Override
-						public FileVisitResult visitFile(Path f, BasicFileAttributes attrs)	throws IOException {
+						public FileVisitResult visitFile(Path f, BasicFileAttributes attrs) throws IOException {
 							if (attrs.isDirectory() || f.getNameCount() < 3) {
 								return FileVisitResult.CONTINUE;
 							}
@@ -175,7 +176,8 @@ public class ClasspathJrtWithReleaseOption extends ClasspathJrt {
 								if (content == null) {
 									return FileVisitResult.CONTINUE;
 								}
-								ClasspathJrtWithReleaseOption.this.acceptModule(content, f.getParent().getFileName().toString(), newCache);
+								ClasspathJrtWithReleaseOption.this.acceptModule(content,
+										f.getParent().getFileName().toString(), newCache);
 							}
 							return FileVisitResult.SKIP_SIBLINGS;
 						}
@@ -187,7 +189,6 @@ public class ClasspathJrtWithReleaseOption extends ClasspathJrt {
 			return newCache.isEmpty() ? null : Collections.unmodifiableMap(newCache);
 		});
 	}
-
 
 	@Override
 	public NameEnvironmentAnswer findClass(String binaryFileName, String qualifiedPackageName, String moduleName,
@@ -205,7 +206,7 @@ public class ClasspathJrtWithReleaseOption extends ClasspathJrt {
 			IBinaryType reader = null;
 			byte[] content = null;
 			String fileNameWithoutExtension = qualifiedBinaryFileName.substring(0,
-												qualifiedBinaryFileName.length() - SuffixConstants.SUFFIX_CLASS.length);
+					qualifiedBinaryFileName.length() - SuffixConstants.SUFFIX_CLASS.length);
 			if (!releaseRoots.isEmpty()) {
 				qualifiedBinaryFileName = qualifiedBinaryFileName.replace(".class", ".sig"); //$NON-NLS-1$ //$NON-NLS-2$
 				Path fullPath = this.ctSym.getFullPath(this.releaseCode, qualifiedBinaryFileName, moduleName);

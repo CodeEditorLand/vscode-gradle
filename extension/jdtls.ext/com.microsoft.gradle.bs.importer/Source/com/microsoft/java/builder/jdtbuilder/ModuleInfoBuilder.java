@@ -40,7 +40,10 @@ import org.eclipse.jdt.internal.core.CompilationGroup;
 import org.eclipse.jdt.internal.core.JavaModelStatus;
 import org.eclipse.jdt.internal.core.ModuleUpdater;
 
-/** Implementation of {@link org.eclipse.jdt.core.JavaCore#compileWithAttributes(IModuleDescription, Map)}. */
+/**
+ * Implementation of
+ * {@link org.eclipse.jdt.core.JavaCore#compileWithAttributes(IModuleDescription, Map)}.
+ */
 public class ModuleInfoBuilder {
 
 	static class BytecodeCollector implements ICompilerRequestor {
@@ -55,7 +58,8 @@ public class ModuleInfoBuilder {
 		}
 	}
 
-	public byte[] compileWithAttributes(IModuleDescription module, Map<String,String> classFileAttributes) throws JavaModelException {
+	public byte[] compileWithAttributes(IModuleDescription module, Map<String, String> classFileAttributes)
+			throws JavaModelException {
 		IJavaProject javaProject = module.getJavaProject();
 		NameEnvironment nameEnvironment = new NameEnvironment(javaProject, CompilationGroup.MAIN);
 
@@ -66,35 +70,39 @@ public class ModuleInfoBuilder {
 		ICompilationUnit[] sourceUnits = { new SourceFile(file, sourceLocation) };
 		BytecodeCollector collector = new BytecodeCollector();
 		Compiler newCompiler = new Compiler(
-									nameEnvironment,
-									DefaultErrorHandlingPolicies.exitOnFirstError(),
-									new CompilerOptions(javaProject.getOptions(true)),
-									collector,
-									ProblemFactory.getProblemFactory(Locale.getDefault()));
+				nameEnvironment,
+				DefaultErrorHandlingPolicies.exitOnFirstError(),
+				new CompilerOptions(javaProject.getOptions(true)),
+				collector,
+				ProblemFactory.getProblemFactory(Locale.getDefault()));
 		newCompiler.compile(sourceUnits);
 		return collector.bytes;
 	}
 
-	private void addModuleUpdates(IModuleDescription module, ModuleUpdater moduleUpdater, Map<String,String> classFileAttributes) {
+	private void addModuleUpdates(IModuleDescription module, ModuleUpdater moduleUpdater,
+			Map<String, String> classFileAttributes) {
 		String mainClassName = classFileAttributes.remove(String.valueOf(IAttributeNamesConstants.MODULE_MAIN_CLASS));
 		if (mainClassName != null) {
-			moduleUpdater.addModuleUpdate(module.getElementName(), m -> m.setMainClassName(mainClassName.toCharArray()), UpdateKind.MODULE);
+			moduleUpdater.addModuleUpdate(module.getElementName(), m -> m.setMainClassName(mainClassName.toCharArray()),
+					UpdateKind.MODULE);
 		}
-		String modulePackageNames = classFileAttributes.remove(String.valueOf(IAttributeNamesConstants.MODULE_PACKAGES));
+		String modulePackageNames = classFileAttributes
+				.remove(String.valueOf(IAttributeNamesConstants.MODULE_PACKAGES));
 		if (modulePackageNames != null) {
 			SimpleSetOfCharArray namesSet = new SimpleSetOfCharArray();
 			String[] providedNames = modulePackageNames.split(","); //$NON-NLS-1$
 			for (int i = 0; i < providedNames.length; i++) {
 				namesSet.add(providedNames[i].trim().toCharArray());
 			}
-			moduleUpdater.addModuleUpdate(module.getElementName(),  m -> m.setPackageNames(namesSet), UpdateKind.MODULE);
+			moduleUpdater.addModuleUpdate(module.getElementName(), m -> m.setPackageNames(namesSet), UpdateKind.MODULE);
 		}
 		if (!classFileAttributes.isEmpty()) {
-			throw new IllegalArgumentException("Unsupported key(s): "+classFileAttributes.keySet().toString()); //$NON-NLS-1$
+			throw new IllegalArgumentException("Unsupported key(s): " + classFileAttributes.keySet().toString()); //$NON-NLS-1$
 		}
 	}
 
-	private ClasspathMultiDirectory getSourceLocation(IJavaProject javaProject, NameEnvironment nameEnvironment, IModuleDescription module)
+	private ClasspathMultiDirectory getSourceLocation(IJavaProject javaProject, NameEnvironment nameEnvironment,
+			IModuleDescription module)
 			throws JavaModelException {
 		IPackageFragmentRoot root = (IPackageFragmentRoot) module.getAncestor(IJavaElement.PACKAGE_FRAGMENT_ROOT);
 		IResource rootResource = root.getCorrespondingResource();

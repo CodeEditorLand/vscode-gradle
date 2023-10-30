@@ -6,11 +6,13 @@ import { Command } from "./Command";
 export const SHOW_STOPPED_DAEMONS = "gradle.showStoppedDaemons";
 
 export class ShowStoppedDaemonsCommand extends Command {
-    constructor(private gradleDaemonsTreeDataProvider: GradleDaemonsTreeDataProvider) {
-        super();
-    }
+	constructor(
+		private gradleDaemonsTreeDataProvider: GradleDaemonsTreeDataProvider
+	) {
+		super();
+	}
 
-    async run(): Promise<void> {
-        this.gradleDaemonsTreeDataProvider.showStoppedDaemons();
-    }
+	async run(): Promise<void> {
+		this.gradleDaemonsTreeDataProvider.showStoppedDaemons();
+	}
 }

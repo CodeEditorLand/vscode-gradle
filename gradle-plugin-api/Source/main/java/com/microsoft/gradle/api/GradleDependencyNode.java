@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface GradleDependencyNode {
 	String getName();
+
 	GradleDependencyType getType();
+
 	List<GradleDependencyNode> getChildren();
 }

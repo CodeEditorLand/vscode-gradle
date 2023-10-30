@@ -91,10 +91,12 @@ public class JavaIncrementalImageBuilder extends IncrementalImageBuilder {
 	protected void removeClassFile(IPath typePath, IContainer outputFolder) throws CoreException {
 		if (typePath.lastSegment().indexOf('$') == -1) {
 			this.newState.removeQualifiedTypeName(typePath.toString());
-			// add dependents even when the type thinks it does not exist to be on the safe side
+			// add dependents even when the type thinks it does not exist to be on the safe
+			// side
 			if (JavaBuilder.DEBUG)
 				System.out.println("Found removed type " + typePath); //$NON-NLS-1$
-			addDependentsOf(typePath, true); // when member types are removed, their enclosing type is structurally changed
+			addDependentsOf(typePath, true); // when member types are removed, their enclosing type is structurally
+												// changed
 			this.newState.wasStructurallyChanged(typePath.toString());
 		}
 	}
@@ -108,40 +110,40 @@ public class JavaIncrementalImageBuilder extends IncrementalImageBuilder {
 			final IContainer sourceFolder = sourceLocation.sourceFolder;
 			final boolean isAlsoProject = sourceFolder.equals(((JavaProblemChecker) this.javaBuilder).currentProject);
 			sourceFolder.accept(
-				new IResourceProxyVisitor() {
-					@Override
-					public boolean visit(IResourceProxy proxy) throws CoreException {
-						switch(proxy.getType()) {
-							case IResource.FILE :
-								if (org.eclipse.jdt.internal.core.util.Util.isJavaLikeFileName(proxy.getName())) {
-									IResource resource = proxy.requestResource();
-									if (exclusionPatterns != null || inclusionPatterns != null)
-										if (Util.isExcluded(resource.getFullPath(), inclusionPatterns, exclusionPatterns, false))
-											return false;
-									SourceFile unit = new SourceFile((IFile) resource, sourceLocation);
-									sourceFiles.add(unit);
-								}
-								return false;
-							case IResource.FOLDER :
-								IPath folderPath = null;
-								if (isAlsoProject)
-									if (isExcludedFromProject(folderPath = proxy.requestFullPath()))
-										return false;
-								if (exclusionPatterns != null) {
-									if (folderPath == null)
-										folderPath = proxy.requestFullPath();
-									if (Util.isExcluded(folderPath, inclusionPatterns, exclusionPatterns, true)) {
-										// must walk children if inclusionPatterns != null, can skip them if == null
-										// but folder is excluded so do not create it in the output folder
-										return inclusionPatterns != null;
+					new IResourceProxyVisitor() {
+						@Override
+						public boolean visit(IResourceProxy proxy) throws CoreException {
+							switch (proxy.getType()) {
+								case IResource.FILE:
+									if (org.eclipse.jdt.internal.core.util.Util.isJavaLikeFileName(proxy.getName())) {
+										IResource resource = proxy.requestResource();
+										if (exclusionPatterns != null || inclusionPatterns != null)
+											if (Util.isExcluded(resource.getFullPath(), inclusionPatterns,
+													exclusionPatterns, false))
+												return false;
+										SourceFile unit = new SourceFile((IFile) resource, sourceLocation);
+										sourceFiles.add(unit);
 									}
-								}
+									return false;
+								case IResource.FOLDER:
+									IPath folderPath = null;
+									if (isAlsoProject)
+										if (isExcludedFromProject(folderPath = proxy.requestFullPath()))
+											return false;
+									if (exclusionPatterns != null) {
+										if (folderPath == null)
+											folderPath = proxy.requestFullPath();
+										if (Util.isExcluded(folderPath, inclusionPatterns, exclusionPatterns, true)) {
+											// must walk children if inclusionPatterns != null, can skip them if == null
+											// but folder is excluded so do not create it in the output folder
+											return inclusionPatterns != null;
+										}
+									}
+							}
+							return true;
 						}
-						return true;
-					}
-				},
-				IResource.NONE
-			);
+					},
+					IResource.NONE);
 			this.notifier.checkCancel();
 		}
 	}
@@ -151,13 +153,15 @@ public class JavaIncrementalImageBuilder extends IncrementalImageBuilder {
 		// disable entire javadoc support if not interested in diagnostics
 		Map<String, String> projectOptions = ((JavaProblemChecker) this.javaBuilder).javaProject.getOptions(true);
 		String option = projectOptions.get(JavaCore.COMPILER_PB_INVALID_JAVADOC);
-		if (option == null || option.equals(JavaCore.IGNORE)) { // TODO (frederic) see why option is null sometimes while running model tests!?
+		if (option == null || option.equals(JavaCore.IGNORE)) { // TODO (frederic) see why option is null sometimes
+																// while running model tests!?
 			option = projectOptions.get(JavaCore.COMPILER_PB_MISSING_JAVADOC_TAGS);
 			if (option == null || option.equals(JavaCore.IGNORE)) {
 				option = projectOptions.get(JavaCore.COMPILER_PB_MISSING_JAVADOC_COMMENTS);
 				if (option == null || option.equals(JavaCore.IGNORE)) {
 					option = projectOptions.get(JavaCore.COMPILER_PB_UNUSED_IMPORT);
-					if (option == null || option.equals(JavaCore.IGNORE)) { // Unused import need also to look inside javadoc comment
+					if (option == null || option.equals(JavaCore.IGNORE)) { // Unused import need also to look inside
+																			// javadoc comment
 						projectOptions.put(JavaCore.COMPILER_DOC_COMMENT_SUPPORT, JavaCore.DISABLED);
 					}
 				}
@@ -193,55 +197,57 @@ public class JavaIncrementalImageBuilder extends IncrementalImageBuilder {
 				compilerOptions,
 				this,
 				ProblemFactory.getProblemFactory(Locale.getDefault())) {
-					@Override
-					public void accept(ISourceType[] sourceTypes, PackageBinding packageBinding,
-							AccessRestriction accessRestriction) {
-						if (sourceTypes[0] instanceof SourceTypeElementInfo) {
-							// ensure to jump back to toplevel type for first one (could be a member)
-							while (sourceTypes[0].getEnclosingType() != null) {
-								sourceTypes[0] = sourceTypes[0].getEnclosingType();
-							}
-
-							CompilationResult result =
-								new CompilationResult(sourceTypes[0].getFileName(), 1, 1, this.options.maxProblemsPerUnit);
-
-							// https://bugs.eclipse.org/bugs/show_bug.cgi?id=305259, build the compilation unit in its own sand box.
-							final long savedComplianceLevel = this.options.complianceLevel;
-							final long savedSourceLevel = this.options.sourceLevel;
-
-							LookupEnvironment environment = packageBinding.environment;
-							if (environment == null)
-								environment = this.lookupEnvironment;
-
-							try {
-								IJavaProject project = ((SourceTypeElementInfo) sourceTypes[0]).getHandle().getJavaProject();
-								this.options.complianceLevel = CompilerOptions.versionToJdkLevel(project.getOption(JavaCore.COMPILER_COMPLIANCE, true));
-								this.options.sourceLevel = CompilerOptions.versionToJdkLevel(project.getOption(JavaCore.COMPILER_SOURCE, true));
-
-								// need to hold onto this
-								CompilationUnitDeclaration unit =
-									SourceTypeConverter.buildCompilationUnit(
-											sourceTypes,//sourceTypes[0] is always toplevel here
-											SourceTypeConverter.FIELD_AND_METHOD // need field and methods
-											| SourceTypeConverter.MEMBER_TYPE // need member types
-											| SourceTypeConverter.FIELD_INITIALIZATION, // need field initialization
-											environment.problemReporter,
-											result);
-								if (unit != null) {
-									environment.buildTypeBindings(unit, accessRestriction);
-									CompilationUnitDeclaration previousUnitBeingCompleted = this.lookupEnvironment.unitBeingCompleted;
-									environment.completeTypeBindings(unit);
-									this.lookupEnvironment.unitBeingCompleted = previousUnitBeingCompleted;
-								}
-							} finally {
-								this.options.complianceLevel = savedComplianceLevel;
-								this.options.sourceLevel = savedSourceLevel;
-							}
-						} else {
-							super.accept(sourceTypes, packageBinding, accessRestriction);
-						}
+			@Override
+			public void accept(ISourceType[] sourceTypes, PackageBinding packageBinding,
+					AccessRestriction accessRestriction) {
+				if (sourceTypes[0] instanceof SourceTypeElementInfo) {
+					// ensure to jump back to toplevel type for first one (could be a member)
+					while (sourceTypes[0].getEnclosingType() != null) {
+						sourceTypes[0] = sourceTypes[0].getEnclosingType();
 					}
-			};
+
+					CompilationResult result = new CompilationResult(sourceTypes[0].getFileName(), 1, 1,
+							this.options.maxProblemsPerUnit);
+
+					// https://bugs.eclipse.org/bugs/show_bug.cgi?id=305259, build the compilation
+					// unit in its own sand box.
+					final long savedComplianceLevel = this.options.complianceLevel;
+					final long savedSourceLevel = this.options.sourceLevel;
+
+					LookupEnvironment environment = packageBinding.environment;
+					if (environment == null)
+						environment = this.lookupEnvironment;
+
+					try {
+						IJavaProject project = ((SourceTypeElementInfo) sourceTypes[0]).getHandle().getJavaProject();
+						this.options.complianceLevel = CompilerOptions
+								.versionToJdkLevel(project.getOption(JavaCore.COMPILER_COMPLIANCE, true));
+						this.options.sourceLevel = CompilerOptions
+								.versionToJdkLevel(project.getOption(JavaCore.COMPILER_SOURCE, true));
+
+						// need to hold onto this
+						CompilationUnitDeclaration unit = SourceTypeConverter.buildCompilationUnit(
+								sourceTypes, // sourceTypes[0] is always toplevel here
+								SourceTypeConverter.FIELD_AND_METHOD // need field and methods
+										| SourceTypeConverter.MEMBER_TYPE // need member types
+										| SourceTypeConverter.FIELD_INITIALIZATION, // need field initialization
+								environment.problemReporter,
+								result);
+						if (unit != null) {
+							environment.buildTypeBindings(unit, accessRestriction);
+							CompilationUnitDeclaration previousUnitBeingCompleted = this.lookupEnvironment.unitBeingCompleted;
+							environment.completeTypeBindings(unit);
+							this.lookupEnvironment.unitBeingCompleted = previousUnitBeingCompleted;
+						}
+					} finally {
+						this.options.complianceLevel = savedComplianceLevel;
+						this.options.sourceLevel = savedSourceLevel;
+					}
+				} else {
+					super.accept(sourceTypes, packageBinding, accessRestriction);
+				}
+			}
+		};
 	}
 
 	@Override
@@ -274,7 +280,8 @@ public class JavaIncrementalImageBuilder extends IncrementalImageBuilder {
 	}
 
 	private IProject[] getRequiredProjects(boolean includeBinaryPrerequisites) {
-		if (this.javaBuilder.javaProject == null || this.javaBuilder.workspaceRoot == null) return new IProject[0];
+		if (this.javaBuilder.javaProject == null || this.javaBuilder.workspaceRoot == null)
+			return new IProject[0];
 
 		LinkedHashSet<IProject> projects = new LinkedHashSet<>();
 		ExternalFoldersManager externalFoldersManager = JavaModelManager.getExternalManager();
@@ -284,14 +291,17 @@ public class JavaIncrementalImageBuilder extends IncrementalImageBuilder {
 				IPath path = entry.getPath();
 				IProject p = null;
 				switch (entry.getEntryKind()) {
-					case IClasspathEntry.CPE_PROJECT :
-						p = this.javaBuilder.workspaceRoot.getProject(path.lastSegment()); // missing projects are considered too
-						if (((ClasspathEntry) entry).isOptional() && !JavaProject.hasJavaNature(p)) // except if entry is optional
+					case IClasspathEntry.CPE_PROJECT:
+						p = this.javaBuilder.workspaceRoot.getProject(path.lastSegment()); // missing projects are
+																							// considered too
+						if (((ClasspathEntry) entry).isOptional() && !JavaProject.hasJavaNature(p)) // except if entry
+																									// is optional
 							p = null;
 						break;
-					case IClasspathEntry.CPE_LIBRARY :
+					case IClasspathEntry.CPE_LIBRARY:
 						if (includeBinaryPrerequisites && path.segmentCount() > 0) {
-							// some binary resources on the class path can come from projects that are not included in the project references
+							// some binary resources on the class path can come from projects that are not
+							// included in the project references
 							IResource resource = this.javaBuilder.workspaceRoot.findMember(path.segment(0));
 							if (resource instanceof IProject) {
 								p = (IProject) resource;
@@ -305,7 +315,7 @@ public class JavaIncrementalImageBuilder extends IncrementalImageBuilder {
 				if (p != null && !projects.contains(p))
 					projects.add(p);
 			}
-		} catch(JavaModelException e) {
+		} catch (JavaModelException e) {
 			return new IProject[0];
 		}
 		IProject[] result = new IProject[projects.size()];
@@ -319,8 +329,10 @@ public class JavaIncrementalImageBuilder extends IncrementalImageBuilder {
 			return;
 		for (IProject requiredProject : requiredProjects) {
 			if (JavaBuilder.DEBUG)
-				System.out.println("About to find affected source files from required project "+ requiredProject.getName());
-			StringSet structurallyChangedTypes = this.newState.getStructurallyChangedTypes(this.javaBuilder.getLastState(requiredProject));
+				System.out.println(
+						"About to find affected source files from required project " + requiredProject.getName());
+			StringSet structurallyChangedTypes = this.newState
+					.getStructurallyChangedTypes(this.javaBuilder.getLastState(requiredProject));
 			if (structurallyChangedTypes == null) {
 				continue;
 			}

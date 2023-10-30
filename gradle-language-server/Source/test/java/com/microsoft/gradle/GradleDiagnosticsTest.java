@@ -127,7 +127,7 @@ public class GradleDiagnosticsTest {
 		List<Object> arguments = new ArrayList<>();
 		Gson gson = new GsonBuilder().create();
 		String projectPath = classpathTestPath.normalize().toString();
-		String[] scriptClasspaths = {classpathTestPath.resolve("classpath.jar").normalize().toString()};
+		String[] scriptClasspaths = { classpathTestPath.resolve("classpath.jar").normalize().toString() };
 		arguments.add(gson.toJsonTree(projectPath, String.class));
 		arguments.add(gson.toJsonTree(scriptClasspaths, String[].class));
 		params.setArguments(arguments);

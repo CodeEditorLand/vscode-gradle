@@ -16,14 +16,15 @@
 package com.microsoft.java.builder.jdtbuilder;
 
 /**
- * Exception thrown when the build should be aborted because a source file is missing/empty.
+ * Exception thrown when the build should be aborted because a source file is
+ * missing/empty.
  */
 public class MissingSourceFileException extends RuntimeException {
 
 	protected String missingSourceFile;
 	private static final long serialVersionUID = -1416609004971115719L; // backward compatible
 
-public MissingSourceFileException(String missingSourceFile) {
-	this.missingSourceFile = missingSourceFile;
-}
+	public MissingSourceFileException(String missingSourceFile) {
+		this.missingSourceFile = missingSourceFile;
+	}
 }

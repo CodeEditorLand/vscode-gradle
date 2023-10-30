@@ -60,7 +60,7 @@ public class CompressedWriter {
 	 * Write the given name UTF8 encoded.
 	 *
 	 * @param name
-	 *            chars to write
+	 *             chars to write
 	 * @see CompressedReader#readChars()
 	 **/
 	public void writeChars(char[] name) throws IOException {
@@ -70,13 +70,14 @@ public class CompressedWriter {
 	}
 
 	/**
-	 * Writes v using a list of likely values "typical". If v is element of "typical" then encode v as an index.
+	 * Writes v using a list of likely values "typical". If v is element of
+	 * "typical" then encode v as an index.
 	 * Otherwise encoded as typical.length and plain encoded v;
 	 *
 	 * @param v
-	 *            the number to write
+	 *                the number to write
 	 * @param typical
-	 *            a list of most used values
+	 *                a list of most used values
 	 *
 	 * @see CompressedReader#readIntWithHint(int[])
 	 **/
@@ -96,13 +97,14 @@ public class CompressedWriter {
 	}
 
 	/**
-	 * Write a number v which must be 0 <= v <range. Otherwise IllegalArgumentException is thrown. Encodes only as many
+	 * Write a number v which must be 0 <= v <range. Otherwise
+	 * IllegalArgumentException is thrown. Encodes only as many
 	 * bytes as needed. I.e. skipping the high bytes.
 	 *
 	 * @param v
-	 *            the number to write.
+	 *              the number to write.
 	 * @param range
-	 *            the maximal possible value of v + 1
+	 *              the maximal possible value of v + 1
 	 * @see CompressedReader#readIntInRange(int)
 	 **/
 	public void writeIntInRange(int v, int range) throws IOException {
@@ -128,11 +130,13 @@ public class CompressedWriter {
 	}
 
 	/**
-	 * Writes the given String. If the String was already written before its index in the dictionary is encoded as
-	 * index+1. Otherwise a 0 index is encoded and then the String is encoded as UTF8 and stored into dictionary.
+	 * Writes the given String. If the String was already written before its index
+	 * in the dictionary is encoded as
+	 * index+1. Otherwise a 0 index is encoded and then the String is encoded as
+	 * UTF8 and stored into dictionary.
 	 *
 	 * @param v
-	 *            the String to write
+	 *          the String to write
 	 * @see CompressedReader#readStringUsingDictionary()
 	 **/
 	public void writeStringUsingDictionary(String v) throws IOException {
@@ -152,7 +156,7 @@ public class CompressedWriter {
 	 * Writes the given String. Encoded like a char array using last string.
 	 *
 	 * @param name
-	 *            the String to write.
+	 *             the String to write.
 	 * @see CompressedReader#readStringUsingLast()
 	 **/
 	public void writeStringUsingLast(String name) throws IOException {
@@ -161,17 +165,20 @@ public class CompressedWriter {
 	}
 
 	/**
-	 * Writes the given char array and remember it. Encoded by writing the length of common leading chars with the last
-	 * given array followed by the remaining chars using a dictionary. Works best if the names are written in binary
+	 * Writes the given char array and remember it. Encoded by writing the length of
+	 * common leading chars with the last
+	 * given array followed by the remaining chars using a dictionary. Works best if
+	 * the names are written in binary
 	 * sorted order.
 	 *
 	 * @param name
-	 *            the char array to write
+	 *             the char array to write
 	 * @see CompressedReader#readCharsUsingLast()
 	 **/
 	public void writeCharsUsingLast(char[] name) throws IOException {
 		// compress by assuming the last name started with the same characters
-		// => typically(qualified name from same package) only two bytes per package + unqualified name from dictionary
+		// => typically(qualified name from same package) only two bytes per package +
+		// unqualified name from dictionary
 		int commonLength = commonLength(name, this.lastName, 255);
 		this.out.writeByte(commonLength);
 		writeStringUsingDictionary(new String(name, commonLength, name.length - commonLength));

@@ -23,7 +23,8 @@ public class CompletionUtils {
 
 	public enum CompletionKinds {
 		DEPENDENCY_GROUP("dependency_group"), DEPENDENCY_ARTIFACT("dependency_artifact"), DEPENDENCY_VERSION(
-				"dependency_version"), METHOD_CALL("method_call"), PROPERTY("property");
+				"dependency_version"),
+		METHOD_CALL("method_call"), PROPERTY("property");
 
 		private final String text;
 

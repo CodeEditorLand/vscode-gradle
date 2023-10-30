@@ -7,7 +7,8 @@ import org.eclipse.lsp4j.SemanticTokenTypes;
 
 public enum TokenType {
 	FUNCTION(SemanticTokenTypes.Function), PROPERTY(SemanticTokenTypes.Property), VARIABLE(
-			SemanticTokenTypes.Variable), PARAMETER(SemanticTokenTypes.Parameter);
+			SemanticTokenTypes.Variable),
+	PARAMETER(SemanticTokenTypes.Parameter);
 
 	private String genericName;
 

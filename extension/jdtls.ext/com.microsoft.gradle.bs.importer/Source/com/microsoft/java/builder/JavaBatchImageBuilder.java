@@ -68,40 +68,40 @@ public class JavaBatchImageBuilder extends BatchImageBuilder {
 			final IContainer sourceFolder = sourceLocation.sourceFolder;
 			final boolean isAlsoProject = sourceFolder.equals(((JavaProblemChecker) this.javaBuilder).currentProject);
 			sourceFolder.accept(
-				new IResourceProxyVisitor() {
-					@Override
-					public boolean visit(IResourceProxy proxy) throws CoreException {
-						switch(proxy.getType()) {
-							case IResource.FILE :
-								if (org.eclipse.jdt.internal.core.util.Util.isJavaLikeFileName(proxy.getName())) {
-									IResource resource = proxy.requestResource();
-									if (exclusionPatterns != null || inclusionPatterns != null)
-										if (Util.isExcluded(resource.getFullPath(), inclusionPatterns, exclusionPatterns, false))
-											return false;
-									SourceFile unit = new SourceFile((IFile) resource, sourceLocation);
-									sourceFiles.add(unit);
-								}
-								return false;
-							case IResource.FOLDER :
-								IPath folderPath = null;
-								if (isAlsoProject)
-									if (isExcludedFromProject(folderPath = proxy.requestFullPath()))
-										return false;
-								if (exclusionPatterns != null) {
-									if (folderPath == null)
-										folderPath = proxy.requestFullPath();
-									if (Util.isExcluded(folderPath, inclusionPatterns, exclusionPatterns, true)) {
-										// must walk children if inclusionPatterns != null, can skip them if == null
-										// but folder is excluded so do not create it in the output folder
-										return inclusionPatterns != null;
+					new IResourceProxyVisitor() {
+						@Override
+						public boolean visit(IResourceProxy proxy) throws CoreException {
+							switch (proxy.getType()) {
+								case IResource.FILE:
+									if (org.eclipse.jdt.internal.core.util.Util.isJavaLikeFileName(proxy.getName())) {
+										IResource resource = proxy.requestResource();
+										if (exclusionPatterns != null || inclusionPatterns != null)
+											if (Util.isExcluded(resource.getFullPath(), inclusionPatterns,
+													exclusionPatterns, false))
+												return false;
+										SourceFile unit = new SourceFile((IFile) resource, sourceLocation);
+										sourceFiles.add(unit);
 									}
-								}
+									return false;
+								case IResource.FOLDER:
+									IPath folderPath = null;
+									if (isAlsoProject)
+										if (isExcludedFromProject(folderPath = proxy.requestFullPath()))
+											return false;
+									if (exclusionPatterns != null) {
+										if (folderPath == null)
+											folderPath = proxy.requestFullPath();
+										if (Util.isExcluded(folderPath, inclusionPatterns, exclusionPatterns, true)) {
+											// must walk children if inclusionPatterns != null, can skip them if == null
+											// but folder is excluded so do not create it in the output folder
+											return inclusionPatterns != null;
+										}
+									}
+							}
+							return true;
 						}
-						return true;
-					}
-				},
-				IResource.NONE
-			);
+					},
+					IResource.NONE);
 			this.notifier.checkCancel();
 		}
 	}
@@ -111,13 +111,15 @@ public class JavaBatchImageBuilder extends BatchImageBuilder {
 		// disable entire javadoc support if not interested in diagnostics
 		Map<String, String> projectOptions = ((JavaProblemChecker) this.javaBuilder).javaProject.getOptions(true);
 		String option = projectOptions.get(JavaCore.COMPILER_PB_INVALID_JAVADOC);
-		if (option == null || option.equals(JavaCore.IGNORE)) { // TODO (frederic) see why option is null sometimes while running model tests!?
+		if (option == null || option.equals(JavaCore.IGNORE)) { // TODO (frederic) see why option is null sometimes
+																// while running model tests!?
 			option = projectOptions.get(JavaCore.COMPILER_PB_MISSING_JAVADOC_TAGS);
 			if (option == null || option.equals(JavaCore.IGNORE)) {
 				option = projectOptions.get(JavaCore.COMPILER_PB_MISSING_JAVADOC_COMMENTS);
 				if (option == null || option.equals(JavaCore.IGNORE)) {
 					option = projectOptions.get(JavaCore.COMPILER_PB_UNUSED_IMPORT);
-					if (option == null || option.equals(JavaCore.IGNORE)) { // Unused import need also to look inside javadoc comment
+					if (option == null || option.equals(JavaCore.IGNORE)) { // Unused import need also to look inside
+																			// javadoc comment
 						projectOptions.put(JavaCore.COMPILER_DOC_COMMENT_SUPPORT, JavaCore.DISABLED);
 					}
 				}
@@ -153,55 +155,57 @@ public class JavaBatchImageBuilder extends BatchImageBuilder {
 				compilerOptions,
 				this,
 				ProblemFactory.getProblemFactory(Locale.getDefault())) {
-					@Override
-					public void accept(ISourceType[] sourceTypes, PackageBinding packageBinding,
-							AccessRestriction accessRestriction) {
-						if (sourceTypes[0] instanceof SourceTypeElementInfo) {
-							// ensure to jump back to toplevel type for first one (could be a member)
-							while (sourceTypes[0].getEnclosingType() != null) {
-								sourceTypes[0] = sourceTypes[0].getEnclosingType();
-							}
-
-							CompilationResult result =
-								new CompilationResult(sourceTypes[0].getFileName(), 1, 1, this.options.maxProblemsPerUnit);
-
-							// https://bugs.eclipse.org/bugs/show_bug.cgi?id=305259, build the compilation unit in its own sand box.
-							final long savedComplianceLevel = this.options.complianceLevel;
-							final long savedSourceLevel = this.options.sourceLevel;
-
-							LookupEnvironment environment = packageBinding.environment;
-							if (environment == null)
-								environment = this.lookupEnvironment;
-
-							try {
-								IJavaProject project = ((SourceTypeElementInfo) sourceTypes[0]).getHandle().getJavaProject();
-								this.options.complianceLevel = CompilerOptions.versionToJdkLevel(project.getOption(JavaCore.COMPILER_COMPLIANCE, true));
-								this.options.sourceLevel = CompilerOptions.versionToJdkLevel(project.getOption(JavaCore.COMPILER_SOURCE, true));
-
-								// need to hold onto this
-								CompilationUnitDeclaration unit =
-									SourceTypeConverter.buildCompilationUnit(
-											sourceTypes,//sourceTypes[0] is always toplevel here
-											SourceTypeConverter.FIELD_AND_METHOD // need field and methods
-											| SourceTypeConverter.MEMBER_TYPE // need member types
-											| SourceTypeConverter.FIELD_INITIALIZATION, // need field initialization
-											environment.problemReporter,
-											result);
-								if (unit != null) {
-									environment.buildTypeBindings(unit, accessRestriction);
-									CompilationUnitDeclaration previousUnitBeingCompleted = this.lookupEnvironment.unitBeingCompleted;
-									environment.completeTypeBindings(unit);
-									this.lookupEnvironment.unitBeingCompleted = previousUnitBeingCompleted;
-								}
-							} finally {
-								this.options.complianceLevel = savedComplianceLevel;
-								this.options.sourceLevel = savedSourceLevel;
-							}
-						} else {
-							super.accept(sourceTypes, packageBinding, accessRestriction);
-						}
+			@Override
+			public void accept(ISourceType[] sourceTypes, PackageBinding packageBinding,
+					AccessRestriction accessRestriction) {
+				if (sourceTypes[0] instanceof SourceTypeElementInfo) {
+					// ensure to jump back to toplevel type for first one (could be a member)
+					while (sourceTypes[0].getEnclosingType() != null) {
+						sourceTypes[0] = sourceTypes[0].getEnclosingType();
 					}
-			};
+
+					CompilationResult result = new CompilationResult(sourceTypes[0].getFileName(), 1, 1,
+							this.options.maxProblemsPerUnit);
+
+					// https://bugs.eclipse.org/bugs/show_bug.cgi?id=305259, build the compilation
+					// unit in its own sand box.
+					final long savedComplianceLevel = this.options.complianceLevel;
+					final long savedSourceLevel = this.options.sourceLevel;
+
+					LookupEnvironment environment = packageBinding.environment;
+					if (environment == null)
+						environment = this.lookupEnvironment;
+
+					try {
+						IJavaProject project = ((SourceTypeElementInfo) sourceTypes[0]).getHandle().getJavaProject();
+						this.options.complianceLevel = CompilerOptions
+								.versionToJdkLevel(project.getOption(JavaCore.COMPILER_COMPLIANCE, true));
+						this.options.sourceLevel = CompilerOptions
+								.versionToJdkLevel(project.getOption(JavaCore.COMPILER_SOURCE, true));
+
+						// need to hold onto this
+						CompilationUnitDeclaration unit = SourceTypeConverter.buildCompilationUnit(
+								sourceTypes, // sourceTypes[0] is always toplevel here
+								SourceTypeConverter.FIELD_AND_METHOD // need field and methods
+										| SourceTypeConverter.MEMBER_TYPE // need member types
+										| SourceTypeConverter.FIELD_INITIALIZATION, // need field initialization
+								environment.problemReporter,
+								result);
+						if (unit != null) {
+							environment.buildTypeBindings(unit, accessRestriction);
+							CompilationUnitDeclaration previousUnitBeingCompleted = this.lookupEnvironment.unitBeingCompleted;
+							environment.completeTypeBindings(unit);
+							this.lookupEnvironment.unitBeingCompleted = previousUnitBeingCompleted;
+						}
+					} finally {
+						this.options.complianceLevel = savedComplianceLevel;
+						this.options.sourceLevel = savedSourceLevel;
+					}
+				} else {
+					super.accept(sourceTypes, packageBinding, accessRestriction);
+				}
+			}
+		};
 	}
 
 	@Override
