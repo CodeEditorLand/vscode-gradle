@@ -40,8 +40,7 @@ public class ClasspathMultiReleaseJar extends ClasspathJar {
 		this.compliance = compliance;
 	}
 
-	public ClasspathMultiReleaseJar(ZipFile zipFile, AccessRuleSet accessRuleSet, boolean isOnModulePath,
-			String compliance) {
+	public ClasspathMultiReleaseJar(ZipFile zipFile, AccessRuleSet accessRuleSet, boolean isOnModulePath, String compliance) {
 		this(zipFile.getName(), 0, accessRuleSet, null, isOnModulePath, compliance);
 		this.zipFile = zipFile;
 		this.closeZipFileAtEnd = true;
@@ -50,7 +49,7 @@ public class ClasspathMultiReleaseJar extends ClasspathJar {
 	@Override
 	IModule initializeModule() {
 		IModule mod = null;
-		try (ZipFile file = new ZipFile(this.zipFilename)) {
+		try (ZipFile file = new ZipFile(this.zipFilename)){
 			ClassFileReader classfile = null;
 			try {
 				for (String path : supportedVersions(file)) {
@@ -61,7 +60,7 @@ public class ClasspathMultiReleaseJar extends ClasspathJar {
 				}
 
 			} catch (Exception e) {
-				Util.log(e, "Failed to initialize module for: " + this); //$NON-NLS-1$
+				Util.log(e, "Failed to initialize module for: " + this);  //$NON-NLS-1$
 				// move on to the default
 			}
 			if (classfile == null) {
@@ -71,7 +70,7 @@ public class ClasspathMultiReleaseJar extends ClasspathJar {
 				mod = classfile.getModuleDeclaration();
 			}
 		} catch (ClassFormatException | IOException e) {
-			Util.log(e, "Failed to initialize module for: " + this); //$NON-NLS-1$
+			Util.log(e, "Failed to initialize module for: " + this);  //$NON-NLS-1$
 		}
 		return mod;
 	}
@@ -103,7 +102,7 @@ public class ClasspathMultiReleaseJar extends ClasspathJar {
 	@Override
 	protected String readJarContent(final SimpleSet packageSet) {
 		String modInfo = null;
-		for (Enumeration<? extends ZipEntry> e = this.zipFile.entries(); e.hasMoreElements();) {
+		for (Enumeration<? extends ZipEntry> e = this.zipFile.entries(); e.hasMoreElements(); ) {
 			String fileName = ((ZipEntry) e.nextElement()).getName();
 			if (fileName.startsWith(META_INF_VERSIONS) && fileName.length() > META_INF_LENGTH) {
 				int i = fileName.indexOf('/', META_INF_LENGTH);
@@ -132,7 +131,7 @@ public class ClasspathMultiReleaseJar extends ClasspathJar {
 		for (String path : supportedVersions(this.zipFile)) {
 			String s = null;
 			try {
-				s = META_INF_VERSIONS + path + "/" + binaryFileName; //$NON-NLS-1$
+				s = META_INF_VERSIONS + path + "/" + binaryFileName;  //$NON-NLS-1$
 				ZipEntry entry = this.zipFile.getEntry(s);
 				if (entry == null)
 					continue;
@@ -152,7 +151,7 @@ public class ClasspathMultiReleaseJar extends ClasspathJar {
 					return createAnswer(fileNameWithoutExtension, reader, modName);
 				}
 			} catch (IOException | ClassFormatException e) {
-				Util.log(e, "Failed to find class for: " + s + " in: " + this); //$NON-NLS-1$ //$NON-NLS-2$
+				Util.log(e, "Failed to find class for: " + s + " in: " + this);  //$NON-NLS-1$ //$NON-NLS-2$
 				// treat as if class file is missing
 			}
 		}

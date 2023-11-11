@@ -7,8 +7,6 @@ import java.util.List;
 
 public interface GradleMethod {
 	String getName();
-
 	List<String> getParameterTypes();
-
 	boolean getDeprecated();
 }

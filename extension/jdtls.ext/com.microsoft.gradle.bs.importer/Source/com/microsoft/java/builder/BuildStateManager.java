@@ -53,19 +53,15 @@ public class BuildStateManager implements ISaveParticipant {
 	/**
 	 * The singleton manager
 	 */
-	private static BuildStateManager MANAGER = new BuildStateManager();
+	private static BuildStateManager MANAGER= new BuildStateManager();
 
 	/** should the state.dat be gzip compressed? **/
 	private static final boolean SAVE_ZIPPED = !Boolean.getBoolean("org.eclipse.jdt.disable_gzip"); //$NON-NLS-1$
-	/**
-	 * Thread count for parallel save - if any value is set. Any value <= 1 will
-	 * disable parallel save.
-	 **/
+	/** Thread count for parallel save - if any value is set. Any value <= 1 will disable parallel save. **/
 	private static final Integer SAVE_THREAD_COUNT = Integer.getInteger("org.eclipse.jdt.model_save_threads"); //$NON-NLS-1$
 	/**
 	 * Table from IProject to PerProjectInfo.
-	 * NOTE: this object itself is used as a lock to synchronize creation/removal of
-	 * per project infos
+	 * NOTE: this object itself is used as a lock to synchronize creation/removal of per project infos
 	 */
 	protected Map<IProject, ProjectInfo> perProjectInfos = new HashMap<>(5);
 
@@ -88,8 +84,7 @@ public class BuildStateManager implements ISaveParticipant {
 	}
 
 	public final static boolean hasBSPNature(IProject project) {
-		// TODO not only for gradle bs project, it can also be applied to other bsp
-		// projects in future.
+		// TODO not only for gradle bs project, it can also be applied to other bsp projects in future.
 		try {
 			return project.hasNature(GradleBuildServerProjectNature.NATURE_ID);
 		} catch (CoreException e) {
@@ -126,8 +121,7 @@ public class BuildStateManager implements ISaveParticipant {
 	private void savingTimed(ISaveContext context) throws CoreException {
 		IProject savedProject = context.getProject();
 		if (savedProject != null) {
-			if (!hasBSPNature(savedProject))
-				return; // ignore
+			if (!hasBSPNature(savedProject)) return; // ignore
 			ProjectInfo info = getPerProjectInfo(savedProject, true /* create info */);
 			saveState(info, context);
 			return;
@@ -137,15 +131,11 @@ public class BuildStateManager implements ISaveParticipant {
 		synchronized (this.perProjectInfos) {
 			infos = new ArrayList<>(this.perProjectInfos.values());
 		}
-		int parallelism = Math.max(1,
-				SAVE_THREAD_COUNT == null ? Math.min(infos.size(), 50) : SAVE_THREAD_COUNT.intValue());
-		// Never use a shared ForkJoinPool.commonPool() as it may be busy with other
-		// tasks, which might deadlock.
+		int parallelism = Math.max(1, SAVE_THREAD_COUNT == null ? Math.min(infos.size(), 50) : SAVE_THREAD_COUNT.intValue());
+		// Never use a shared ForkJoinPool.commonPool() as it may be busy with other tasks, which might deadlock.
 		// Also use a custom ForkJoinWorkerThreadFactory, to prevent issues with a
-		// potential SecurityManager, since the threads created by it get no
-		// permissions.
-		// See related problem in eclipse-platform
-		// https://github.com/eclipse-platform/eclipse.platform/issues/294
+		// potential SecurityManager, since the threads created by it get no permissions.
+		// See related problem in eclipse-platform https://github.com/eclipse-platform/eclipse.platform/issues/294
 		ForkJoinPool forkJoinPool = new ForkJoinPool(parallelism, //
 				pool -> new ForkJoinWorkerThread(pool) {
 					// anonymous subclass to access protected constructor
@@ -166,8 +156,7 @@ public class BuildStateManager implements ISaveParticipant {
 			forkJoinPool.shutdown();
 		}
 		if (stats.length > 0) {
-			throw new CoreException(
-					new MultiStatus(JavaCore.PLUGIN_ID, IStatus.ERROR, stats, Messages.build_cannotSaveStates, null));
+			throw new CoreException(new MultiStatus(JavaCore.PLUGIN_ID, IStatus.ERROR, stats, Messages.build_cannotSaveStates, null));
 		}
 	}
 
@@ -183,7 +172,7 @@ public class BuildStateManager implements ISaveParticipant {
 				System.out.println(project + " is not a BSP Java project"); //$NON-NLS-1$
 			return null; // should never be requested on non-Java projects
 		}
-		ProjectInfo info = getPerProjectInfo(project, true/* create if missing */);
+		ProjectInfo info = getPerProjectInfo(project, true/*create if missing*/);
 		if (!info.triedRead) {
 			info.triedRead = true;
 			try {
@@ -203,7 +192,7 @@ public class BuildStateManager implements ISaveParticipant {
 	public void setLastBuiltState(IProject project, Object state) {
 		if (hasBSPNature(project)) {
 			// should never be requested on non-Java projects
-			ProjectInfo info = getPerProjectInfo(project, true /* create if missing */);
+			ProjectInfo info = getPerProjectInfo(project, true /*create if missing*/);
 			info.triedRead = true; // no point trying to re-read once using setter
 			info.savedState = state;
 		}
@@ -212,21 +201,20 @@ public class BuildStateManager implements ISaveParticipant {
 				File file = getSerializationFile(project);
 				if (file != null && file.exists())
 					file.delete();
-			} catch (SecurityException se) {
+			} catch(SecurityException se) {
 				// could not delete file: cannot do much more
 			}
 		}
 	}
 
 	/*
-	 * Returns the per-project info for the given project. If specified, create the
-	 * info if the info doesn't exist.
+	 * Returns the per-project info for the given project. If specified, create the info if the info doesn't exist.
 	 */
 	public ProjectInfo getPerProjectInfo(IProject project, boolean create) {
-		synchronized (this.perProjectInfos) { // use the perProjectInfo collection as its own lock
-			ProjectInfo info = this.perProjectInfos.get(project);
+		synchronized(this.perProjectInfos) { // use the perProjectInfo collection as its own lock
+			ProjectInfo info= this.perProjectInfos.get(project);
 			if (info == null && create) {
-				info = new ProjectInfo(project);
+				info= new ProjectInfo(project);
 				this.perProjectInfos.put(project, info);
 			}
 			return info;
@@ -235,8 +223,7 @@ public class BuildStateManager implements ISaveParticipant {
 
 	private void saveState(ProjectInfo info, ISaveContext context) throws CoreException {
 		// passed this point, save actions are non trivial
-		if (context.getKind() == ISaveContext.SNAPSHOT)
-			return;
+		if (context.getKind() == ISaveContext.SNAPSHOT) return;
 
 		// save built state
 		if (info.triedRead) {
@@ -269,8 +256,7 @@ public class BuildStateManager implements ISaveParticipant {
 		if (JavaBuilder.DEBUG)
 			System.out.println(Messages.bind(Messages.build_saveStateProgress, info.project.getName()));
 		File file = getSerializationFile(info.project);
-		if (file == null)
-			return;
+		if (file == null) return;
 		long t = System.currentTimeMillis();
 		try {
 			try (DataOutputStream out = new DataOutputStream(createOutputStream(file))) {
@@ -286,12 +272,12 @@ public class BuildStateManager implements ISaveParticipant {
 		} catch (RuntimeException | IOException e) {
 			try {
 				file.delete();
-			} catch (SecurityException se) {
+			} catch(SecurityException se) {
 				// could not delete file: cannot do much more
 			}
 			throw new CoreException(
-					new Status(IStatus.ERROR, JavaCore.PLUGIN_ID, Platform.PLUGIN_ERROR,
-							Messages.bind(Messages.build_cannotSaveState, info.project.getName()), e));
+				new Status(IStatus.ERROR, JavaCore.PLUGIN_ID, Platform.PLUGIN_ERROR,
+					Messages.bind(Messages.build_cannotSaveState, info.project.getName()), e));
 		}
 		if (JavaBuilder.DEBUG) {
 			t = System.currentTimeMillis() - t;
@@ -308,17 +294,15 @@ public class BuildStateManager implements ISaveParticipant {
 	}
 
 	/**
-	 * Returns the File to use for saving and restoring the last built state for the
-	 * given project.
+	 * Returns the File to use for saving and restoring the last built state for the given project.
 	 */
 	private File getSerializationFile(IProject project) {
-		if (!project.exists())
-			return null;
+		if (!project.exists()) return null;
 		IPath workingLocation = project.getWorkingLocation(JavaCore.PLUGIN_ID);
 		return workingLocation.append("buildstate.dat").toFile(); //$NON-NLS-1$
 	}
 
-	private Object readStateTimed(IProject project) throws CoreException {
+		private Object readStateTimed(IProject project) throws CoreException {
 		File file = getSerializationFile(project);
 		if (file != null && file.exists()) {
 			try (DataInputStream in = new DataInputStream(createInputStream(file))) {
@@ -334,8 +318,7 @@ public class BuildStateManager implements ISaveParticipant {
 					System.out.println("Saved state thinks last build failed for " + project.getName()); //$NON-NLS-1$
 			} catch (Exception e) {
 				e.printStackTrace();
-				throw new CoreException(new Status(IStatus.ERROR, JavaCore.PLUGIN_ID, Platform.PLUGIN_ERROR,
-						"Error reading last build state for project " + project.getName(), e)); //$NON-NLS-1$
+				throw new CoreException(new Status(IStatus.ERROR, JavaCore.PLUGIN_ID, Platform.PLUGIN_ERROR, "Error reading last build state for project "+ project.getName(), e)); //$NON-NLS-1$
 			}
 		} else if (JavaBuilder.DEBUG) {
 			if (file == null)

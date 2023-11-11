@@ -25,7 +25,7 @@ import com.microsoft.java.builder.jdtbuilder.JavaBuilder;
 import com.microsoft.java.builder.jdtbuilder.NameEnvironment;
 
 public class JavaProblemChecker extends JavaBuilder {
-	public static final String BUILDER_ID = "java.bs.JavaProblemChecker";
+    public static final String BUILDER_ID = "java.bs.JavaProblemChecker";
 
 	protected BatchImageBuilder createBatchImageBuilder(BatchImageBuilder batchImageBuilder, boolean buildStarting,
 			CompilationGroup group) {

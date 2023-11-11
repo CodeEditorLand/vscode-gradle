@@ -78,12 +78,11 @@ public class CompressedReader {
 	}
 
 	/**
-	 * Reads an integer number by decoding its index into the given "typical" Array.
-	 * If the index is out of bounds
+	 * Reads an integer number by decoding its index into the given "typical" Array. If the index is out of bounds
 	 * decode the plain Integer.
 	 *
 	 * @param typical
-	 *                The same range that has been used during writing.
+	 *            The same range that has been used during writing.
 	 * @see CompressedWriter#writeIntWithHint(int, int[])
 	 **/
 	public int readIntWithHint(int[] typical) throws IOException {
@@ -96,11 +95,10 @@ public class CompressedReader {
 	}
 
 	/**
-	 * Reads an integer number by only reading its low bytes. The number of bytes
-	 * written depends on the given range.
+	 * Reads an integer number by only reading its low bytes. The number of bytes written depends on the given range.
 	 *
 	 * @param range
-	 *              The same range that has been used during writing.
+	 *            The same range that has been used during writing.
 	 * @see CompressedWriter#writeIntInRange(int, int)
 	 **/
 	public int readIntInRange(int range) throws IOException {
@@ -120,10 +118,8 @@ public class CompressedReader {
 	}
 
 	/**
-	 * Reads an array of chars by using this first common chars of the last result.
-	 * The number of common chars is
-	 * decoded from a single byte. The remaining chars are read using the
-	 * dictionary.
+	 * Reads an array of chars by using this first common chars of the last result. The number of common chars is
+	 * decoded from a single byte. The remaining chars are read using the dictionary.
 	 *
 	 * @see CompressedWriter#writeCharsUsingLast(char[])
 	 **/

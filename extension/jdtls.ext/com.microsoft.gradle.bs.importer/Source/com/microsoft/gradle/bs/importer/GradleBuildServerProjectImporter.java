@@ -42,300 +42,310 @@ import ch.epfl.scala.bsp4j.InitializeBuildResult;
 
 public class GradleBuildServerProjectImporter extends AbstractProjectImporter {
 
-	private static final String CLIENT_NAME = "jdtls";
+    private static final String CLIENT_NAME = "jdtls";
 
-	private static final String CLIENT_VERSION = "0.1.0";
+    private static final String CLIENT_VERSION = "0.1.0";
 
-	private static final String BSP_VERSION = "2.1.0-M4";
+    private static final String BSP_VERSION = "2.1.0-M4";
 
-	private static final String SCHEMA_VERSION_KEY = "bspSchemaVersion";
-	private static final String SCHEMA_VERSION = "0.1.0";
+    private static final String SCHEMA_VERSION_KEY = "bspSchemaVersion";
+    private static final String SCHEMA_VERSION = "0.1.0";
 
-	public static final String BUILD_GRADLE_DESCRIPTOR = "build.gradle";
-	public static final String BUILD_GRADLE_KTS_DESCRIPTOR = "build.gradle.kts";
-	public static final String SETTINGS_GRADLE_DESCRIPTOR = "settings.gradle";
-	public static final String SETTINGS_GRADLE_KTS_DESCRIPTOR = "settings.gradle.kts";
-	public static final String ANDROID_MANIFEST = "AndroidManifest.xml";
+    public static final String BUILD_GRADLE_DESCRIPTOR = "build.gradle";
+    public static final String BUILD_GRADLE_KTS_DESCRIPTOR = "build.gradle.kts";
+    public static final String SETTINGS_GRADLE_DESCRIPTOR = "settings.gradle";
+    public static final String SETTINGS_GRADLE_KTS_DESCRIPTOR = "settings.gradle.kts";
+    public static final String ANDROID_MANIFEST = "AndroidManifest.xml";
 
-	@Override
-	public boolean applies(IProgressMonitor monitor) throws OperationCanceledException, CoreException {
-		if (rootFolder == null) {
-			return false;
-		}
+    @Override
+    public boolean applies(IProgressMonitor monitor) throws OperationCanceledException, CoreException {
+        if (rootFolder == null) {
+            return false;
+        }
 
-		if (!Utils.isBuildServerEnabled(getPreferences())) {
-			return false;
-		}
 
-		// if the current root already contains Gradle Java project
-		// imported by Buildship, skip the build server importer.
-		for (IProject project : ProjectUtils.getGradleProjects()) {
-			if (ProjectUtils.isJavaProject(project)
-					&& project.getLocation().toFile().toPath().startsWith(rootFolder.toPath())) {
-				return false;
-			}
-		}
+        if (!Utils.isBuildServerEnabled(getPreferences())) {
+            return false;
+        }
 
-		if (directories == null) {
-			BasicFileDetector gradleDetector = new BasicFileDetector(rootFolder.toPath(), BUILD_GRADLE_DESCRIPTOR,
-					SETTINGS_GRADLE_DESCRIPTOR, BUILD_GRADLE_KTS_DESCRIPTOR, SETTINGS_GRADLE_KTS_DESCRIPTOR)
-					.includeNested(false)
-					.addExclusions("**/build") // default gradle build dir
-					.addExclusions("**/bin");
-			directories = gradleDetector.scan(monitor);
-		}
+        // if the current root already contains Gradle Java project
+        // imported by Buildship, skip the build server importer.
+        for (IProject project : ProjectUtils.getGradleProjects()) {
+            if (ProjectUtils.isJavaProject(project)
+                    && project.getLocation().toFile().toPath().startsWith(rootFolder.toPath())) {
+                Telemetry telemetry = new Telemetry("hasBuildshipJavaProject", "true");
+                Utils.sendTelemetry(JavaLanguageServerPlugin.getProjectsManager().getConnection(),
+                        telemetry);
+                return false;
+            }
+        }
 
-		if (directories.isEmpty()) {
-			return false;
-		}
+        if (directories == null) {
+            BasicFileDetector gradleDetector = new BasicFileDetector(rootFolder.toPath(), BUILD_GRADLE_DESCRIPTOR,
+                    SETTINGS_GRADLE_DESCRIPTOR, BUILD_GRADLE_KTS_DESCRIPTOR, SETTINGS_GRADLE_KTS_DESCRIPTOR)
+                    .includeNested(false)
+                    .addExclusions("**/build") //default gradle build dir
+                    .addExclusions("**/bin");
+            directories = gradleDetector.scan(monitor);
+        }
 
-		for (java.nio.file.Path directory : directories) {
-			// we don't support android
-			BasicFileDetector androidDetector = new BasicFileDetector(directory, ANDROID_MANIFEST)
-					.includeNested(false)
-					.addExclusions("**/build") // default gradle build dir
-					.addExclusions("**/bin");
-			Collection<java.nio.file.Path> androidDirectories = androidDetector.scan(monitor);
-			if (!androidDirectories.isEmpty()) {
-				Telemetry telemetry = new Telemetry("hasAndroidManifest", "true");
-				Utils.sendTelemetry(JavaLanguageServerPlugin.getProjectsManager().getConnection(),
-						telemetry);
-				return false;
-			}
-		}
+        if (directories.isEmpty()) {
+            return false;
+        }
 
-		return true;
-	}
+        for (java.nio.file.Path directory : directories) {
+            // we don't support android
+            BasicFileDetector androidDetector = new BasicFileDetector(directory, ANDROID_MANIFEST)
+                .includeNested(false)
+                .addExclusions("**/build") //default gradle build dir
+                .addExclusions("**/bin");
+            Collection<java.nio.file.Path> androidDirectories = androidDetector.scan(monitor);
+            if (!androidDirectories.isEmpty()) {
+                Telemetry telemetry = new Telemetry("hasAndroidManifest", "true");
+                Utils.sendTelemetry(JavaLanguageServerPlugin.getProjectsManager().getConnection(),
+                        telemetry);
+                return false;
+            }
+        }
 
-	@Override
-	public boolean applies(Collection<IPath> projectConfigurations, IProgressMonitor monitor)
-			throws OperationCanceledException, CoreException {
-		if (rootFolder == null) {
-			return false;
-		}
+        Telemetry telemetry = new Telemetry("hasAndroidManifest", "false");
+        Utils.sendTelemetry(JavaLanguageServerPlugin.getProjectsManager().getConnection(),
+                telemetry);
+        return true;
+    }
 
-		if (!Utils.isBuildServerEnabled(getPreferences())) {
-			return false;
-		}
+    @Override
+    public boolean applies(Collection<IPath> projectConfigurations, IProgressMonitor monitor)
+            throws OperationCanceledException, CoreException {
+        if (rootFolder == null) {
+            return false;
+        }
 
-		Collection<java.nio.file.Path> directories = findProjectPathByConfigurationName(
-				projectConfigurations,
-				Arrays.asList(
-						BUILD_GRADLE_DESCRIPTOR,
-						SETTINGS_GRADLE_DESCRIPTOR,
-						BUILD_GRADLE_KTS_DESCRIPTOR,
-						SETTINGS_GRADLE_KTS_DESCRIPTOR),
-				false /* includeNested */
-		);
 
-		return !directories.isEmpty() && !importedByOtherImporters(directories);
-	}
+        if (!Utils.isBuildServerEnabled(getPreferences())) {
+            return false;
+        }
 
-	@Override
-	public void importToWorkspace(IProgressMonitor monitor) throws OperationCanceledException, CoreException {
-		IPath rootPath = ResourceUtils.filePathFromURI(rootFolder.toURI().toString());
-		BuildServerConnection buildServer = ImporterPlugin.getBuildServerConnection(rootPath);
+        this.directories = findProjectPathByConfigurationName(
+            projectConfigurations,
+            Arrays.asList(
+                BUILD_GRADLE_DESCRIPTOR,
+                SETTINGS_GRADLE_DESCRIPTOR,
+                BUILD_GRADLE_KTS_DESCRIPTOR,
+                SETTINGS_GRADLE_KTS_DESCRIPTOR
+            ),
+            false /*includeNested*/
+        );
 
-		// for all the path in this.directories, find the out most directory which
-		// belongs
-		// to rootFolder and use that directory as the root folder for the build server.
-		java.nio.file.Path inferredRoot = this.directories.stream()
-				.filter(directory -> directory.startsWith(rootFolder.toPath()))
-				.sorted((p1, p2) -> p1.getNameCount() - p2.getNameCount())
-				.findFirst()
-				.orElse(rootFolder.toPath());
-		InitializeBuildParams params = new InitializeBuildParams(
-				CLIENT_NAME,
-				CLIENT_VERSION,
-				BSP_VERSION,
-				inferredRoot.toUri().toString(),
-				new BuildClientCapabilities(java.util.Collections.singletonList("java")));
-		BuildServerPreferences data = getBuildServerPreferences();
-		params.setData(data);
-		InitializeBuildResult initializeResult = buildServer.buildInitialize(params).join();
-		buildServer.onBuildInitialized();
-		// TODO: save the capabilities of this server
+        return !directories.isEmpty() && !importedByOtherImporters(directories);
+    }
 
-		if (monitor.isCanceled()) {
-			return;
-		}
+    @Override
+    public void importToWorkspace(IProgressMonitor monitor) throws OperationCanceledException, CoreException {
+        IPath rootPath = ResourceUtils.filePathFromURI(rootFolder.toURI().toString());
+        BuildServerConnection buildServer = ImporterPlugin.getBuildServerConnection(rootPath);
 
-		List<IProject> projects = importProjects(buildServer, monitor);
-		if (projects.isEmpty()) {
-			return;
-		}
+        // for all the path in this.directories, find the out most directory which belongs
+        // to rootFolder and use that directory as the root folder for the build server.
+        // TODO: consider the following folder structure
+        //   ROOT
+        //    |-- sub1
+        //    |-- sub2
+        //    |-- sub3
+        // if user partially selects sub1 and sub2, we should still use ROOT as the root folder
+        // and only import sub1 and sub2 as projects.
+        java.nio.file.Path inferredRoot = this.directories.stream()
+                .filter(directory -> directory.startsWith(rootFolder.toPath()))
+                .sorted((p1, p2) -> p1.getNameCount() - p2.getNameCount())
+                .findFirst()
+                .orElse(rootFolder.toPath());
+        InitializeBuildParams params = new InitializeBuildParams(
+                CLIENT_NAME,
+                CLIENT_VERSION,
+                BSP_VERSION,
+                inferredRoot.toUri().toString(),
+                new BuildClientCapabilities(java.util.Collections.singletonList("java"))
+        );
+        BuildServerPreferences data = getBuildServerPreferences();
+        params.setData(data);
+        InitializeBuildResult initializeResult = buildServer.buildInitialize(params).join();
+        buildServer.onBuildInitialized();
+        // TODO: save the capabilities of this server
 
-		GradleBuildServerBuildSupport buildSupport = new GradleBuildServerBuildSupport();
-		for (IProject project : projects) {
-			buildSupport.updateClasspath(project, monitor);
-		}
+        if (monitor.isCanceled()) {
+            return;
+        }
 
-		// We need to add the project dependencies after the Java nature is set to all
-		// the projects, which is done in 'updateClasspath(IProject, IProgressMonitor)',
-		// otherwise JDT will thrown exception when adding projects as dependencies.
-		for (IProject project : projects) {
-			buildSupport.updateProjectDependencies(project, monitor);
-		}
+        List<IProject> projects = importProjects(buildServer, monitor);
+        if (projects.isEmpty()) {
+            return;
+        }
 
-		for (IProject project : projects) {
-			updateConfigurationDigest(project);
-		}
-	}
+        GradleBuildServerBuildSupport buildSupport = new GradleBuildServerBuildSupport();
+        for (IProject project : projects) {
+            buildSupport.updateClasspath(project, monitor);
+        }
 
-	@Override
-	public boolean isResolved(File folder) throws OperationCanceledException, CoreException {
-		// TOOD: Once the upstream GradleProjectImporter has been updated to not import
-		// when
-		// the gradle project has already imported by other importers, we can modify
-		// this logic
-		// so that Maven importer can be involved for other projects.
-		for (IProject project : ProjectUtils.getAllProjects()) {
-			if (Utils.isGradleBuildServerProject(project) &&
-					project.getLocation().toPath().startsWith(folder.toPath())) {
-				return true;
-			}
-		}
-		return false;
-	}
+        // We need to add the project dependencies after the Java nature is set to all
+        // the projects, which is done in 'updateClasspath(IProject, IProgressMonitor)',
+        // otherwise JDT will thrown exception when adding projects as dependencies.
+        for (IProject project : projects) {
+            buildSupport.updateProjectDependencies(project, monitor);
+        }
 
-	@Override
-	public void reset() {
-		// do nothing
-	}
+        for (IProject project : projects) {
+            updateConfigurationDigest(project);
+        }
+    }
 
-	/**
-	 * Update the digest of the gradle configuration file. Return <code>true</code>
-	 * if
-	 * the digest is updated, <code>false</code> otherwise.
-	 * 
-	 * @throws CoreException
-	 */
-	public static boolean updateConfigurationDigest(IProject project) {
-		DigestStore digestStore = ImporterPlugin.getDigestStore();
-		boolean result = false;
-		try {
-			File buildFile = project.getFile(BUILD_GRADLE_DESCRIPTOR).getLocation().toFile();
-			result = (buildFile.exists() && digestStore.updateDigest(buildFile.toPath())) || result;
+    @Override
+    public boolean isResolved(File folder) throws OperationCanceledException, CoreException {
+        // TOOD: Once the upstream GradleProjectImporter has been updated to not import when
+        // the gradle project has already imported by other importers, we can modify this logic
+        // so that Maven importer can be involved for other projects.
+        for (IProject project : ProjectUtils.getAllProjects()) {
+            if (Utils.isGradleBuildServerProject(project) &&
+                    project.getLocation().toPath().startsWith(folder.toPath())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-			File settingsFile = project.getFile(SETTINGS_GRADLE_DESCRIPTOR).getLocation().toFile();
-			result = (settingsFile.exists() && digestStore.updateDigest(settingsFile.toPath())) || result;
+    @Override
+    public void reset() {
+        // do nothing
+    }
 
-			File buildKtsFile = project.getFile(BUILD_GRADLE_KTS_DESCRIPTOR).getLocation().toFile();
-			result = (buildKtsFile.exists() && digestStore.updateDigest(buildKtsFile.toPath())) || result;
+    /**
+     * Update the digest of the gradle configuration file. Return <code>true</code> if
+     * the digest is updated, <code>false</code> otherwise.
+     * @throws CoreException
+     */
+    public static boolean updateConfigurationDigest(IProject project) {
+        DigestStore digestStore = ImporterPlugin.getDigestStore();
+        boolean result = false;
+        try {
+            File buildFile = project.getFile(BUILD_GRADLE_DESCRIPTOR).getLocation().toFile();
+            result = (buildFile.exists() && digestStore.updateDigest(buildFile.toPath())) || result;
 
-			File settingsKtsFile = project.getFile(SETTINGS_GRADLE_KTS_DESCRIPTOR).getLocation().toFile();
-			result = (settingsKtsFile.exists() && digestStore.updateDigest(settingsKtsFile.toPath())) || result;
-		} catch (CoreException e) {
-			JavaLanguageServerPlugin.logException("Failed to update digest for Gradle configuration file", e);
-		}
+            File settingsFile = project.getFile(SETTINGS_GRADLE_DESCRIPTOR).getLocation().toFile();
+            result = (settingsFile.exists() && digestStore.updateDigest(settingsFile.toPath())) || result;
 
-		return result;
-	}
+            File buildKtsFile = project.getFile(BUILD_GRADLE_KTS_DESCRIPTOR).getLocation().toFile();
+            result = (buildKtsFile.exists() && digestStore.updateDigest(buildKtsFile.toPath())) || result;
 
-	/**
-	 * Return false if any of the input folder has already been imported as a
-	 * Java project by other importer.
-	 */
-	private boolean importedByOtherImporters(Collection<java.nio.file.Path> directories) {
-		return directories.stream()
-				.map(directory -> ProjectUtils.getProjectFromUri(directory.toUri().toString()))
-				.anyMatch(project -> !Utils.isGradleBuildServerProject(project) &&
-						ProjectUtils.isJavaProject(project));
-	}
+            File settingsKtsFile = project.getFile(SETTINGS_GRADLE_KTS_DESCRIPTOR).getLocation().toFile();
+            result = (settingsKtsFile.exists() && digestStore.updateDigest(settingsKtsFile.toPath())) || result;
+        } catch (CoreException e) {
+            JavaLanguageServerPlugin.logException("Failed to update digest for Gradle configuration file", e);
+        }
 
-	/**
-	 * Import the projects according to the available build targets. If a build
-	 * target
-	 * maps to a project that is already imported by other importer
-	 *
-	 * @throws CoreException
-	 */
-	private List<IProject> importProjects(BuildServerConnection buildServer, IProgressMonitor monitor)
-			throws CoreException {
-		Map<URI, List<BuildTarget>> buildTargetMap = Utils.getBuildTargetsMappedByProjectPath(buildServer);
-		List<IProject> projects = new LinkedList<>();
-		for (Entry<URI, List<BuildTarget>> entrySet : buildTargetMap.entrySet()) {
-			URI uri = entrySet.getKey();
-			IProject project = ProjectUtils.getProjectFromUri(uri.toString());
-			if (project == null) {
-				project = createProject(new File(uri), monitor);
-			} else if (!project.isAccessible() || !Utils.isGradleBuildServerProject(project)) {
-				// skip project already imported by other importers.
-				continue;
-			} else {
-				updateProjectDescription(project, monitor);
-			}
+        return result;
+    }
 
-			project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
-			projects.add(project);
-		}
-		return projects;
-	}
+    /**
+     * Return false if any of the input folder has already been imported as a
+     * Java project by other importer.
+     */
+    private boolean importedByOtherImporters(Collection<java.nio.file.Path> directories) {
+        return directories.stream()
+            .map(directory -> ProjectUtils.getProjectFromUri(directory.toUri().toString()))
+            .anyMatch(project -> !Utils.isGradleBuildServerProject(project) &&
+                    ProjectUtils.isJavaProject(project)
+            );
+    }
 
-	private IProject createProject(File directory, IProgressMonitor monitor) throws CoreException {
-		String projectName = findFreeProjectName(directory.getName());
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IProjectDescription projectDescription = workspace.newProjectDescription(projectName);
-		if (projectDescription instanceof ProjectDescription description) {
-			VariableDescription variableDescription = new VariableDescription(SCHEMA_VERSION_KEY, SCHEMA_VERSION);
-			description.setVariableDescription(SCHEMA_VERSION_KEY, variableDescription);
-		}
-		projectDescription.setLocation(Path.fromOSString(directory.getPath()));
-		projectDescription.setNatureIds(new String[] { GradleBuildServerProjectNature.NATURE_ID });
-		ICommand buildSpec = Utils.getBuildServerBuildSpec(projectDescription);
-		ICommand problemReporter = projectDescription.newCommand();
-		problemReporter.setBuilderName(JavaProblemChecker.BUILDER_ID);
-		projectDescription.setBuildSpec(new ICommand[] { problemReporter, buildSpec });
-		IProject project = workspace.getRoot().getProject(projectName);
-		project.create(projectDescription, monitor);
+    /**
+     * Import the projects according to the available build targets. If a build target
+     * maps to a project that is already imported by other importer
+     *
+     * @throws CoreException
+     */
+    private List<IProject> importProjects(BuildServerConnection buildServer, IProgressMonitor monitor) throws CoreException {
+        Map<URI, List<BuildTarget>> buildTargetMap = Utils.getBuildTargetsMappedByProjectPath(buildServer);
+        List<IProject> projects = new LinkedList<>();
+        for (Entry<URI, List<BuildTarget>> entrySet : buildTargetMap.entrySet()) {
+            URI uri = entrySet.getKey();
+            IProject project = ProjectUtils.getProjectFromUri(uri.toString());
+            if (project == null) {
+                project = createProject(new File(uri), monitor);
+            } else if (!project.isAccessible() || !Utils.isGradleBuildServerProject(project)) {
+                // skip project already imported by other importers.
+                continue;
+            } else {
+                updateProjectDescription(project, monitor);
+            }
 
-		project.open(IResource.NONE, monitor);
-		return project;
-	}
+            project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+            projects.add(project);
+        }
+        return projects;
+    }
 
-	private void updateProjectDescription(IProject project, IProgressMonitor monitor) throws CoreException {
-		SubMonitor progress = SubMonitor.convert(monitor, 1);
-		IProjectDescription projectDescription = project.getDescription();
-		Utils.removeBuildshipConfigurations(projectDescription);
+    private IProject createProject(File directory, IProgressMonitor monitor) throws CoreException {
+        String projectName = findFreeProjectName(directory.getName());
+        IWorkspace workspace = ResourcesPlugin.getWorkspace();
+        IProjectDescription projectDescription = workspace.newProjectDescription(projectName);
+        if (projectDescription instanceof ProjectDescription description) {
+            VariableDescription variableDescription = new VariableDescription(SCHEMA_VERSION_KEY, SCHEMA_VERSION);
+            description.setVariableDescription(SCHEMA_VERSION_KEY, variableDescription);
+        }
+        projectDescription.setLocation(Path.fromOSString(directory.getPath()));
+        projectDescription.setNatureIds(new String[]{ GradleBuildServerProjectNature.NATURE_ID });
+        ICommand buildSpec = Utils.getBuildServerBuildSpec(projectDescription);
+        ICommand problemReporter = projectDescription.newCommand();
+        problemReporter.setBuilderName(JavaProblemChecker.BUILDER_ID);
+        projectDescription.setBuildSpec(new ICommand[]{ problemReporter, buildSpec});
+        IProject project = workspace.getRoot().getProject(projectName);
+        project.create(projectDescription, monitor);
 
-		ICommand problemReporter = projectDescription.newCommand();
-		problemReporter.setBuilderName(JavaProblemChecker.BUILDER_ID);
-		Utils.addBuildSpec(projectDescription, new ICommand[] {
-				Utils.getBuildServerBuildSpec(projectDescription),
-				problemReporter
-		});
-		project.setDescription(projectDescription, IResource.AVOID_NATURE_CONFIG, progress.newChild(1));
+        project.open(IResource.NONE, monitor);
+        return project;
+    }
 
-		// Here we don't use the public API: {@code project.setDescription()} to update
-		// the project,
-		// because that API will ignore the variable descriptions.
-		if (project instanceof Project internalProject) {
-			ProjectDescription description = internalProject.internalGetDescription();
-			VariableDescription variableDescription = new VariableDescription(SCHEMA_VERSION_KEY, SCHEMA_VERSION);
-			boolean changed = description.setVariableDescription(SCHEMA_VERSION_KEY, variableDescription);
-			if (changed) {
-				internalProject.writeDescription(IResource.NONE);
-			}
-		}
-	}
+    private void updateProjectDescription(IProject project, IProgressMonitor monitor) throws CoreException {
+        SubMonitor progress = SubMonitor.convert(monitor, 1);
+        IProjectDescription projectDescription = project.getDescription();
+        Utils.removeBuildshipConfigurations(projectDescription);
 
-	private String findFreeProjectName(String baseName) {
-		IProject project = Arrays.stream(ProjectUtils.getAllProjects())
-				.filter(p -> p.getName().equals(baseName)).findFirst().orElse(null);
-		return project != null ? findFreeProjectName(baseName + "_") : baseName;
-	}
+        ICommand problemReporter = projectDescription.newCommand();
+        problemReporter.setBuilderName(JavaProblemChecker.BUILDER_ID);
+        Utils.addBuildSpec(projectDescription, new ICommand[] {
+            Utils.getBuildServerBuildSpec(projectDescription),
+            problemReporter
+        });
+        project.setDescription(projectDescription, IResource.AVOID_NATURE_CONFIG, progress.newChild(1));
 
-	private BuildServerPreferences getBuildServerPreferences() {
-		BuildServerPreferences pref = new BuildServerPreferences();
-		Preferences jdtlsPreferences = getPreferences();
-		pref.setWrapperEnabled(jdtlsPreferences.isGradleWrapperEnabled());
-		pref.setGradleArguments(jdtlsPreferences.getGradleArguments());
-		pref.setGradleHome(jdtlsPreferences.getGradleHome());
-		pref.setGradleJavaHome(jdtlsPreferences.getGradleJavaHome());
-		pref.setGradleJvmArguments(jdtlsPreferences.getGradleJvmArguments());
-		pref.setGradleUserHome(jdtlsPreferences.getGradleUserHome());
-		pref.setGradleVersion(jdtlsPreferences.getGradleVersion());
-		pref.setJdks(EclipseVmUtil.getAllVmInstalls());
-		return pref;
-	}
+        // Here we don't use the public API: {@code project.setDescription()} to update the project,
+        // because that API will ignore the variable descriptions.
+        if (project instanceof Project internalProject) {
+            ProjectDescription description = internalProject.internalGetDescription();
+            VariableDescription variableDescription = new VariableDescription(SCHEMA_VERSION_KEY, SCHEMA_VERSION);
+            boolean changed = description.setVariableDescription(SCHEMA_VERSION_KEY, variableDescription);
+            if (changed) {
+                internalProject.writeDescription(IResource.NONE);
+            }
+        }
+    }
+
+    private String findFreeProjectName(String baseName) {
+        IProject project = Arrays.stream(ProjectUtils.getAllProjects())
+                .filter(p -> p.getName().equals(baseName)).findFirst().orElse(null);
+        return project != null ? findFreeProjectName(baseName + "_") : baseName;
+    }
+
+    private BuildServerPreferences getBuildServerPreferences() {
+        BuildServerPreferences pref = new BuildServerPreferences();
+        Preferences jdtlsPreferences = getPreferences();
+        pref.setWrapperEnabled(jdtlsPreferences.isGradleWrapperEnabled());
+        pref.setGradleArguments(jdtlsPreferences.getGradleArguments());
+        pref.setGradleHome(jdtlsPreferences.getGradleHome());
+        pref.setGradleJavaHome(jdtlsPreferences.getGradleJavaHome());
+        pref.setGradleJvmArguments(jdtlsPreferences.getGradleJvmArguments());
+        pref.setGradleUserHome(jdtlsPreferences.getGradleUserHome());
+        pref.setGradleVersion(jdtlsPreferences.getGradleVersion());
+        pref.setJdks(EclipseVmUtil.getAllVmInstalls());
+        return pref;
+    }
 }

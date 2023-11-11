@@ -23,7 +23,6 @@ import org.eclipse.jdt.internal.compiler.env.ICompilationUnit;
 /**
  * Used to convert an IFile into an ICompilationUnit,
  * for clients outside of this package.
- * 
  * @since 3.3
  */
 public interface ICompilationUnitLocator {

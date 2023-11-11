@@ -5,6 +5,5 @@ package com.microsoft.gradle.api;
 
 public interface GradleField {
 	String getName();
-
 	boolean getDeprecated();
 }

@@ -11,38 +11,33 @@ import { getGradleConfig } from "../util/config";
 const lock = new AwaitLock();
 
 export class GradleBuildContentProvider {
-	private cachedBuild: Map<string, GradleBuild> = new Map();
+    private cachedBuild: Map<string, GradleBuild> = new Map();
 
-	constructor(private readonly client: GradleClient) {}
+    constructor(private readonly client: GradleClient) {}
 
-	public async getGradleBuild(
-		rootProject: RootProject
-	): Promise<GradleBuild | undefined> {
-		await lock.acquireAsync();
-		try {
-			const projectPath = rootProject.getProjectUri().fsPath;
-			if (this.cachedBuild.has(projectPath)) {
-				return this.cachedBuild.get(projectPath);
-			}
-			const gradleBuild = await this.client.getBuild(
-				rootProject,
-				getGradleConfig()
-			);
-			if (gradleBuild) {
-				await syncGradleBuild(gradleBuild);
-				this.cachedBuild.set(projectPath, gradleBuild);
-			}
-			return gradleBuild;
-		} finally {
-			lock.release();
-		}
-	}
+    public async getGradleBuild(rootProject: RootProject): Promise<GradleBuild | undefined> {
+        await lock.acquireAsync();
+        try {
+            const projectPath = rootProject.getProjectUri().fsPath;
+            if (this.cachedBuild.has(projectPath)) {
+                return this.cachedBuild.get(projectPath);
+            }
+            const gradleBuild = await this.client.getBuild(rootProject, getGradleConfig());
+            if (gradleBuild) {
+                await syncGradleBuild(gradleBuild);
+                this.cachedBuild.set(projectPath, gradleBuild);
+            }
+            return gradleBuild;
+        } finally {
+            lock.release();
+        }
+    }
 
-	public refresh(): void {
-		this.cachedBuild.clear();
-	}
+    public refresh(): void {
+        this.cachedBuild.clear();
+    }
 
-	public getCachedBuild(): Map<string, GradleBuild> {
-		return this.cachedBuild;
-	}
+    public getCachedBuild(): Map<string, GradleBuild> {
+        return this.cachedBuild;
+    }
 }

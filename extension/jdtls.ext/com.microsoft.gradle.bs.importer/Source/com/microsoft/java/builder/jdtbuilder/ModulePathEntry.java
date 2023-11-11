@@ -15,6 +15,7 @@
  *******************************************************************************/
 package com.microsoft.java.builder.jdtbuilder;
 
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -32,7 +33,7 @@ import org.eclipse.jdt.internal.compiler.env.IMultiModuleEntry;
 public class ModulePathEntry implements IModulePathEntry {
 
 	private IPath path;
-	/* private */ ClasspathLocation[] locations;
+	/*private*/ ClasspathLocation[] locations;
 	IModule module;
 	boolean isAutomaticModule;
 
@@ -43,17 +44,14 @@ public class ModulePathEntry implements IModulePathEntry {
 		this.isAutomaticModule = module.isAutomatic();
 		initializeModule();
 	}
-
 	public ModulePathEntry(IPath path, ClasspathLocation location) {
 		this.path = path;
 		initModule(location);
-		this.locations = new ClasspathLocation[] { location };
+		this.locations = new ClasspathLocation[] {location};
 	}
-
 	public IPath getPath() {
 		return this.path;
 	}
-
 	public ClasspathLocation[] getClasspathLocations() {
 		return this.locations;
 	}
@@ -68,7 +66,6 @@ public class ModulePathEntry implements IModulePathEntry {
 	public boolean isAutomaticModule() {
 		return this.isAutomaticModule;
 	}
-
 	public static IModule getAutomaticModule(ClasspathLocation location) {
 		if (location instanceof ClasspathJar) {
 			ClasspathJar classpathJar = (ClasspathJar) location;
@@ -79,12 +76,11 @@ public class ModulePathEntry implements IModulePathEntry {
 		}
 		return null;
 	}
-
 	private void initModule(ClasspathLocation location) {
 		IModule mod = null;
 		if (location instanceof ClasspathJar) {
 			mod = ((ClasspathJar) location).initializeModule();
-		} else if (location instanceof ClasspathDirectory) {
+		} else if (location instanceof ClasspathDirectory){
 			mod = ((ClasspathDirectory) location).initializeModule();
 		}
 		if (mod != null) {
@@ -97,17 +93,14 @@ public class ModulePathEntry implements IModulePathEntry {
 		location.setModule(this.module);
 	}
 
-	// TODO: This is only needed because SourceFile.module() uses the module set on
-	// the location
-	// Once we have a mechanism to map a folder to a module path entry, this should
-	// no longer be
+	// TODO: This is only needed because SourceFile.module() uses the module set on the location
+	// Once we have a mechanism to map a folder to a module path entry, this should no longer be
 	// needed
 	private void initializeModule() {
 		for (int i = 0; i < this.locations.length; i++) {
 			this.locations[i].setModule(this.module);
 		}
 	}
-
 	@Override
 	public char[][] getModulesDeclaringPackage(String qualifiedPackageName, String moduleName) {
 		if (moduleName != null && ((this.module == null) || !moduleName.equals(String.valueOf(this.module.name()))))
@@ -121,7 +114,6 @@ public class ModulePathEntry implements IModulePathEntry {
 		}
 		return names == CharOperation.NO_CHAR_CHAR ? null : names;
 	}
-
 	@Override
 	public boolean hasCompilationUnit(String qualifiedPackageName, String moduleName) {
 		for (ClasspathLocation cp : this.locations) {
@@ -144,8 +136,7 @@ public class ModulePathEntry implements IModulePathEntry {
 	}
 
 	/**
-	 * Combines an IMultiModuleEntry with further locations in order to support
-	 * patch-module.
+	 * Combines an IMultiModuleEntry with further locations in order to support patch-module.
 	 * Implemented by adding IMultiModuleEntry functionality to ModulePathEntry.
 	 */
 	static public class Multi extends ModulePathEntry implements IMultiModuleEntry {
@@ -155,8 +146,8 @@ public class ModulePathEntry implements IModulePathEntry {
 		}
 
 		void addPatchLocation(ClasspathLocation location) {
-			this.locations = Arrays.copyOf(this.locations, this.locations.length + 1);
-			this.locations[this.locations.length - 1] = location;
+			this.locations = Arrays.copyOf(this.locations, this.locations.length+1);
+			this.locations[this.locations.length-1] = location;
 			location.setModule(this.module);
 		}
 

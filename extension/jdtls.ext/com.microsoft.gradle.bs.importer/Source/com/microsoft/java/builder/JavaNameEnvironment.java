@@ -32,16 +32,14 @@ public class JavaNameEnvironment extends NameEnvironment {
 
 	public JavaNameEnvironment(IJavaProject javaProject, CompilationGroup compilationGroup) throws CoreException {
 		super(javaProject, compilationGroup);
-		this.delegateEnvironment = new SearchableEnvironment((JavaProject) javaProject, (WorkingCopyOwner) null,
-				compilationGroup == CompilationGroup.MAIN);
+		this.delegateEnvironment = new SearchableEnvironment((JavaProject) javaProject, (WorkingCopyOwner) null, compilationGroup == CompilationGroup.MAIN);
 	}
 
 	public JavaNameEnvironment(IWorkspaceRoot root, JavaProject javaProject,
 			SimpleLookupTable binaryLocationsPerProject, BuildNotifier notifier, CompilationGroup compilationGroup)
 			throws CoreException {
 		super(root, javaProject, binaryLocationsPerProject, notifier, compilationGroup);
-		this.delegateEnvironment = new SearchableEnvironment(javaProject, (WorkingCopyOwner) null,
-				compilationGroup == CompilationGroup.MAIN);
+		this.delegateEnvironment = new SearchableEnvironment(javaProject, (WorkingCopyOwner) null, compilationGroup == CompilationGroup.MAIN);
 	}
 
 	@Override
