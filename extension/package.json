@@ -1,13 +1,32 @@
 {
-	"activationEvents": [
-		"workspaceContains:**/gradlew",
-		"workspaceContains:**/gradlew.bat",
-		"workspaceContains:build.gradle",
-		"workspaceContains:settings.gradle",
-		"workspaceContains:build.gradle.kts",
-		"workspaceContains:settings.gradle.kts"
-	],
-	"aiKey": "b4aae7d0-c65b-4819-92bf-1d2f537ae7ce",
+	"name": "vscode-gradle",
+	"displayName": "Gradle for Java",
+	"version": "0.0.1",
+	"private": false,
+	"description": "Manage Gradle Projects, run Gradle tasks and provide better Gradle file authoring experience in VS Code",
+	"homepage": "https://github.com/CodeEditorLand/Foundation#readme",
+	"bugs": {
+		"url": "https://github.com/CodeEditorLand/Foundation/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/CodeEditorLand/Foundation.git"
+	},
+	"license": "SEE LICENSE IN LICENSE",
+	"author": {
+		"name": "Playform",
+		"email": "Hello@Playform.Cloud",
+		"url": "https://playform.cloud"
+	},
+	"type": "module",
+	"main": "./dist/index.js",
+	"scripts": {
+		"compile": "tsc -p . && webpack --config webpack.config.js --mode production",
+		"compile:test": "tsc -p .",
+		"preinstall:ext": "vsce package",
+		"prepublishOnly": "TypeScriptESBuild 'Source/**/*.ts'",
+		"update-tpn": "node scripts/update-third-party-notice.js"
+	},
 	"contributes": {
 		"commands": [
 			{
@@ -905,6 +924,14 @@
 			]
 		}
 	},
+	"activationEvents": [
+		"workspaceContains:**/gradlew",
+		"workspaceContains:**/gradlew.bat",
+		"workspaceContains:build.gradle",
+		"workspaceContains:settings.gradle",
+		"workspaceContains:build.gradle.kts",
+		"workspaceContains:settings.gradle.kts"
+	],
 	"dependencies": {
 		"await-lock": "^2.2.2",
 		"fs-extra": "^11.1.0",
@@ -917,7 +944,6 @@
 		"vscode-extension-telemetry-wrapper": "0.13.3",
 		"vscode-languageclient": "7.0.0"
 	},
-	"description": "Manage Gradle Projects, run Gradle tasks and provide better Gradle file authoring experience in VS Code",
 	"devDependencies": {
 		"@grpc/grpc-js": "^1.8.11",
 		"@types/fs-extra": "^11.0.1",
@@ -941,17 +967,10 @@
 		"webpack": "^5.76.0",
 		"webpack-cli": "^5.0.1"
 	},
-	"displayName": "Gradle for Java",
-	"icon": "resources/icon.png",
-	"main": "./dist/index.js",
-	"name": "vscode-gradle",
-	"readme": "README.md",
-	"scripts": {
-		"compile": "tsc -p . && webpack --config webpack.config.js --mode production",
-		"compile:test": "tsc -p .",
-		"preinstall:ext": "vsce package",
-		"prepublishOnly": "TypeScriptESBuild 'Source/**/*.ts'",
-		"update-tpn": "node scripts/update-third-party-notice.js"
+	"publishConfig": {
+		"access": "public"
 	},
-	"type": "module"
+	"icon": "resources/icon.png",
+	"aiKey": "b4aae7d0-c65b-4819-92bf-1d2f537ae7ce",
+	"readme": "README.md"
 }

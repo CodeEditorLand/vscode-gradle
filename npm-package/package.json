@@ -1,24 +1,43 @@
 {
+	"name": "vscode-gradle",
+	"displayName": "Gradle Tasks",
+	"version": "0.0.1",
+	"private": false,
+	"description": "Type definitions for the Gradle Tasks vscode extension",
+	"homepage": "https://github.com/CodeEditorLand/Foundation#readme",
+	"bugs": {
+		"url": "https://github.com/CodeEditorLand/Foundation/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/CodeEditorLand/Foundation.git"
+	},
+	"license": "SEE LICENSE IN LICENSE",
+	"author": {
+		"name": "Playform",
+		"email": "Hello@Playform.Cloud",
+		"url": "https://playform.cloud"
+	},
+	"maintainers": [
+		"Richard Willis <willis.rh@gmail.com>"
+	],
+	"type": "module",
+	"main": "./index.js",
+	"types": "./index.ts",
+	"scripts": {
+		"compile": "tsc -p .",
+		"prepublishOnly": "TypeScriptESBuild 'Source/**/*.ts'"
+	},
 	"dependencies": {
 		"@grpc/grpc-js": "^1.6.7",
 		"@types/google-protobuf": "^3.15.6",
 		"@types/vscode": "^1.63.0"
 	},
-	"description": "Type definitions for the Gradle Tasks vscode extension",
 	"devDependencies": {
 		"typescript": "^4.6.4",
 		"typescript-esbuild": "0.4.5"
 	},
-	"displayName": "Gradle Tasks",
-	"main": "./index.js",
-	"maintainers": [
-		"Richard Willis <willis.rh@gmail.com>"
-	],
-	"name": "vscode-gradle",
-	"scripts": {
-		"compile": "tsc -p .",
-		"prepublishOnly": "TypeScriptESBuild 'Source/**/*.ts'"
-	},
-	"type": "module",
-	"types": "./index.ts"
+	"publishConfig": {
+		"access": "public"
+	}
 }
