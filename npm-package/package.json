@@ -33,7 +33,7 @@
 		"prepublishOnly": "Build 'Source/**/*.ts'"
 	},
 	"dependencies": {
-		"@grpc/grpc-js": "1.10.6",
+		"@grpc/grpc-js": "1.10.7",
 		"@types/google-protobuf": "3.15.12"
 	},
 	"devDependencies": {
