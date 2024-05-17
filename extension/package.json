@@ -1,27 +1,7 @@
 {
 	"name": "vscode-gradle",
 	"displayName": "Gradle for Java",
-	"version": "0.0.1",
-	"private": false,
 	"description": "Manage Gradle Projects, run Gradle tasks and provide better Gradle file authoring experience in VS Code",
-	"keywords": [
-		"land"
-	],
-	"homepage": "HTTPS://GitHub.Com/CodeEditorLand/LandGradle#readme",
-	"bugs": {
-		"url": "HTTPS://GitHub.Com/CodeEditorLand/LandGradle/issues"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+HTTPS://github.com/CodeEditorLand/LandGradle.git"
-	},
-	"license": "SEE LICENSE IN LICENSE",
-	"author": {
-		"name": "🛬 Land —",
-		"email": "Land@PlayForm.Cloud",
-		"url": "HTTPS://Land.PlayForm.Cloud"
-	},
-	"type": "module",
 	"main": "./dist/index.js",
 	"scripts": {
 		"Document": "Document 'Source/**/*.ts'",
@@ -949,7 +929,6 @@
 	"devDependencies": {
 		"@grpc/grpc-js": "1.10.7",
 		"@playform/build": "0.0.7",
-		"@playform/document": "0.0.6",
 		"@types/fs-extra": "11.0.4",
 		"@types/glob": "8.1.0",
 		"@types/google-protobuf": "3.15.12",
@@ -961,9 +940,6 @@
 		"sinon": "17.0.1",
 		"ts-loader": "9.5.1",
 		"ts-protoc-gen": "0.15.0"
-	},
-	"publishConfig": {
-		"access": "public"
 	},
 	"icon": "resources/icon.png",
 	"aiKey": "b4aae7d0-c65b-4819-92bf-1d2f537ae7ce",
