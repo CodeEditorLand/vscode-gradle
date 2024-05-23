@@ -5,7 +5,6 @@ target/
 bin/
 
 # Mac OS X files
-.DS_Store
 
 # Eclipse files
 .settings
