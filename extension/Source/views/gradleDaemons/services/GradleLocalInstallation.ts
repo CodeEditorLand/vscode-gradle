@@ -1,8 +1,5 @@
 import { GradleExecution } from "./GradleExecution";
 import { execAsync } from "../../../util/execAsync";
-import { getConfigJavaImportGradleJavaHome } from "../../../util/config";
-import { logger } from "../../../logger";
-
 export class GradleLocalInstallation implements GradleExecution {
     private gradleHomePath: string;
 
@@ -18,17 +15,13 @@ export class GradleLocalInstallation implements GradleExecution {
         const command = `${this.gradleHomePath} ${args.join(" ")}`;
 
         try {
-            const jdkPath = getConfigJavaImportGradleJavaHome();
-            const env = jdkPath ? { ...process.env, JAVA_HOME: jdkPath } : process.env;
-
-            const { stdout, stderr } = await execAsync(command, { env });
+            const { stdout, stderr } = await execAsync(command);
             if (stderr) {
-                logger.error(stderr);
+                throw new Error(`Error running gradle: ${stderr}`);
             }
             return stdout;
         } catch (error) {
-            logger.error(error.message);
-            throw new Error(`Error running gradle local installation: ${error.message}`);
+            throw new Error(`Error running gradle: ${error.message}`);
         }
     }
 }
