@@ -1,0 +1,388 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Extension",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}/extension"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/extension/dist/**/*.js"
+      ],
+      "preLaunchTask": "Gradle: Build",
+      "presentation": {
+        "group": "debug",
+        "order": 1
+      },
+      "env": {
+        "DEBUG_VSCODE_JAVA":"true"
+      },
+    },
+    {
+      "type": "java",
+      "name": "Attach to JDT.LS Plugin",
+      "request": "attach",
+      "hostName": "localhost",
+      "port": "1044",
+      "projectName": "com.microsoft.gradle.bs.importer"
+    },
+    {
+      "type": "java",
+      "name": "Debug Server",
+      "request": "launch",
+      "mainClass": "com.github.badsyntax.gradle.GradleServer",
+      "projectName": "gradle-server",
+      "cwd": "${workspaceFolder}/gradle-server",
+      "presentation": {
+        "group": "debug",
+        "order": 2,
+        "hidden": true
+      }
+    },
+    {
+      "name": "Debug Extension with Debug Server",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}/extension"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/extension/dist/**/*.js"
+      ],
+      "preLaunchTask": "Gradle: Build",
+      "env": {
+        "VSCODE_DEBUG_SERVER": "true"
+      },
+      "presentation": {
+        "hidden": true
+      }
+    },
+    {
+      "name": "Debug Extension & Gradle Plugin",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}/extension"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/extension/dist/**/*.js"
+      ],
+      "preLaunchTask": "Gradle: Build",
+      "env": {
+        "VSCODE_DEBUG_PLUGIN": "true"
+      },
+      "presentation": {
+        "group": "debug",
+        "order": 2
+      }
+    },
+    {
+      "name": "Debug Extension & Build Server",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}/extension"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/extension/dist/**/*.js"
+      ],
+      "preLaunchTask": "Gradle: Build",
+      "presentation": {
+        "group": "debug",
+        "order": 3
+      },
+      "env": {
+        "DEBUG_GRADLE_BUILD_SERVER":"true"
+      },
+    },
+    {
+      "name": "Debug Language Server: Launch Extension",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}/extension"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/extension/dist/**/*.js"
+      ],
+      "preLaunchTask": "Gradle: Build",
+      "env": {
+        "VSCODE_DEBUG_LANGUAGE_SERVER": "true",
+        "VSCODE_GRADLE_PORT": "6006"
+      },
+      "presentation": {
+        "group": "debug",
+        "order": 4
+      }
+    },
+    {
+      "type": "java",
+      "name": "Debug Language Server: Launch Language Server",
+      "request": "launch",
+      "mainClass": "com.microsoft.gradle.GradleLanguageServer",
+      "projectName": "gradle-language-server",
+      "env": {
+        "VSCODE_GRADLE_PORT": "6006"
+      },
+      "presentation": {
+        "group": "debug",
+        "order": 5
+      }
+    },
+    {
+      "type": "java",
+      "name": "Attach to Gradle Plugin",
+      "request": "attach",
+      "hostName": "localhost",
+      "projectName": "gradle-plugin",
+      "port": 5005,
+      "presentation": {
+        "group": "debug",
+        "order": 6
+      }
+    },
+    {
+      "name": "Test: Groovy Default",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "env": {
+        "FIXTURE_NAME": "gradle-groovy-default-build-file",
+        "VSCODE_TEST": "true",
+        "SUITE_NAME": "Run tests with Gradle"
+      },
+      "args": [
+        "--disable-extensions",
+        "--extensionDevelopmentPath=${workspaceFolder}/extension",
+        "--extensionTestsPath=${workspaceFolder}/extension/out/test/integration/gradle",
+        "${workspaceFolder}/extension/test-fixtures/gradle-groovy-default-build-file"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/extension/dist/**/*.js",
+        "${workspaceFolder}/extension/out/**/*.js"
+      ],
+      "preLaunchTask": "Gradle: Build Test",
+      "presentation": {
+        "group": "test"
+      }
+    },
+    {
+      "name": "Test: Kotlin Default",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "env": {
+        "FIXTURE_NAME": "gradle-kotlin-default-build-file",
+        "VSCODE_TEST": "true",
+        "SUITE_NAME": "Run tests with Gradle"
+      },
+      "args": [
+        "--disable-extensions",
+        "--extensionDevelopmentPath=${workspaceFolder}/extension",
+        "--extensionTestsPath=${workspaceFolder}/extension/out/test/integration/gradle",
+        "${workspaceFolder}/extension/test-fixtures/gradle-kotlin-default-build-file"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/extension/dist/**/*.js",
+        "${workspaceFolder}/extension/out/**/*.js"
+      ],
+      "preLaunchTask": "Gradle: Build Test",
+      "presentation": {
+        "group": "test"
+      }
+    },
+    {
+      "name": "Test: Groovy Custom",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "env": {
+        "FIXTURE_NAME": "gradle-groovy-custom-build-file",
+        "VSCODE_TEST": "true",
+        "SUITE_NAME": "Run tests with Gradle"
+      },
+      "args": [
+        "--disable-extensions",
+        "--extensionDevelopmentPath=${workspaceFolder}/extension",
+        "--extensionTestsPath=${workspaceFolder}/extension/out/test/integration/gradle",
+        "${workspaceFolder}/extension/test-fixtures/gradle-groovy-custom-build-file"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/extension/dist/**/*.js",
+        "${workspaceFolder}/extension/out/**/*.js"
+      ],
+      "preLaunchTask": "Gradle: Build Test",
+      "presentation": {
+        "group": "test"
+      }
+    },
+    {
+      "name": "Test: Nested Projects",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "env": {
+        "FIXTURE_NAME": "test-fixtures",
+        "VSCODE_TEST": "true",
+        "SUITE_NAME": "Run nested project tests"
+      },
+      "args": [
+        "--disable-extensions",
+        "--extensionDevelopmentPath=${workspaceFolder}/extension",
+        "--extensionTestsPath=${workspaceFolder}/extension/out/test/integration/nested-projects",
+        "${workspaceFolder}/extension/test-fixtures"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/extension/dist/**/*.js",
+        "${workspaceFolder}/extension/out/**/*.js"
+      ],
+      "preLaunchTask": "Gradle: Build Test",
+      "presentation": {
+        "group": "test"
+      }
+    },
+    {
+      "name": "Test: No-Gradle",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "env": {
+        "VSCODE_TEST": "true",
+        "SUITE_NAME": "Run tests without Gradle"
+      },
+      "args": [
+        "--disable-extensions",
+        "--extensionDevelopmentPath=${workspaceFolder}/extension",
+        "--extensionTestsPath=${workspaceFolder}/extension/out/test/integration/no-gradle/",
+        "${workspaceFolder}/extension/test-fixtures/no-gradle"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/extension/dist/**/*.js",
+        "${workspaceFolder}/extension/out/**/*.js"
+      ],
+      "preLaunchTask": "Gradle: Build Test",
+      "presentation": {
+        "group": "test"
+      }
+    },
+    {
+      "name": "Test: Multi-root",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "env": {
+        "FIXTURE_NAME": "multi-root-workspace",
+        "VSCODE_TEST": "true",
+        "SUITE_NAME": "Run tests with multi-root vscode project"
+      },
+      "args": [
+        "--disable-extensions",
+        "--extensionDevelopmentPath=${workspaceFolder}/extension",
+        "--extensionTestsPath=${workspaceFolder}/extension/out/test/integration/multi-root/",
+        "${workspaceFolder}/extension/test-fixtures/multi-root/multiple-project.code-workspace"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/extension/dist/**/*.js",
+        "${workspaceFolder}/extension/out/**/*.js"
+      ],
+      "preLaunchTask": "Gradle: Build Test",
+      "presentation": {
+        "group": "test"
+      }
+    },
+    {
+      "name": "Test: Multi-Project",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "env": {
+        "VSCODE_TEST": "true",
+        "SUITE_NAME": "Run tests with Gradle multi-project"
+      },
+      "args": [
+        "--disable-extensions",
+        "--extensionDevelopmentPath=${workspaceFolder}/extension",
+        "--extensionTestsPath=${workspaceFolder}/extension/out/test/integration/multi-project/",
+        "${workspaceFolder}/extension/test-fixtures/multi-project"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/extension/dist/**/*.js",
+        "${workspaceFolder}/extension/out/**/*.js"
+      ],
+      "preLaunchTask": "Gradle: Build Test",
+      "presentation": {
+        "group": "test"
+      }
+    },
+    {
+      "name": "Test: Network",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "env": {
+        "FIXTURE_NAME": "gradle-groovy-default-build-file",
+        "VSCODE_TEST": "true",
+        "http_proxy": "http://0.0.0.0",
+        "SUITE_NAME": "Run network tests with Gradle"
+      },
+      "args": [
+        "--disable-extensions",
+        "--extensionDevelopmentPath=${workspaceFolder}/extension",
+        "--extensionTestsPath=${workspaceFolder}/extension/out/test/integration/gradle",
+        "${workspaceFolder}/extension/test-fixtures/gradle-groovy-default-build-file"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/extension/dist/**/*.js",
+        "${workspaceFolder}/extension/out/**/*.js"
+      ],
+      "preLaunchTask": "Gradle: Build",
+      "presentation": {
+        "group": "test"
+      }
+    },
+    {
+      "name": "Test: Unit",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "env": {
+        "FIXTURE_NAME": "no-gradle",
+        "VSCODE_TEST": "true",
+        "SUITE_NAME": "Run Unit tests"
+      },
+      "args": [
+        "--disable-extensions",
+        "--extensionDevelopmentPath=${workspaceFolder}/extension",
+        "--extensionTestsPath=${workspaceFolder}/extension/out/test/unit",
+        "${workspaceFolder}/extension/test-fixtures/no-gradle"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/extension/out/**/*.js"
+      ],
+      "preLaunchTask": "Gradle: Build Test",
+      "presentation": {
+        "group": "test"
+      }
+    },
+  ],
+  "compounds": [
+    {
+      "name": "Debug Server & Extension",
+      "configurations": [
+        "Debug Server",
+        "Debug Extension with Debug Server"
+      ],
+      "presentation": {
+        "group": "debug",
+        "order": 3
+      }
+    }
+  ]
+}
