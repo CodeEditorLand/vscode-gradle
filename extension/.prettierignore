@@ -1,0 +1,11 @@
+node_modules
+.vscode-test
+out/
+dist/
+test-fixtures/
+package-lock.json
+package.json
+lib/
+src/proto/
+build/
+src/java-test-runner.api.ts
