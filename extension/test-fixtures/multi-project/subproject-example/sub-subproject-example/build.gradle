@@ -1,9 +1,0 @@
-plugins {
-    id 'groovy'
-}
-
-tasks.register("helloGroovySubSubProject") {
-    doLast {
-        println 'Hello, World! SubSubProject'
-    }
-}

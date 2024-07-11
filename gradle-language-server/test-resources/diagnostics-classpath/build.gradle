@@ -1,5 +1,0 @@
-import org.microsoft.gradle.test.ClasspathType
-
-plugins {
-  id "java"
-}
