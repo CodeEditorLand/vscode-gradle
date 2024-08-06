@@ -70,19 +70,7 @@ Gradle plugin, you can follow these steps:
 2. Run vscode launch configuration `Attach to Gradle Server` when you notice the
    `Gradle: Connecting...` message in the bottom status bar.
 
-> **Note:** If the "Java: Error" message appears in the bottom status bar and
-> the following error is logged in the `.log` file:
->
-> ```java
-> java.lang.NullPointerException: Cannot invoke "ch.epfl.scala.bsp4j.WorkspaceBuildTargetsResult.getTargets()"
-> ```
->
-> it indicates that the connection attempt to the Gradle Server was too slow.
-> The
-> [GradleBuildClient](/extension/jdtls.ext/com.microsoft.gradle.bs.importer/src/com/microsoft/gradle/bs/importer/ImporterPlugin.java#L107)
-> requires an active Gradle Server to successfully establish a connection. If
-> you encounter this issue, please retry the connection promptly to avoid this
-> error.
+> **Note:** If `[error] Error connecting to gradle server: Failed to connect before the deadline`  appears in the `Gradle for Java` output channel, it indicates that the connection attempt to the Gradle Server was too slow. The [GradleBuildClient](/extension/jdtls.ext/com.microsoft.gradle.bs.importer/src/com/microsoft/gradle/bs/importer/ImporterPlugin.java#L107) requires an active Gradle Server to successfully establish a connection. If you encounter this issue, please retry the connection promptly to avoid this error.
 
 ## Development Workflow
 
