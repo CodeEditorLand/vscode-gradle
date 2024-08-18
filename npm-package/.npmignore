@@ -32,7 +32,7 @@ build
 # Gradle build
 build.gradle
 
-# Dotfiles
+# DotFiles
 .eslintignore
 .eslintrc.json
 .prettierignore
