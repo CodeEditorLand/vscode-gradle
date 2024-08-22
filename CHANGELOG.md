@@ -4,63 +4,115 @@ All notable changes to the "vscode-gradle" extension will be documented in this
 file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
-and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
+and this project adheres to
+[Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## 3.16.4
+
 ## What's Changed
-* fix - closeConnection will fail if pipe server hasn't been started by @Jiaaming in https://github.com/microsoft/vscode-gradle/pull/1579
-* build - Update Gradle task to v3 by @jdneo in https://github.com/microsoft/vscode-gradle/pull/1580
-* build - Compilation error in test code by @jdneo in https://github.com/microsoft/vscode-gradle/pull/1571
+
+-   fix - closeConnection will fail if pipe server hasn't been started by
+    @Jiaaming in https://github.com/microsoft/vscode-gradle/pull/1579
+-   build - Update Gradle task to v3 by @jdneo in
+    https://github.com/microsoft/vscode-gradle/pull/1580
+-   build - Compilation error in test code by @jdneo in
+    https://github.com/microsoft/vscode-gradle/pull/1571
 
 ## 3.16.3
+
 ## What's Changed
-* enhancement - Activate the extension when gradle files are in sub-folders of the workspace by @Jiaaming in https://github.com/microsoft/vscode-gradle/pull/1570
-* enhancement - Notify user to install jdk when GradleServerEnv not found by @Jiaaming in https://github.com/microsoft/vscode-gradle/pull/1569
-* fix - Language server generatePipepath error by @Jiaaming in https://github.com/microsoft/vscode-gradle/pull/1557
-* fix - Add bspProxy connectors error listeners by @Jiaaming in https://github.com/microsoft/vscode-gradle/pull/1558
-* fix - Fallback to BuildShip when importer connect hit max attempts  by @Jiaaming in https://github.com/microsoft/vscode-gradle/pull/1560
-* fix - Improve bspProxy start sequence by @Jiaaming in https://github.com/microsoft/vscode-gradle/pull/1563
-* fix - Deduplicate the project dependency by @jdneo in https://github.com/microsoft/vscode-gradle/pull/1568
-* fix - Refine waitForImporterPipePath event & listener sequence by @Jiaaming in https://github.com/microsoft/vscode-gradle/pull/1573
-* fix - Fallback to Buildship when multiple gradle projects in same level by @jdneo in https://github.com/microsoft/vscode-gradle/pull/1574
-* fix - Create linked folder for resource if it's placed out of the project by @jdneo in https://github.com/microsoft/vscode-gradle/pull/1575
-* fix - Fallback to Buildship when failed to generate named pipe by @Jiaaming in https://github.com/microsoft/vscode-gradle/pull/1576
-* docs - Refine doc & Remove redundant file by @Jiaaming in https://github.com/microsoft/vscode-gradle/pull/1561
-* docs - Add comments for taskServerClient handleConnectError by @Jiaaming in https://github.com/microsoft/vscode-gradle/pull/1565
-* build - Bump @grpc/grpc-js from 1.8.14 to 1.8.22 in /extension by @dependabot in https://github.com/microsoft/vscode-gradle/pull/1494
-* build - Bump node version to 18.20.4 by @Jiaaming in https://github.com/microsoft/vscode-gradle/pull/1567
+
+-   enhancement - Activate the extension when gradle files are in sub-folders of
+    the workspace by @Jiaaming in
+    https://github.com/microsoft/vscode-gradle/pull/1570
+-   enhancement - Notify user to install jdk when GradleServerEnv not found by
+    @Jiaaming in https://github.com/microsoft/vscode-gradle/pull/1569
+-   fix - Language server generatePipepath error by @Jiaaming in
+    https://github.com/microsoft/vscode-gradle/pull/1557
+-   fix - Add bspProxy connectors error listeners by @Jiaaming in
+    https://github.com/microsoft/vscode-gradle/pull/1558
+-   fix - Fallback to BuildShip when importer connect hit max attempts by
+    @Jiaaming in https://github.com/microsoft/vscode-gradle/pull/1560
+-   fix - Improve bspProxy start sequence by @Jiaaming in
+    https://github.com/microsoft/vscode-gradle/pull/1563
+-   fix - Deduplicate the project dependency by @jdneo in
+    https://github.com/microsoft/vscode-gradle/pull/1568
+-   fix - Refine waitForImporterPipePath event & listener sequence by @Jiaaming
+    in https://github.com/microsoft/vscode-gradle/pull/1573
+-   fix - Fallback to Buildship when multiple gradle projects in same level by
+    @jdneo in https://github.com/microsoft/vscode-gradle/pull/1574
+-   fix - Create linked folder for resource if it's placed out of the project by
+    @jdneo in https://github.com/microsoft/vscode-gradle/pull/1575
+-   fix - Fallback to Buildship when failed to generate named pipe by @Jiaaming
+    in https://github.com/microsoft/vscode-gradle/pull/1576
+-   docs - Refine doc & Remove redundant file by @Jiaaming in
+    https://github.com/microsoft/vscode-gradle/pull/1561
+-   docs - Add comments for taskServerClient handleConnectError by @Jiaaming in
+    https://github.com/microsoft/vscode-gradle/pull/1565
+-   build - Bump @grpc/grpc-js from 1.8.14 to 1.8.22 in /extension by
+    @dependabot in https://github.com/microsoft/vscode-gradle/pull/1494
+-   build - Bump node version to 18.20.4 by @Jiaaming in
+    https://github.com/microsoft/vscode-gradle/pull/1567
 
 ## 3.16.2
+
 ### What's Changed
-* fix - Stop start build server when getRandomPipepath return empty by @Jiaaming in https://github.com/microsoft/vscode-gradle/pull/1545
-* fix - Use 'java.import.gradle.java.home' when it's specified by @jdneo in https://github.com/microsoft/vscode-gradle/pull/1552
-* fix - Inform that JDK 17 is required by @jdneo in https://github.com/microsoft/vscode-gradle/pull/1549
-* fix - Refine findValidJavaHome logic by @Jiaaming in https://github.com/microsoft/vscode-gradle/pull/1554
+
+-   fix - Stop start build server when getRandomPipepath return empty by
+    @Jiaaming in https://github.com/microsoft/vscode-gradle/pull/1545
+-   fix - Use 'java.import.gradle.java.home' when it's specified by @jdneo in
+    https://github.com/microsoft/vscode-gradle/pull/1552
+-   fix - Inform that JDK 17 is required by @jdneo in
+    https://github.com/microsoft/vscode-gradle/pull/1549
+-   fix - Refine findValidJavaHome logic by @Jiaaming in
+    https://github.com/microsoft/vscode-gradle/pull/1554
 
 ## 3.16.1
+
 ## What's Changed
-* enhancement - Support debug test delegation by @jdneo in https://github.com/microsoft/vscode-gradle/pull/1536
-* fix - Gradle build server cannot be started when path has spaces by @Jiaaming in https://github.com/microsoft/vscode-gradle/pull/1542
-* fix - Fail to start if import.gradle.java.home jdk version lower than 17 by @Jiaaming in https://github.com/microsoft/vscode-gradle/pull/1547
+
+-   enhancement - Support debug test delegation by @jdneo in
+    https://github.com/microsoft/vscode-gradle/pull/1536
+-   fix - Gradle build server cannot be started when path has spaces by
+    @Jiaaming in https://github.com/microsoft/vscode-gradle/pull/1542
+-   fix - Fail to start if import.gradle.java.home jdk version lower than 17 by
+    @Jiaaming in https://github.com/microsoft/vscode-gradle/pull/1547
 
 ## 3.16.0
+
 ## What's Changed
-* performance - Merge Task Server & Build Server by @Jiaaming in https://github.com/microsoft/vscode-gradle/pull/1512
-* performance - Merge Language Server to Gradle Server by @Jiaaming in https://github.com/microsoft/vscode-gradle/pull/1525
-* fix - Catch the error when running Gradle tests by @jdneo in https://github.com/microsoft/vscode-gradle/pull/1524
-* fix - Wrong status code returned for test completion by @jdneo in https://github.com/microsoft/vscode-gradle/pull/1532
-* fix - Override LanguageServer setTrace to avoid default Exception throw by @Jiaaming in https://github.com/microsoft/vscode-gradle/pull/1533
-* fix - Get daemon status handle project folder name include empty space by @Jiaaming in https://github.com/microsoft/vscode-gradle/pull/1537
-* documentation - Update architecture.md for merge server by @Jiaaming in https://github.com/microsoft/vscode-gradle/pull/1520
-* documentation - Update doc after merge language server by @Jiaaming in https://github.com/microsoft/vscode-gradle/pull/1528
+
+-   performance - Merge Task Server & Build Server by @Jiaaming in
+    https://github.com/microsoft/vscode-gradle/pull/1512
+-   performance - Merge Language Server to Gradle Server by @Jiaaming in
+    https://github.com/microsoft/vscode-gradle/pull/1525
+-   fix - Catch the error when running Gradle tests by @jdneo in
+    https://github.com/microsoft/vscode-gradle/pull/1524
+-   fix - Wrong status code returned for test completion by @jdneo in
+    https://github.com/microsoft/vscode-gradle/pull/1532
+-   fix - Override LanguageServer setTrace to avoid default Exception throw by
+    @Jiaaming in https://github.com/microsoft/vscode-gradle/pull/1533
+-   fix - Get daemon status handle project folder name include empty space by
+    @Jiaaming in https://github.com/microsoft/vscode-gradle/pull/1537
+-   documentation - Update architecture.md for merge server by @Jiaaming in
+    https://github.com/microsoft/vscode-gradle/pull/1520
+-   documentation - Update doc after merge language server by @Jiaaming in
+    https://github.com/microsoft/vscode-gradle/pull/1528
 
 ### 3.15.0
+
 ## What's Changed
-* feat - Support delegate tests to Gradle build Server by @jdneo in https://github.com/microsoft/vscode-gradle/pull/1510
-* fix - Only send request after initialization by @jdneo in https://github.com/microsoft/vscode-gradle/pull/1503
-* fix - Add java 22 to compatibility matrix by @jdneo in https://github.com/microsoft/vscode-gradle/pull/1505
-* refactor - Introduce gson to simplify the object parsing by @jdneo in https://github.com/microsoft/vscode-gradle/pull/1509
-* fix - Slice the build target list to 1 when running gradle tests by @jdneo in https://github.com/microsoft/vscode-gradle/pull/1518
+
+-   feat - Support delegate tests to Gradle build Server by @jdneo in
+    https://github.com/microsoft/vscode-gradle/pull/1510
+-   fix - Only send request after initialization by @jdneo in
+    https://github.com/microsoft/vscode-gradle/pull/1503
+-   fix - Add java 22 to compatibility matrix by @jdneo in
+    https://github.com/microsoft/vscode-gradle/pull/1505
+-   refactor - Introduce gson to simplify the object parsing by @jdneo in
+    https://github.com/microsoft/vscode-gradle/pull/1509
+-   fix - Slice the build target list to 1 when running gradle tests by @jdneo
+    in https://github.com/microsoft/vscode-gradle/pull/1518
 
 ### 3.14.1
 
