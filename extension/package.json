@@ -938,7 +938,7 @@
 	"displayName": "Gradle for Java",
 	"icon": "resources/icon.png",
 	"main": "./dist/index.js",
-	"name": "vscode-gradle",
+	"name": "root-vscode-gradle",
 	"readme": "README.md",
 	"scripts": {
 		"compile": "tsc -p . && webpack --config webpack.config.js --mode production",
