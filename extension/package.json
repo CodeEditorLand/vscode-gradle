@@ -929,11 +929,11 @@
 		"@types/lodash": "4.17.7",
 		"@types/node": "22.5.0",
 		"@types/sinon": "17.0.3",
-		"google-protobuf": "4.0.0-rc.2",
+		"google-protobuf": "3.21.4",
 		"grpc-tools": "1.12.4",
 		"sinon": "18.0.0",
 		"ts-loader": "9.5.1",
-		"ts-protoc-gen": "0.15.1-pre.a71b34e"
+		"ts-protoc-gen": "0.15.0"
 	},
 	"displayName": "Gradle for Java",
 	"icon": "resources/icon.png",
