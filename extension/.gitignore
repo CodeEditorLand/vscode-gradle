@@ -1,0 +1,14 @@
+/out
+/dist
+node_modules
+*.vsix
+.vscode-test
+/lib
+!jdtls.ext/**/.project
+!jdtls.ext/**/.classpath
+.settings
+/src/proto/
+/*.md
+/images
+server
+jdtls.ext/com.microsoft.gradle.bs.importer/lib/*.jar

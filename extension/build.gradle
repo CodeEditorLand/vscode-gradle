@@ -1,0 +1,252 @@
+description = 'vscode-gradle :: extension'
+
+def isWindows = System.getProperty('os.name').toLowerCase().contains('windows')
+def docsFiles = [
+  "README.md",
+  "LICENSE.md",
+  "ARCHITECTURE.md",
+  "CONTRIBUTING.md",
+  "CHANGELOG.md"
+]
+
+project.ext.set('protoLib', 'src/proto')
+
+sourceSets {
+  main {
+    proto {
+      srcDir file('../proto')
+    }
+  }
+}
+
+protobuf {
+  plugins {
+    grpc {
+      path = file(
+        './node_modules/.bin/grpc_tools_node_protoc_plugin' + (isWindows ? '.cmd' : '')
+      )
+    }
+    ts {
+      path = file(
+        './node_modules/.bin/protoc-gen-ts' + (isWindows ? '.cmd' : '')
+      )
+    }
+  }
+  generateProtoTasks {
+    generateTestProto.enabled = false
+    extractProto.enabled = false;
+    extractIncludeProto.enabled = false;
+    extractIncludeTestProto.enabled = false;
+    generateProto.finalizedBy copyProtoJs, copyProtoTs
+    all().each { task ->
+      task.plugins {
+        grpc {
+          outputSubDir = 'js'
+          option 'grpc_js'
+        }
+        ts {
+          option 'service=grpc-node,mode=grpc-js'
+        }
+      }
+      task.builtins {
+        remove java
+        js {
+          option 'import_style=commonjs'
+        }
+      }
+      task.dependsOn npmInstall
+    }
+  }
+}
+
+test.enabled = false;
+jar.enabled = false;
+compileJava.enabled = false
+compileTestJava.enabled = false
+processResources.enabled = false;
+
+clean {
+  delete protobuf.generatedFilesBaseDir
+  delete file('node_modules')
+  delete file(protoLib)
+  delete file('out')
+  delete file('.vscode-test')
+  delete file('build')
+  delete docsFiles
+}
+
+task copyProtoJs(type: Copy) {
+  dependsOn ':extension:generateProto'
+  dependsOn ':extension:copyDocs'
+  group 'copy'
+  description 'Copies proto JavaScript files into src dir'
+  from "$protobuf.generatedFilesBaseDir/main/js"
+  into protoLib
+}
+
+task copyProtoTs(type: Copy) {
+  dependsOn ':extension:generateProto'
+  group 'copy'
+  description 'Copies proto TypeScript definitions into src dir'
+  from "$protobuf.generatedFilesBaseDir/main/ts"
+  into protoLib
+}
+
+task npmInstall(type: CrossPlatformExec) {
+  description 'Installs node dependencies'
+  inputs.file('package-lock.json').withPathSensitivity(PathSensitivity.RELATIVE)
+  outputs.dir('node_modules')
+  outputs.cacheIf { true }
+  // for apple m1, please add npm_arch=x64 in $HOME/.gradle/gradle.properties
+  if (project.hasProperty('npm_arch')) {
+    commandLine 'npm', "--target_arch=${npm_arch}", 'install'
+  } else {
+    commandLine 'npm', 'install'
+  }
+}
+
+task lint(type: CrossPlatformExec) {
+  dependsOn npmInstall
+  description 'Lints source files'
+  commandLine 'npm', 'run', 'lint'
+}
+
+task format(type: CrossPlatformExec) {
+  description 'Formats source files'
+  commandLine 'npm', 'run', 'lint:fix'
+}
+
+task buildTest(type: CrossPlatformExec) {
+  dependsOn copyProtoJs, copyProtoTs
+  group 'build'
+  description 'Builds TypeScript test source files'
+  buildDir = 'out'
+  inputs.dir('src').withPathSensitivity(PathSensitivity.RELATIVE)
+  inputs.file('tsconfig.json').withPathSensitivity(PathSensitivity.RELATIVE)
+  outputs.dir(buildDir)
+  outputs.cacheIf { true }
+  commandLine 'npm', 'run', 'compile:test'
+}
+
+task buildDev(type: CrossPlatformExec) {
+  dependsOn 'copyProtoJs', 'copyProtoTs'
+  group 'build'
+  description 'Compile extension source files'
+  inputs.file('webpack.config.js').withPathSensitivity(PathSensitivity.RELATIVE)
+  inputs.files(fileTree('src').matching {
+    exclude 'test'
+  }).withPathSensitivity(PathSensitivity.RELATIVE)
+  outputs.dir('dist')
+  outputs.cacheIf { true }
+  environment NODE_ENV: 'development'
+  commandLine 'npm', 'run', 'compile'
+}
+
+task buildProd(type: CrossPlatformExec) {
+  dependsOn 'copyProtoJs', 'copyProtoTs'
+  group 'build'
+  description 'Compile extension source files'
+  inputs.file('webpack.config.js').withPathSensitivity(PathSensitivity.RELATIVE)
+  inputs.files(fileTree('src').matching {
+    exclude 'test'
+  }).withPathSensitivity(PathSensitivity.RELATIVE)
+  outputs.dir('dist')
+  outputs.cacheIf { true }
+  environment NODE_ENV: 'production'
+  commandLine 'npm', 'run', 'compile'
+}
+
+task bundle() {
+  dependsOn ':gradle-server:build', buildProd, ':npm-package:build', ':gradle-language-server:build'
+  group 'build'
+  description 'Bundles the extension files for release'
+}
+
+task installExtension(type: CrossPlatformExec) {
+  dependsOn bundle
+  commandLine 'npm', 'run', 'install:ext'
+}
+
+task testVsCode(type: CrossPlatformExec) {
+  group 'verification'
+  description 'Tests the extension'
+  commandLine 'npm', 'run', 'test'
+}
+
+task copyDocs(type: Copy) {
+  dependsOn ':extension:generateProto'
+  dependsOn ':extension:npmInstall'
+  dependsOn ':extension:copyProtoTs'
+  dependsOn ':gradle-server:serverStartScripts'
+  group 'copy'
+  description 'Copies docs from the root project into the extension'
+  from docsFiles.collect { "$rootProject.projectDir/" + it }
+  into "$projectDir"
+}
+
+task prepareBeta(type: CrossPlatformExec) {
+  description 'Prepare the extesion for a BETA release'
+  workingDir file('./beta')
+  commandLine 'node', 'prepare.js'
+}
+
+task prepareForRelease() {
+  dependsOn bundle, copyDocs
+}
+
+task prepareForBetaRelease() {
+  dependsOn bundle, copyDocs, prepareBeta
+}
+
+task buildJdtlsPlugin(type: CrossPlatformExec) {
+  workingDir file('./jdtls.ext')
+  if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+    commandLine 'mvnw', 'clean', 'package'
+  } else {
+    commandLine './mvnw', 'clean', 'package'
+  }
+}
+
+task copyJdtlsPluginJar(type: Copy) {
+  dependsOn ':extension:buildJdtlsPlugin'
+  from('./jdtls.ext/com.microsoft.gradle.bs.importer/target/') {
+    include 'com.microsoft.gradle.bs.importer-*.jar'
+  }
+  into 'server'
+  mustRunAfter copyDocs
+}
+
+task buildBuildServer(type: CrossPlatformExec) {
+  workingDir file('./build-server-for-gradle')
+  if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+    commandLine 'gradlew', 'build', '-x', 'test'
+  } else {
+    commandLine './gradlew', 'build', '-x', 'test'
+  }
+}
+
+task copyBuildServerPluginJars(type: Copy) {
+  dependsOn ':extension:buildBuildServer'
+  from('./build-server-for-gradle/server/build/libs/') {
+    include 'plugins/'
+  }
+  into 'server'
+  mustRunAfter copyDocs
+}
+
+// TODO: This task can be removed once the build server is published.
+task copyBuildServerJarsToGradleServer(type: Copy) {
+  dependsOn ':extension:buildBuildServer'
+  from('./build-server-for-gradle/server/build/libs/') {
+    include 'runtime/'
+  }
+  from('./build-server-for-gradle/server/build/libs/server.jar')
+  into '../gradle-server/build/libs/'
+  mustRunAfter copyDocs
+}
+
+task buildJars() {
+  dependsOn copyJdtlsPluginJar, copyBuildServerPluginJars, copyBuildServerJarsToGradleServer
+}
+
+build.finalizedBy buildProd, buildTest
