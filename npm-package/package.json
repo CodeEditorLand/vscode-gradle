@@ -1,18 +1,41 @@
 {
-	"dependencies": {
-		"@grpc/grpc-js": "^1.6.7",
-		"@types/google-protobuf": "^3.15.6"
-	},
-	"description": "Type definitions for the Gradle Tasks vscode extension",
-	"devDependencies": {},
-	"displayName": "Gradle Tasks",
-	"main": "./index.js",
-	"maintainers": [
-		"Richard Willis <willis.rh@gmail.com>"
-	],
-	"name": "vscode-gradle",
-	"scripts": {
-		"compile": "tsc -p ."
-	},
-	"types": "./index.ts"
+  "name": "vscode-gradle",
+  "displayName": "Gradle Tasks",
+  "description": "Type definitions for the Gradle Tasks vscode extension",
+  "version": "0.0.0",
+  "author": "Richard Willis <willis.rh@gmail.com>",
+  "maintainers": [
+    "Richard Willis <willis.rh@gmail.com>"
+  ],
+  "bugs": {
+    "url": "https://github.com/badsyntax/vscode-gradle/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/badsyntax/vscode-gradle/"
+  },
+  "license": "MIT",
+  "main": "./index.js",
+  "types": "./index.ts",
+  "engines": {
+    "node": "^18.20.4",
+    "npm": "^10.7.0"
+  },
+  "scripts": {
+    "compile": "tsc -p ."
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.6.7",
+    "@types/google-protobuf": "^3.15.6",
+    "@types/vscode": "^1.63.0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.22.0",
+    "@typescript-eslint/parser": "^5.22.0",
+    "eslint": "^8.14.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "prettier": "^2.6.2",
+    "typescript": "^4.6.4"
+  }
 }
