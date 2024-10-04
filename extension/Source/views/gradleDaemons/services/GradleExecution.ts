@@ -1,3 +1,3 @@
 export interface GradleExecution {
-    exec(args: string[]): Promise<string>;
+	exec(args: string[]): Promise<string>;
 }

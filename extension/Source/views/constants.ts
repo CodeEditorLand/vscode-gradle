@@ -21,12 +21,14 @@ export const TREE_ITEM_STATE_TASK_PINNED_PREFIX = "pinned";
 export const TREE_ITEM_STATE_NO_TASKS = "notasks";
 export const TREE_ITEM_STATE_FOLDER = "folder";
 
-export const TASK_STATE_RUNNING_REGEX = new RegExp(`^${TREE_ITEM_STATE_TASK_RUNNING}`);
+export const TASK_STATE_RUNNING_REGEX = new RegExp(
+	`^${TREE_ITEM_STATE_TASK_RUNNING}`,
+);
 
 export const DAEMON_ICON_MAP = {
-    [DaemonStatus.BUSY]: ICON_DAEMON_BUSY,
-    [DaemonStatus.IDLE]: ICON_DAEMON_IDLE,
-    [DaemonStatus.STOPPED]: ICON_DAEMON_STOPPED,
-    [DaemonStatus.STOPPING]: ICON_DAEMON_STOPPED,
-    [DaemonStatus.CANCELED]: ICON_DAEMON_STOPPED,
+	[DaemonStatus.BUSY]: ICON_DAEMON_BUSY,
+	[DaemonStatus.IDLE]: ICON_DAEMON_IDLE,
+	[DaemonStatus.STOPPED]: ICON_DAEMON_STOPPED,
+	[DaemonStatus.STOPPING]: ICON_DAEMON_STOPPED,
+	[DaemonStatus.CANCELED]: ICON_DAEMON_STOPPED,
 };

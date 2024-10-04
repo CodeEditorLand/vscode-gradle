@@ -3,14 +3,17 @@
 
 import { GradleDaemonsTreeDataProvider } from "../views";
 import { Command } from "./Command";
+
 export const HIDE_STOPPED_DAEMONS = "gradle.hideStoppedDaemons";
 
 export class HideStoppedDaemonsCommand extends Command {
-    constructor(private gradleDaemonsTreeDataProvider: GradleDaemonsTreeDataProvider) {
-        super();
-    }
+	constructor(
+		private gradleDaemonsTreeDataProvider: GradleDaemonsTreeDataProvider,
+	) {
+		super();
+	}
 
-    async run(): Promise<void> {
-        this.gradleDaemonsTreeDataProvider.hideStoppedDaemons();
-    }
+	async run(): Promise<void> {
+		this.gradleDaemonsTreeDataProvider.hideStoppedDaemons();
+	}
 }
