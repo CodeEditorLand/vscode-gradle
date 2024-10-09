@@ -35,4 +35,6 @@ const runTaskOpts: RunTaskOpts = {
 await gradleApi.runTask(runTaskOpts);
 ```
 
-Refer to [vscode-spotless-gradle](https://github.com/badsyntax/vscode-spotless-gradle) for example API usage.
+Refer to
+[vscode-spotless-gradle](https://github.com/badsyntax/vscode-spotless-gradle)
+for example API usage.
