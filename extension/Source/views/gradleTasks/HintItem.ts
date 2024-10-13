@@ -4,8 +4,8 @@
 import * as vscode from "vscode";
 
 export class HintItem extends vscode.TreeItem {
-    constructor(message: string) {
-        super("", vscode.TreeItemCollapsibleState.None);
-        this.description = message;
-    }
+	constructor(message: string) {
+		super("", vscode.TreeItemCollapsibleState.None);
+		this.description = message;
+	}
 }
