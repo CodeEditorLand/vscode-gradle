@@ -1,18 +1,18 @@
 {
-	"name": "vscode-gradle",
-	"displayName": "Gradle Tasks",
-	"description": "Type definitions for the Gradle Tasks vscode extension",
-	"maintainers": [
-		"Richard Willis <willis.rh@gmail.com>"
-	],
-	"main": "./index.js",
-	"types": "./index.ts",
-	"scripts": {
-		"compile": "tsc -p ."
-	},
 	"dependencies": {
 		"@grpc/grpc-js": "1.12.2",
 		"@types/google-protobuf": "3.15.12"
 	},
-	"devDependencies": {}
+	"description": "Type definitions for the Gradle Tasks vscode extension",
+	"devDependencies": {},
+	"displayName": "Gradle Tasks",
+	"main": "./index.js",
+	"maintainers": [
+		"Richard Willis <willis.rh@gmail.com>"
+	],
+	"name": "vscode-gradle",
+	"scripts": {
+		"compile": "tsc -p ."
+	},
+	"types": "./index.ts"
 }
