@@ -20,7 +20,9 @@ import { GradleBuildLinkProvider } from "./GradleBuildLinkProvider";
 import { GradleTestRunner } from "./GradleTestRunner";
 
 const APPEND_BUILD_LOG_CMD = "_java.gradle.buildServer.appendBuildLog";
+
 const LOG_CMD = "_java.gradle.buildServer.log";
+
 const SEND_TELEMETRY_CMD = "_java.gradle.buildServer.sendTelemetry";
 
 export class BuildServerController implements Disposable {
@@ -46,8 +48,10 @@ export class BuildServerController implements Disposable {
 			commands.registerCommand(APPEND_BUILD_LOG_CMD, (msg: string) => {
 				if (msg) {
 					this.buildOutputChannel.appendLine(msg);
+
 					const openBehavior: OpenBuildOutputValue =
 						getOpenBuildOutput();
+
 					if (openBehavior === OpenBuildOutputValue.NEVER) {
 						return;
 					}
@@ -56,6 +60,7 @@ export class BuildServerController implements Disposable {
 						openBehavior === OpenBuildOutputValue.ON_BUILD_START
 							? /^> Build starts at /m
 							: /^BUILD FAILED/m;
+
 					if (pattern.test(msg)) {
 						this.buildOutputChannel.show(true);
 					}
@@ -72,6 +77,7 @@ export class BuildServerController implements Disposable {
 				SEND_TELEMETRY_CMD,
 				(data: string | object | Error) => {
 					let jsonObj: { [key: string]: any };
+
 					if (typeof data === "string") {
 						jsonObj = JSON.parse(data);
 					} else {
@@ -85,6 +91,7 @@ export class BuildServerController implements Disposable {
 						schemaVersion,
 						...rest
 					} = jsonObj;
+
 					if (trace || rootCauseMessage) {
 						sendInfo("", {
 							kind: "bsp-error",
@@ -135,12 +142,14 @@ export class BuildServerController implements Disposable {
 						)
 					) {
 						const storagePath = context.storageUri?.fsPath;
+
 						if (!storagePath) {
 							return;
 						}
 
 						const msg =
 							"Please reload to make the change of 'java.gradle.buildServer.enabled' take effect. Reload now?";
+
 						const action = "Reload";
 						window
 							.showWarningMessage(msg, action)
@@ -155,6 +164,7 @@ export class BuildServerController implements Disposable {
 										"jdt_ws",
 									);
 									await fse.ensureDir(jlsWorkspacePath);
+
 									const flagFile = path.resolve(
 										jlsWorkspacePath,
 										".cleanWorkspace",
@@ -185,6 +195,7 @@ export class BuildServerController implements Disposable {
 
 	private async checkMachineStatus() {
 		const machineStatus: { [key: string]: string } = {};
+
 		if (this.isGradleExecutableOnPath()) {
 			machineStatus.gradleExecutableFound = "true";
 		}
@@ -192,6 +203,7 @@ export class BuildServerController implements Disposable {
 			machineStatus.hasProxy = "true";
 		}
 		const gradleVersionInWrapper = await this.gradleVersionInWrapper();
+
 		if (gradleVersionInWrapper) {
 			machineStatus.gradleVersionInWrapper = gradleVersionInWrapper;
 		}
@@ -207,8 +219,10 @@ export class BuildServerController implements Disposable {
 	private isGradleExecutableOnPath(): boolean {
 		if (process.env.PATH) {
 			const pathDirectories = process.env.PATH.split(path.delimiter);
+
 			for (const dir of pathDirectories) {
 				const executablePath = path.join(dir, "gradle");
+
 				if (
 					fse.existsSync(executablePath) &&
 					fse.statSync(executablePath).isFile()
@@ -234,15 +248,19 @@ export class BuildServerController implements Disposable {
 			undefined,
 			1,
 		);
+
 		if (propertiesFile.length === 0) {
 			return "";
 		}
 
 		const properties = await workspace.fs.readFile(propertiesFile[0]);
+
 		const propertiesContent = properties.toString();
+
 		const versionMatch = /^distributionUrl=.*\/gradle-([0-9.]+)-.*$/m.exec(
 			propertiesContent,
 		);
+
 		if (versionMatch) {
 			return versionMatch[1];
 		}
@@ -255,6 +273,7 @@ export class BuildServerController implements Disposable {
 			undefined,
 			1,
 		);
+
 		return file.length > 0;
 	}
 }

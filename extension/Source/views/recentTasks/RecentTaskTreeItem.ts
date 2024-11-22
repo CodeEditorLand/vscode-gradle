@@ -42,9 +42,11 @@ export class RecentTaskTreeItem extends GradleTaskTreeItem {
 		this.tooltip =
 			(definition.args ? `(args: ${definition.args}) ` : "") +
 			(definition.description || this.label);
+
 		const taskTerminalsStore = this.taskTerminalsStore.getItem(
 			definition.id + definition.args,
 		);
+
 		const numTerminals = taskTerminalsStore ? taskTerminalsStore.size : 0;
 		this.description = `(${numTerminals})`;
 		this.contextValue = getRecentTaskTreeItemState(

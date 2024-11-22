@@ -33,6 +33,7 @@ export class CreateProjectCommand extends Command {
 			return;
 		}
 		const folders = vscode.workspace.workspaceFolders;
+
 		const targetFolderUri = await vscode.window.showOpenDialog({
 			defaultUri: folders && folders.length ? folders[0].uri : undefined,
 			title: "Select target Folder",
@@ -41,7 +42,9 @@ export class CreateProjectCommand extends Command {
 			canSelectFolders: true,
 			canSelectMany: false,
 		});
+
 		const isAdvanced = params[0] as boolean;
+
 		if (targetFolderUri) {
 			const metadata: IProjectCreationMetadata = {
 				isAdvanced: isAdvanced,
@@ -59,17 +62,23 @@ export class CreateProjectCommand extends Command {
 					: selectScriptDSLStep,
 				client: this.client,
 			};
+
 			const success = await this.runSteps(metadata);
+
 			if (success) {
 				await this.createProject(metadata);
+
 				const hasOpenFolder = folders !== undefined;
+
 				const insideWorkspace: boolean =
 					folders?.find((workspaceFolder) =>
 						metadata.targetFolder.startsWith(
 							workspaceFolder.uri?.fsPath,
 						),
 					) !== undefined;
+
 				let openProjectBehaviour = getProjectOpenBehaviour();
+
 				if (
 					openProjectBehaviour ===
 					ProjectOpenBehaviourValue.INTERACTIVE
@@ -80,10 +89,12 @@ export class CreateProjectCommand extends Command {
 							? ProjectOpenBehaviourValue.ADDTOWORKSPACE
 							: undefined,
 					].filter(Boolean) as string[];
+
 					const choice = await vscode.window.showInformationMessage(
 						`Gradle project [${metadata.projectName}] is created under: ${metadata.targetFolder}`,
 						...candidates,
 					);
+
 					if (choice) {
 						openProjectBehaviour = choice;
 					}
@@ -119,18 +130,24 @@ export class CreateProjectCommand extends Command {
 		metadata: IProjectCreationMetadata,
 	): Promise<boolean> {
 		let step: IProjectCreationStep | undefined = metadata.nextStep;
+
 		while (step !== undefined) {
 			const result = await step.run(metadata);
+
 			switch (result) {
 				case StepResult.NEXT:
 					step = metadata.nextStep;
+
 					break;
+
 				case StepResult.PREVIOUS:
 					if (metadata.steps.length === 0) {
 						return false;
 					}
 					step = metadata.steps.pop();
+
 					break;
+
 				case StepResult.STOP:
 					return false; // user cancellation
 				default:
@@ -148,7 +165,9 @@ export class CreateProjectCommand extends Command {
 			metadata.targetFolder,
 			"init",
 		);
+
 		const args: string[] = ["init"];
+
 		if (
 			!metadata.projectType ||
 			!metadata.scriptDSL ||
@@ -161,12 +180,14 @@ export class CreateProjectCommand extends Command {
 		args.push(metadata.scriptDSL);
 		args.push("--type");
 		args.push(metadata.projectType);
+
 		if (metadata.testFramework) {
 			args.push("--test-framework");
 			args.push(metadata.testFramework);
 		}
 		args.push("--project-name");
 		args.push(metadata.projectName);
+
 		if (metadata.sourcePackageName) {
 			args.push("--package");
 			args.push(metadata.sourcePackageName);

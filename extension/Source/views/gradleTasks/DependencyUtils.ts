@@ -15,7 +15,9 @@ export function getDependencyConfigurationTreeItems(
 	parent: ProjectDependencyTreeItem,
 ): DependencyConfigurationTreeItem[] | undefined {
 	const children = protocolItem.getChildrenList();
+
 	const configItems = [];
+
 	for (const child of children) {
 		if (child.getType() !== GradleDependencyType.CONFIGURATION) {
 			continue;
@@ -24,6 +26,7 @@ export function getDependencyConfigurationTreeItems(
 			child,
 			parent,
 		);
+
 		if (configurationItem) {
 			configItems.push(configurationItem);
 		}
@@ -39,15 +42,20 @@ function protocolItem2DependencyConfigurationTreeItem(
 	parent: vscode.TreeItem,
 ): DependencyConfigurationTreeItem | undefined {
 	const name = protocolItem.getName();
+
 	const storageMap = new Map();
+
 	const configurationItem: DependencyConfigurationTreeItem =
 		new DependencyConfigurationTreeItem(
 			name,
 			vscode.TreeItemCollapsibleState.Collapsed,
 			parent,
 		);
+
 	const children = protocolItem.getChildrenList();
+
 	const treeChildren = [];
+
 	for (const child of children) {
 		if (child.getType() !== GradleDependencyType.DEPENDENCY) {
 			continue;
@@ -64,6 +72,7 @@ function protocolItem2DependencyConfigurationTreeItem(
 		return undefined;
 	}
 	configurationItem.setChildren(treeChildren);
+
 	return configurationItem;
 }
 
@@ -73,13 +82,16 @@ function protocolItem2DependencyTreeItem(
 	storageMap: Map<string, vscode.TreeItem>,
 ): DependencyTreeItem {
 	const name = protocolItem.getName();
+
 	const dependencyItem: DependencyTreeItem = new DependencyTreeItem(
 		name,
 		vscode.TreeItemCollapsibleState.Collapsed,
 		parent,
 	);
+
 	if (storageMap.has(name)) {
 		const omittedTreeItem = storageMap.get(name);
+
 		if (omittedTreeItem) {
 			dependencyItem.setOmittedTreeItem(omittedTreeItem);
 		}
@@ -90,8 +102,11 @@ function protocolItem2DependencyTreeItem(
 			'Dependency omitted. Click "Go to Dependency" to reveal the previously listed dependency.';
 	} else {
 		storageMap.set(name, dependencyItem);
+
 		const children = protocolItem.getChildrenList();
+
 		const treeChildren = [];
+
 		for (const child of children) {
 			if (child.getType() !== GradleDependencyType.DEPENDENCY) {
 				continue;

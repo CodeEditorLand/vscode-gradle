@@ -41,6 +41,7 @@ export class DefaultProjectsTreeDataProvider
 		if (!element) {
 			// async configuring
 			void this.gradleTaskProvider.loadTasks();
+
 			return GradleTasksTreeDataProvider.buildItemsTreeFromTasks(
 				await this.defaultProjectProvider.getDefaultTasks(
 					await this.rootProjectStore.getProjectRoots(),
@@ -73,8 +74,11 @@ export class DefaultProjectsTreeDataProvider
 			element,
 		);
 		projectTaskItem.setChildren([...element.tasks, ...element.groups]);
+
 		const results: vscode.TreeItem[] = [projectTaskItem];
+
 		const resourceUri = element.resourceUri;
+
 		if (!resourceUri) {
 			return results;
 		}
@@ -88,6 +92,7 @@ export class DefaultProjectsTreeDataProvider
 					? element.label
 					: resourceUri.fsPath,
 			);
+
 		return [projectDependencyTreeItem, ...results];
 	}
 }

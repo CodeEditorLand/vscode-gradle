@@ -6,6 +6,7 @@ import * as vscode from "vscode";
 export class DependencyTreeItem extends vscode.TreeItem {
 	private children: vscode.TreeItem[] | undefined;
 	private omittedTreeItem: vscode.TreeItem | undefined;
+
 	constructor(
 		name: string,
 		collapsibleState: vscode.TreeItemCollapsibleState,

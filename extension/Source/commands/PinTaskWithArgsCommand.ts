@@ -16,6 +16,7 @@ export class PinTaskWithArgsCommand extends Command {
 	async run(treeItem: GradleTaskTreeItem): Promise<void> {
 		if (treeItem && treeItem.task) {
 			const args = await getTaskArgs();
+
 			if (args) {
 				const definition = treeItem.task
 					.definition as GradleTaskDefinition;

@@ -12,6 +12,7 @@ export function findGradleProjectFromBuild(
 	gradleBuild: GradleBuild,
 ): GradleProject | undefined {
 	const rootProject = gradleBuild.getProject();
+
 	if (!rootProject || !rootProject.getIsRoot()) {
 		return undefined;
 	}
@@ -27,6 +28,7 @@ function findGradleProject(
 	}
 	for (const subProject of project.getProjectsList()) {
 		const result = findGradleProject(projectPath, subProject);
+
 		if (result) {
 			return result;
 		}

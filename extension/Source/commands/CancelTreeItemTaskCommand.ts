@@ -14,14 +14,17 @@ export class CancelTreeItemTaskCommand extends Command {
 		if (treeItem && treeItem.task) {
 			// We get the running task as we could be cancelling a task that is running with args
 			const runningTask = getRunningGradleTask(treeItem.task);
+
 			if (!runningTask) {
 				return;
 			}
 			const definition = runningTask.definition as GradleTaskDefinition;
+
 			const cancellationKey = getRunTaskCommandCancellationKey(
 				definition.projectFolder,
 				runningTask.name,
 			);
+
 			return vscode.commands.executeCommand(
 				COMMAND_CANCEL_BUILD,
 				cancellationKey,

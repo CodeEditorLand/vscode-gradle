@@ -16,21 +16,25 @@ export class GradleLocalInstallation implements GradleExecution {
 		}
 
 		const quotedArgs = args.map((arg) => `"${arg}"`).join(" ");
+
 		const command = `${this.gradleHomePath} ${quotedArgs}`;
 
 		try {
 			const jdkPath = getConfigJavaImportGradleJavaHome();
+
 			const env = jdkPath
 				? { ...process.env, JAVA_HOME: jdkPath }
 				: process.env;
 
 			const { stdout, stderr } = await execAsync(command, { env });
+
 			if (stderr) {
 				logger.error(stderr);
 			}
 			return stdout;
 		} catch (error) {
 			logger.error(error.message);
+
 			throw new Error(
 				`Error running gradle local installation: ${error.message}`,
 			);

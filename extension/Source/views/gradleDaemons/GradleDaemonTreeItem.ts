@@ -7,12 +7,14 @@ import { DaemonStatus } from "./models/DaemonStatus";
 
 export class GradleDaemonTreeItem extends vscode.TreeItem {
 	private status: string;
+
 	constructor(
 		private readonly context: vscode.ExtensionContext,
 		public readonly label: string,
 		private readonly daemonInfo: DaemonInfo,
 	) {
 		super(label, vscode.TreeItemCollapsibleState.None);
+
 		const iconName = DAEMON_ICON_MAP[daemonInfo.getStatus()];
 		this.iconPath = {
 			light: this.context.asAbsolutePath(

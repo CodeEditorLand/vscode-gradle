@@ -6,6 +6,7 @@ export const JAVA_DEBUGGER_EXTENSION_ID = "vscjava.vscode-java-debug";
 export function isJavaLanguageSupportExtensionActivated(): boolean {
 	const javaExt: vscode.Extension<unknown> | undefined =
 		getJavaLanguageSupportExtension();
+
 	return javaExt?.isActive || false;
 }
 

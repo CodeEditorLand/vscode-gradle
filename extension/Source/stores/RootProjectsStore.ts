@@ -8,11 +8,13 @@ import { GRADLE_BUILD_FILE_NAMES } from "../constant";
 
 async function getNestedRootProjectFolders(): Promise<string[]> {
     const matchingNestedWrapperFiles = await vscode.workspace.findFiles("**/{settings.gradle,settings.gradle.kts}");
+
     return [...new Set(matchingNestedWrapperFiles.map((uri) => path.dirname(uri.fsPath)))];
 }
 
 function buildRootFolder(folderUri: vscode.Uri): RootProject {
     const workspaceFolder = vscode.workspace.getWorkspaceFolder(folderUri)!;
+
     return new RootProject(workspaceFolder, folderUri);
 }
 
@@ -37,17 +39,21 @@ export class RootProjectsStore extends StoreMap<string, RootProject> {
 
     public async populate(): Promise<void> {
         const workspaceFolders: ReadonlyArray<vscode.WorkspaceFolder> = vscode.workspace.workspaceFolders || [];
+
         const gradleProjectFolders = await getNestedRootProjectFolders();
 
         for (const workspaceFolder of workspaceFolders) {
             const configNestedFolders = getNestedProjectsConfig(workspaceFolder);
+
             const gradleProjectFoldersOutsideRoot = getGradleProjectFoldersOutsideRoot(
                 configNestedFolders,
                 gradleProjectFolders,
                 workspaceFolder
             );
+
             if (gradleProjectFolders.includes(workspaceFolder.uri.fsPath)) {
                 const rootProject = buildRootFolder(workspaceFolder.uri);
+
                 if (isGradleRootProject(rootProject)) {
                     this.setRootProjectFolder(rootProject);
                 }
@@ -101,13 +107,16 @@ export class RootProjectsStore extends StoreMap<string, RootProject> {
 
     public async getProjectRootsWithUniqueVersions(): Promise<RootProject[]> {
         const gradleVersionIds: string[] = [];
+
         return (await this.getProjectRoots()).filter((rootProject) => {
             const version = rootProject.getEnvironment()?.getGradleEnvironment()?.getGradleVersion();
+
             if (version === undefined) {
                 return false;
             }
             if (!gradleVersionIds.includes(version)) {
                 gradleVersionIds.push(version);
+
                 return true;
             }
             return false;

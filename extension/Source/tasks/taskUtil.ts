@@ -28,6 +28,7 @@ import {
 import { getTaskArgs } from "../util/input";
 
 const cancellingTasks: Map<string, vscode.Task> = new Map();
+
 const restartingTasks: Map<string, vscode.Task> = new Map();
 
 export function getTaskExecution(
@@ -43,6 +44,7 @@ function isTask(
 	args?: TaskArgs,
 ): boolean {
 	const checkForArgs = args !== undefined;
+
 	return (
 		task1.definition.id === task2.definition.id &&
 		(!checkForArgs || task1.definition.args === args)
@@ -83,7 +85,9 @@ export async function cancelBuild(
 
 export function isTaskCancelling(task: vscode.Task, args?: TaskArgs): boolean {
 	const cancellingTask = getCancellingTask(task);
+
 	const checkForArgs = args !== undefined;
+
 	return Boolean(
 		cancellingTask &&
 			(!checkForArgs || cancellingTask.definition.args === args),
@@ -92,7 +96,9 @@ export function isTaskCancelling(task: vscode.Task, args?: TaskArgs): boolean {
 
 export function isTaskRestarting(task: vscode.Task, args?: TaskArgs): boolean {
 	const restartingTask = getRestartingTask(task);
+
 	const checkForArgs = args !== undefined;
+
 	return Boolean(
 		restartingTask &&
 			(!checkForArgs || restartingTask.definition.args === args),
@@ -113,8 +119,10 @@ export function getRestartingTask(task: vscode.Task): vscode.Task | void {
 
 export async function restartQueuedTask(task: vscode.Task): Promise<void> {
 	const restartingTask = getRestartingTask(task);
+
 	if (restartingTask) {
 		restartingTasks.delete(restartingTask.definition.id);
+
 		try {
 			await vscode.tasks.executeTask(restartingTask);
 		} catch (e) {
@@ -125,6 +133,7 @@ export async function restartQueuedTask(task: vscode.Task): Promise<void> {
 
 export function removeCancellingTask(task: vscode.Task): void {
 	const cancellingTask = getCancellingTask(task);
+
 	if (cancellingTask) {
 		cancellingTasks.delete(cancellingTask.definition.id);
 		vscode.commands.executeCommand(COMMAND_RENDER_TASK, task);
@@ -138,6 +147,7 @@ export async function queueRestartTask(
 	if (isTaskRunning(task)) {
 		const definition = task.definition as GradleTaskDefinition;
 		restartingTasks.set(definition.id, task);
+
 		const cancellationKey = getRunTaskCommandCancellationKey(
 			definition.projectFolder,
 			task.name,
@@ -157,6 +167,7 @@ export function buildTaskId(
 
 export function buildTaskName(definition: GradleTaskDefinition): string {
 	const argsLabel = definition.args ? ` ${definition.args}` : "";
+
 	return `${definition.script}${argsLabel}`;
 }
 
@@ -174,7 +185,9 @@ export function createTaskFromDefinition(
 	const args = [definition.script]
 		.concat(parseArgsStringToArgv(definition.args.trim()))
 		.filter(Boolean);
+
 	const taskName = buildTaskName(definition);
+
 	const cancellationKey = getRunTaskCommandCancellationKey(
 		rootProject.getProjectUri().fsPath,
 		definition.script,
@@ -186,6 +199,7 @@ export function createTaskFromDefinition(
 		cancellationKey,
 		client,
 	);
+
 	const task = new vscode.Task(
 		definition,
 		rootProject.getWorkspaceFolder(),
@@ -198,7 +212,9 @@ export function createTaskFromDefinition(
 	);
 
 	const reuseTerminals = getConfigReuseTerminals();
+
 	let panelKind = vscode.TaskPanelKind.Dedicated;
+
 	if (reuseTerminals === "off") {
 		panelKind = vscode.TaskPanelKind.New;
 	} else if (reuseTerminals === "all") {
@@ -213,6 +229,7 @@ export function createTaskFromDefinition(
 		reveal: vscode.TaskRevealKind.Always,
 	};
 	terminal.setTask(task);
+
 	return task;
 }
 
@@ -222,6 +239,7 @@ export function resolveTaskFromDefinition(
 	client: TaskServerClient,
 ): vscode.Task | undefined {
 	const taskName = buildTaskName(definition);
+
 	const task = new vscode.Task(
 		definition,
 		workspaceFolder,
@@ -233,18 +251,22 @@ export function resolveTaskFromDefinition(
 			): Promise<vscode.Pseudoterminal> => {
 				const resolvedTaskDefinition =
 					resolvedDefinition as GradleTaskDefinition;
+
 				const resolvedWorkspaceFolder =
 					vscode.workspace.getWorkspaceFolder(
 						vscode.Uri.file(resolvedTaskDefinition.workspaceFolder),
 					) || workspaceFolder;
+
 				const rootProject = new RootProject(
 					resolvedWorkspaceFolder,
 					vscode.Uri.file(resolvedTaskDefinition.projectFolder),
 				);
+
 				const cancellationKey = getRunTaskCommandCancellationKey(
 					rootProject.getProjectUri().fsPath,
 					definition.script,
 				);
+
 				const resolvedArgs = [resolvedTaskDefinition.script]
 					.concat(
 						parseArgsStringToArgv(
@@ -252,6 +274,7 @@ export function resolveTaskFromDefinition(
 						),
 					)
 					.filter(Boolean);
+
 				const executeTerminal = new GradleRunnerTerminal(
 					rootProject,
 					resolvedArgs,
@@ -259,6 +282,7 @@ export function resolveTaskFromDefinition(
 					client,
 				);
 				executeTerminal.setTask(task);
+
 				return executeTerminal;
 			},
 		),
@@ -266,7 +290,9 @@ export function resolveTaskFromDefinition(
 	);
 
 	const reuseTerminals = getConfigReuseTerminals();
+
 	let panelKind = vscode.TaskPanelKind.Dedicated;
+
 	if (reuseTerminals === "off") {
 		panelKind = vscode.TaskPanelKind.New;
 	} else if (reuseTerminals === "all") {
@@ -280,6 +306,7 @@ export function resolveTaskFromDefinition(
 		panel: panelKind,
 		reveal: vscode.TaskRevealKind.Always,
 	};
+
 	return task;
 }
 
@@ -290,7 +317,9 @@ function createVSCodeTaskFromGradleTask(
 	args = "",
 ): vscode.Task {
 	const taskPath = gradleTask.getPath();
+
 	const script = taskPath[0] === ":" ? taskPath.substr(1) : taskPath;
+
 	const definition: Required<GradleTaskDefinition> = {
 		type: "gradle",
 		id: buildTaskId(
@@ -311,6 +340,7 @@ function createVSCodeTaskFromGradleTask(
 		isPinned: false,
 		javaDebug: false,
 	};
+
 	return createTaskFromDefinition(definition, rootProject, client);
 }
 
@@ -320,10 +350,14 @@ export function getVSCodeTasksFromGradleProject(
 	client: TaskServerClient,
 ): vscode.Task[] {
 	let projects: Array<GradleProject> = [gradleProject];
+
 	const vsCodeTasks: vscode.Task[] = [];
+
 	while (projects.length) {
 		const project = projects.shift();
+
 		const gradleTasks: GradleTask[] | void = project!.getTasksList();
+
 		for (const gradleTask of gradleTasks) {
 			vsCodeTasks.push(
 				createVSCodeTaskFromGradleTask(gradleTask, rootProject, client),
@@ -341,11 +375,14 @@ export async function loadTasksForProjectRoots(
 	gradleBuildContentProvider: GradleBuildContentProvider,
 ): Promise<vscode.Task[]> {
 	let allTasks: vscode.Task[] = [];
+
 	for (const rootProject of rootProjects) {
 		if (getConfigIsAutoDetectionEnabled(rootProject)) {
 			const gradleBuild =
 				await gradleBuildContentProvider.getGradleBuild(rootProject);
+
 			const gradleProject = gradleBuild && gradleBuild.getProject();
+
 			if (gradleProject) {
 				const vsCodeTasks = getVSCodeTasksFromGradleProject(
 					rootProject,
@@ -358,6 +395,7 @@ export async function loadTasksForProjectRoots(
 	}
 	// detect duplicate task names
 	const tasksMap: Map<string, vscode.Task[]> = new Map();
+
 	for (const task of allTasks) {
 		if (tasksMap.has(task.name)) {
 			tasksMap.get(task.name)!.push(task);
@@ -370,10 +408,12 @@ export async function loadTasksForProjectRoots(
 		if (tasks.length !== 1) {
 			for (const task of tasks) {
 				const definition = task.definition as GradleTaskDefinition;
+
 				const relativePath = path.relative(
 					definition.workspaceFolder,
 					definition.projectFolder,
 				);
+
 				if (relativePath) {
 					task.name = task.name + ` (${relativePath})`;
 				}
@@ -391,17 +431,21 @@ export async function runTask(
 	debug = false,
 ): Promise<void> {
 	const isRunning = isTaskRunning(task, args);
+
 	if (!getAllowParallelRun() && isRunning) {
 		logger.warn("Unable to run task, task is already running:", task.name);
+
 		return;
 	}
 	if (debug) {
 		const INSTALL_EXTENSIONS = "Install Missing Extensions";
+
 		if (!getJavaLanguageSupportExtension() || !getJavaDebuggerExtension()) {
 			const input = await vscode.window.showErrorMessage(
 				"The Java Language Support & Debugger extensions are required for debugging.",
 				INSTALL_EXTENSIONS,
 			);
+
 			if (input === INSTALL_EXTENSIONS) {
 				await vscode.commands.executeCommand(
 					"workbench.extensions.action.showExtensionsWithIds",
@@ -413,6 +457,7 @@ export async function runTask(
 			await vscode.window.showErrorMessage(
 				"The Java Language Support extension is not activated.",
 			);
+
 			return;
 		}
 	}
@@ -442,6 +487,7 @@ export async function runTaskWithArgs(
 	debug = false,
 ): Promise<void> {
 	const args = await getTaskArgs();
+
 	if (args !== undefined) {
 		await runTask(rootProjectsStore, task, client, args, debug);
 	} else {
@@ -462,7 +508,9 @@ export function cloneTask(
 		args,
 		javaDebug: javaDebug,
 	};
+
 	const rootProject = rootProjectsStore.get(definition.projectFolder);
+
 	return createTaskFromDefinition(
 		definition,
 		rootProject!,

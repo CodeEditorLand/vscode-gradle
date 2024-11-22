@@ -27,6 +27,7 @@ export class SpecifyProjectNameStep implements IProjectCreationStep {
 				inputBox.validationMessage = this.isValidProjectName(
 					metadata.projectName,
 				);
+
 				if (metadata.steps.length) {
 					inputBox.buttons = [vscode.QuickInputButtons.Back];
 					disposables.push(

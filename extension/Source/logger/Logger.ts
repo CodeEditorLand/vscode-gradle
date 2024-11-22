@@ -39,7 +39,9 @@ export class Logger {
 
 	public format(message: string, verbosity: LogVerbosity): string {
 		const verbosityString = LogVerbosity[verbosity].toLowerCase();
+
 		const prefix = this.prefix ? ` [${this.prefix}]` : "";
+
 		return `[${verbosityString}]${prefix} ${message}`;
 	}
 

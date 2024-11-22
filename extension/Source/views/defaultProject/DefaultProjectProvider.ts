@@ -40,6 +40,7 @@ export class DefaultProjectProvider {
 			return this.defaultTasks;
 		}
 		const tasks = [];
+
 		for (const rootProject of rootProjects) {
 			for (const defaultTaskDefinition of DefaultProjectProvider.defaultTaskDefinitions) {
 				tasks.push(
@@ -62,6 +63,7 @@ export class DefaultProjectProvider {
 			}
 		}
 		this.defaultTasks = tasks;
+
 		return tasks;
 	}
 
@@ -100,21 +102,25 @@ export class DefaultProjectProvider {
 	): Promise<vscode.TreeItem[]> {
 		const configurationMap: Map<string, DependencyConfigurationTreeItem> =
 			new Map();
+
 		const buildFileUri = vscode.Uri.file(
 			// Due to no project knowledge, we only get informations from project root's build.gradle
 			path.join(element.projectPath, "build.gradle"),
 		);
+
 		if (!isLanguageServerStarted) {
 			return [new HintItem("No dependencies")];
 		}
 		const dependencyItems = await vscode.commands.executeCommand<
 			DefaultDependencyItem[]
 		>("gradle.getDependencies", buildFileUri.toString());
+
 		if (!dependencyItems) {
 			return [new HintItem("No dependencies")];
 		}
 		for (const dependencyItem of dependencyItems) {
 			const configuration = dependencyItem.configuration;
+
 			if (!configurationMap.has(configuration)) {
 				const configItem: DependencyConfigurationTreeItem =
 					new DependencyConfigurationTreeItem(
@@ -125,6 +131,7 @@ export class DefaultProjectProvider {
 				configurationMap.set(configuration, configItem);
 			}
 			const configurationItem = configurationMap.get(configuration);
+
 			if (!configurationItem) {
 				continue;
 			}
@@ -150,6 +157,7 @@ export class DefaultProjectProvider {
 			buildFileUri.toString(),
 			Array.from(configurationMap.values()),
 		);
+
 		return this.defaultDependencies.get(buildFileUri.toString()) || [];
 	}
 }

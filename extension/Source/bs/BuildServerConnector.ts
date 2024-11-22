@@ -19,6 +19,7 @@ export class BuildServerConnector {
 	 */
 	public setupBuildServerPipeStream(): boolean {
 		this.serverPipePath = getRandomPipeName();
+
 		if (this.serverPipePath === "") {
 			return false;
 		}
@@ -37,6 +38,7 @@ export class BuildServerConnector {
 			});
 		});
 		this.serverPipeServer.listen(this.serverPipePath);
+
 		return true;
 	}
 

@@ -53,13 +53,17 @@ export async function findValidJavaHome(): Promise<string | undefined> {
 		getJdtlsConfigJavaHome,
 		getConfigJavaHome,
 	];
+
 	let javaHome: string | undefined = undefined;
+
 	let javaVersion = 0;
 
 	for (const getJavaHome of javaHomeGetters) {
 		javaHome = getJavaHome() || undefined;
+
 		if (javaHome) {
 			javaVersion = await getMajorVersion(javaHome);
+
 			if (javaVersion >= REQUIRED_JDK_VERSION) {
 				return javaHome;
 			}
@@ -68,9 +72,11 @@ export async function findValidJavaHome(): Promise<string | undefined> {
 
 	// Search valid JDKs from env.JAVA_HOME, env.PATH, SDKMAN, jEnv, jabba, common directories
 	const javaRuntimes = await listJdks();
+
 	const validJdks = javaRuntimes.find(
 		(r) => r.version!.major >= REQUIRED_JDK_VERSION,
 	);
+
 	if (validJdks !== undefined) {
 		return validJdks.homedir;
 	}
@@ -78,6 +84,7 @@ export async function findValidJavaHome(): Promise<string | undefined> {
 	// Search java.configuration.runtimes if still not found
 	javaHome = await findDefaultRuntimeFromSettings();
 	javaVersion = await getMajorVersion(javaHome);
+
 	if (javaVersion >= REQUIRED_JDK_VERSION) {
 		return javaHome;
 	}
@@ -98,8 +105,10 @@ export function getRedHatJavaEmbeddedJRE(): string | undefined {
 		vscode.extensions.getExtension("redhat.java")!.extensionPath,
 		"jre",
 	);
+
 	if (fse.existsSync(jreHome) && fse.statSync(jreHome).isDirectory()) {
 		const candidates = fse.readdirSync(jreHome);
+
 		for (const candidate of candidates) {
 			if (
 				fse.existsSync(
@@ -245,11 +254,17 @@ export function getProjectOpenBehaviour(): string {
 
 export function getGradleConfig(): GradleConfig {
 	const gradleConfig = new GradleConfig();
+
 	const gradleHome = getConfigJavaImportGradleHome();
+
 	const gradleUserHome = getConfigJavaImportGradleUserHome();
+
 	const gradleJvmArguments = getConfigJavaImportGradleJvmArguments();
+
 	const gradleVersion = getConfigJavaImportGradleVersion();
+
 	const javaHome = getConfigJavaImportGradleJavaHome();
+
 	if (gradleHome !== null) {
 		gradleConfig.setGradleHome(gradleHome);
 	}
@@ -266,9 +281,12 @@ export function getGradleConfig(): GradleConfig {
 		gradleConfig.setJavaHome(javaHome);
 	}
 	gradleConfig.setWrapperEnabled(getConfigJavaImportGradleWrapperEnabled());
+
 	const javaExtension = vscode.extensions.getExtension("redhat.java");
+
 	if (javaExtension) {
 		const version = javaExtension.packageJSON.version;
+
 		if (version) {
 			gradleConfig.setJavaExtensionVersion(version);
 		}

@@ -310,6 +310,7 @@ export class Commands {
 			COMMAND_RUN_TASKS,
 			new RunTasksCommand(this.gradleTaskProvider),
 		);
+
 		if (isJavaExtEnabled()) {
 			this.registerCommand(
 				COMMAND_RELOAD_JAVA_PROJECT,

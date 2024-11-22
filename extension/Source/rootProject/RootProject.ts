@@ -7,6 +7,7 @@ import { isTest } from "../util";
 export class RootProject {
 	private environment?: Environment;
 	private gradleVersion?: string;
+
 	constructor(
 		private readonly workspaceFolder: vscode.WorkspaceFolder,
 		private readonly projectUri: vscode.Uri,
@@ -14,11 +15,14 @@ export class RootProject {
 
 	public setEnvironment(environment: Environment): void {
 		this.environment = environment;
+
 		const gradleVersion = environment
 			.getGradleEnvironment()
 			?.getGradleVersion();
+
 		if (gradleVersion && gradleVersion !== this.gradleVersion) {
 			this.gradleVersion = gradleVersion;
+
 			if (!isTest()) {
 				sendInfo("", {
 					name: "changeGradleVersion",

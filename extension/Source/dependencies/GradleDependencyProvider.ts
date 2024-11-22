@@ -21,25 +21,31 @@ export class GradleDependencyProvider {
 		rootProject: RootProject,
 	): Promise<vscode.TreeItem[]> {
 		const projectPath = element.getProjectPath();
+
 		if (this.cachedDependencies.has(projectPath)) {
 			return this.cachedDependencies.get(projectPath)!;
 		}
 		const gradleBuild =
 			await this.contentProvider.getGradleBuild(rootProject);
+
 		if (gradleBuild) {
 			const project = findGradleProjectFromBuild(
 				projectPath,
 				gradleBuild,
 			);
+
 			if (project) {
 				const dependencyItem = project.getDependencyitem();
+
 				if (dependencyItem) {
 					const configItems = getDependencyConfigurationTreeItems(
 						dependencyItem,
 						element,
 					);
+
 					if (configItems) {
 						this.cachedDependencies.set(projectPath, configItems);
+
 						return configItems;
 					}
 				}
@@ -47,6 +53,7 @@ export class GradleDependencyProvider {
 		}
 		const noDependencies = GradleDependencyProvider.getNoDependencies();
 		this.cachedDependencies.set(projectPath, noDependencies);
+
 		return noDependencies;
 	}
 

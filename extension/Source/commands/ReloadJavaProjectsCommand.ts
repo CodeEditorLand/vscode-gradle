@@ -15,6 +15,7 @@ export class ReloadJavaProjectsCommand extends Command {
 	}
 	async run(): Promise<void> {
 		const projectsMap = getProjectTreeItemMap();
+
 		if (projectsMap?.size) {
 			// call Reload All Java Projects in redhat.java
 			vscode.commands.executeCommand(

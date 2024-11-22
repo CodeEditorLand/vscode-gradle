@@ -13,6 +13,7 @@ export class EventWaiter<T = null> {
 		const disposable = this.event(() => {
 			disposable.dispose();
 			this.eventRun = true;
+
 			if (callback) {
 				callback();
 			}

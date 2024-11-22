@@ -11,6 +11,7 @@ let extension: Extension;
 
 export async function activate(context: vscode.ExtensionContext): Promise<Api> {
 	await initializeFromJsonFile(context.asAbsolutePath("./package.json"));
+
 	return instrumentOperation("activation", activateExtension)(context);
 }
 
@@ -19,6 +20,7 @@ function activateExtension(
 	context: vscode.ExtensionContext,
 ): Api {
 	extension = new Extension(context);
+
 	return extension.getApi();
 }
 

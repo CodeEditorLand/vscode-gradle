@@ -27,6 +27,7 @@ export class FileWatcher implements vscode.Disposable {
 				const fileDeleted = event.files.find((file) =>
 					this.isFileMatching(file),
 				);
+
 				if (fileDeleted) {
 					this.fireOnDidChange(fileDeleted);
 				}
@@ -37,6 +38,7 @@ export class FileWatcher implements vscode.Disposable {
 				const fileCreated = event.files.find((file) =>
 					this.isFileMatching(file),
 				);
+
 				if (fileCreated) {
 					this.fireOnDidChange(fileCreated);
 				}

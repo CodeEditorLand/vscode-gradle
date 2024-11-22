@@ -13,6 +13,7 @@ export async function getMajorVersion(
 		return 0;
 	}
 	const runtime = await getRuntime(javaHome, { withVersion: true });
+
 	return runtime?.version?.major || 0;
 }
 
@@ -22,13 +23,16 @@ export async function findDefaultRuntimeFromSettings(): Promise<
 	const runtimes = vscode.workspace
 		.getConfiguration()
 		.get("java.configuration.runtimes");
+
 	if (Array.isArray(runtimes) && runtimes.length) {
 		let candidate: string | undefined;
+
 		for (const runtime of runtimes) {
 			if (!runtime || typeof runtime !== "object" || !runtime.path) {
 				continue;
 			}
 			const jr = await getRuntime(runtime.path);
+
 			if (jr) {
 				candidate = jr.homedir;
 			}

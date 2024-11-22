@@ -9,5 +9,6 @@ export function isJavaExtEnabled(): boolean {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const javaExt: vscode.Extension<any> | undefined =
 		vscode.extensions.getExtension(JAVA_EXTENSION_ID);
+
 	return !!javaExt;
 }

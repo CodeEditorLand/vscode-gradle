@@ -27,6 +27,7 @@ export class GradleTaskManager implements vscode.Disposable {
 			vscode.tasks.onDidEndTask((e: vscode.TaskEndEvent) => {
 				if (isGradleTask(e.execution.task)) {
 					this._onDidEndTask.fire(e.execution.task);
+
 					if (getRunningGradleTasks().length === 0) {
 						this._onDidEndAllTasks.fire(null);
 					}

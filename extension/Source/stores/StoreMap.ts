@@ -17,6 +17,7 @@ export abstract class StoreMap<K, V> extends EventedStore<V> {
 
 	public clear(fireOnDidChange = true): void {
 		this.data.clear();
+
 		if (fireOnDidChange) {
 			this.fireOnDidChange(null);
 		}
@@ -24,6 +25,7 @@ export abstract class StoreMap<K, V> extends EventedStore<V> {
 
 	public setItem(key: K, value: V, fireOnDidChange = true): void {
 		this.data.set(key, value);
+
 		if (fireOnDidChange) {
 			this.fireOnDidChange(value);
 		}
@@ -31,8 +33,10 @@ export abstract class StoreMap<K, V> extends EventedStore<V> {
 
 	public removeItem(key: K, fireOnDidChange = true): void {
 		const item = this.data.get(key);
+
 		if (item) {
 			this.data.delete(key);
+
 			if (fireOnDidChange) {
 				this.fireOnDidChange(item);
 			}

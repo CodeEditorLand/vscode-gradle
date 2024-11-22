@@ -27,6 +27,7 @@ export class StopDaemonsCommand extends Command {
 		}
 		const gradleRootFolders =
 			await this.rootProjectsStore.getProjectRootsWithUniqueVersions();
+
 		try {
 			const promises: Promise<void>[] = gradleRootFolders.map(
 				(rootProject) =>
@@ -42,7 +43,9 @@ export class StopDaemonsCommand extends Command {
 
 	async stopDaemons(projectFolder: string): Promise<void> {
 		const gradleConfig = getGradleConfig();
+
 		const connectType = await GradleStatus.getConnectionType(gradleConfig);
+
 		if (connectType === GradleConnectionType.WRAPPER) {
 			const gradleExecution = new GradleWrapper(projectFolder);
 			await gradleExecution.exec(["--stop"]);

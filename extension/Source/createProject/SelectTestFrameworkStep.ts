@@ -26,6 +26,7 @@ export class SelectTestFrameworkStep implements IProjectCreationStep {
 				pickBox.matchOnDescription = true;
 				pickBox.ignoreFocusOut = true;
 				pickBox.items = this.getTestFrameworkPickItems();
+
 				if (metadata.steps.length) {
 					pickBox.buttons = [vscode.QuickInputButtons.Back];
 					disposables.push(
@@ -39,24 +40,33 @@ export class SelectTestFrameworkStep implements IProjectCreationStep {
 				disposables.push(
 					pickBox.onDidAccept(() => {
 						const selectedTestFramework = pickBox.selectedItems[0];
+
 						if (selectedTestFramework) {
 							switch (selectedTestFramework.label) {
 								case "JUnit 4":
 									// junit4 is the default test framework
 									metadata.testFramework = undefined;
+
 									break;
+
 								case "TestNG":
 									metadata.testFramework =
 										TestFramework.TESTNG;
+
 									break;
+
 								case "Spock":
 									metadata.testFramework =
 										TestFramework.SPOCK;
+
 									break;
+
 								case "JUnit Jupiter":
 									metadata.testFramework =
 										TestFramework.JUNIT_JUPITER;
+
 									break;
+
 								default:
 									resolve(StepResult.STOP);
 							}
@@ -95,6 +105,7 @@ export class SelectTestFrameworkStep implements IProjectCreationStep {
 		result.push({
 			label: "JUnit Jupiter",
 		});
+
 		return result;
 	}
 }

@@ -42,6 +42,7 @@ export class BspProxy {
 	public async start(): Promise<void> {
 		await this.jdtlsImporterConnector.waitForImporterPipePath();
 		await this.jdtlsImporterConnector.setupImporterPipeStream();
+
 		if (this.buildServerStart) {
 			this.setupMessageForwarding(
 				this.jdtlsImporterConnector.getImporterConnection(),
@@ -75,6 +76,7 @@ export class BspProxy {
 			}
 			importerConnection.sendNotification(method);
 		});
+
 		importerConnection.onError(([error]) => {
 			this.logger.error(`Error on importerConnection: ${error.message}`);
 			sendInfo("", {

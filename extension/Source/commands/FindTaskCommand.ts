@@ -16,10 +16,12 @@ export class FindTaskCommand extends Command {
 	}
 	async run(): Promise<void> {
 		const foundTaskName = await getFindTask(this.gradleTaskProvider);
+
 		if (foundTaskName) {
 			const vscodeTask = this.gradleTaskProvider
 				.getTasks()
 				.find((task) => task.name === foundTaskName);
+
 			if (vscodeTask) {
 				await focusTaskInGradleTasksTree(
 					vscodeTask,

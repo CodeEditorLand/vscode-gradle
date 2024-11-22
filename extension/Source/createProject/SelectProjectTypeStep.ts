@@ -29,23 +29,29 @@ export class SelectProjectTypeStep implements IProjectCreationStep {
 				disposables.push(
 					pickBox.onDidAccept(async () => {
 						const selectedType = pickBox.selectedItems[0];
+
 						if (selectedType) {
 							switch (selectedType.label) {
 								case "application":
 									metadata.projectType =
 										ProjectType.JAVA_APPLICATION;
 									metadata.totalSteps = 5;
+
 									break;
+
 								case "library":
 									metadata.projectType =
 										ProjectType.JAVA_LIBRARY;
 									metadata.totalSteps = 5;
+
 									break;
+
 								case "Gradle plugin":
 									metadata.projectType =
 										ProjectType.JAVA_GRADLE_PLUGIN;
 									metadata.totalSteps = 4; // when creating gradle plugin, we shouldn't specify test framework
 									break;
+
 								default:
 									resolve(StepResult.STOP);
 							}
@@ -84,6 +90,7 @@ export class SelectProjectTypeStep implements IProjectCreationStep {
 			label: "Gradle plugin",
 			description: "A Gradle plugin implemented in Java",
 		});
+
 		return result;
 	}
 }

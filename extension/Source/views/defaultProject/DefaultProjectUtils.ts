@@ -96,6 +96,7 @@ export function generateDefaultTaskDefinitions(): DefaultTaskDefinition[] {
 			"Displays the tasks runnable from root project.",
 		),
 	);
+
 	return result;
 }
 

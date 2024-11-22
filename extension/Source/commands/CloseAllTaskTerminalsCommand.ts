@@ -18,6 +18,7 @@ export class CloseAllTaskTerminalsCommand extends Command {
 			Array.from(this.taskTerminalsStore.getData().keys()).forEach(
 				(key) => {
 					const terminalsSet = this.taskTerminalsStore.getItem(key);
+
 					if (terminalsSet) {
 						Array.from(terminalsSet).forEach((terminal) =>
 							terminal.dispose(),

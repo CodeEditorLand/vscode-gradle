@@ -36,17 +36,22 @@ export class GradleTestRunner implements TestRunner {
 
 	public async launch(context: IRunTestContext): Promise<void> {
 		this.context = context;
+
 		const tests: Map<string, string[]> = new Map();
 		context.testItems.forEach((testItem) => {
 			const id = testItem.id;
+
 			const parts: TestIdParts =
 				this.testRunnerApi.parsePartsFromTestId(id);
+
 			if (!parts.class) {
 				return;
 			}
 			const testMethods = tests.get(parts.class) || [];
+
 			if (parts.invocations?.length) {
 				let methodId = parts.invocations[0];
+
 				if (methodId.includes("(")) {
 					methodId = methodId.slice(0, methodId.indexOf("(")); // gradle test task doesn't support method with parameters
 				}
@@ -56,13 +61,18 @@ export class GradleTestRunner implements TestRunner {
 		});
 
 		const agrs = context.testConfig?.args ?? [];
+
 		const vmArgs = context.testConfig?.vmArgs;
+
 		const isDebug =
 			context.isDebug &&
 			!!vscode.extensions.getExtension("vscjava.vscode-java-debug");
+
 		let debugPort = -1;
+
 		if (isDebug) {
 			debugPort = await getPort();
+
 			const initScriptContent = this.getInitScriptContent(debugPort);
 			await vscode.workspace.fs.writeFile(
 				vscode.Uri.file(this.testInitScriptPath),
@@ -71,6 +81,7 @@ export class GradleTestRunner implements TestRunner {
 			agrs.unshift("--init-script", this.testInitScriptPath);
 		}
 		const env = context.testConfig?.env;
+
 		try {
 			await vscode.commands.executeCommand(
 				"java.execute.workspaceCommand",
@@ -81,6 +92,7 @@ export class GradleTestRunner implements TestRunner {
 				vmArgs,
 				env,
 			);
+
 			if (isDebug) {
 				this.startJavaDebug(debugPort);
 			}
@@ -122,6 +134,7 @@ export class GradleTestRunner implements TestRunner {
 
 	private filterStackTrace(stackTrace: string): string {
 		const filterElements = this.getStacktraceFilterElements();
+
 		return stackTrace
 			.split("\n")
 			.filter((line) =>
@@ -167,6 +180,7 @@ export class GradleTestRunner implements TestRunner {
 		}
 
 		await waitOnTcp("localhost", javaDebugPort);
+
 		const debugConfig = {
 			type: "java",
 			name: "Debug (Attach) via Gradle",
@@ -175,10 +189,12 @@ export class GradleTestRunner implements TestRunner {
 			port: javaDebugPort,
 			projectName: this.context.projectName,
 		};
+
 		const startedDebugging = await vscode.debug.startDebugging(
 			this.context.workspaceFolder,
 			debugConfig,
 		);
+
 		if (!startedDebugging) {
 			throw new Error("The debugger was not started");
 		}

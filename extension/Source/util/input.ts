@@ -60,11 +60,13 @@ export function getRunTasks(
 		vscode.Uri.parse(projectUri).fsPath,
 		"build.gradle",
 	);
+
 	return vscode.window.showQuickPick(
 		gradleTaskProvider.loadTasks().then((tasks) =>
 			tasks
 				.filter((task) => {
 					const buildFile = task.definition.buildFile;
+
 					if (buildFile) {
 						if (
 							vscode.Uri.file(buildFile).fsPath === buildFilePath
@@ -88,12 +90,14 @@ export async function getRootProjectFolder(
 	rootProjectsStore: RootProjectsStore,
 ): Promise<RootProject | undefined> {
 	const rootProjects = await rootProjectsStore.getProjectRoots();
+
 	if (rootProjects.length === 1) {
 		return Promise.resolve(rootProjects[0]);
 	}
 	const rootProjectPaths = rootProjects.map(
 		(rootProject) => rootProject.getProjectUri().fsPath,
 	);
+
 	const selectedRootProjectPath = await vscode.window.showQuickPick(
 		rootProjectPaths,
 		{
@@ -101,6 +105,7 @@ export async function getRootProjectFolder(
 			placeHolder: "Select the root project",
 		},
 	);
+
 	if (selectedRootProjectPath) {
 		return rootProjects[rootProjectPaths.indexOf(selectedRootProjectPath)];
 	}
@@ -112,10 +117,12 @@ export async function confirmModal(message: string): Promise<boolean> {
 		return true;
 	}
 	const CONFIRM = "Yes";
+
 	const result = await vscode.window.showWarningMessage(
 		message,
 		{ modal: true },
 		CONFIRM,
 	);
+
 	return result === CONFIRM;
 }

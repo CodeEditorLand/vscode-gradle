@@ -43,17 +43,20 @@ export class GradleDaemonsTreeDataProvider
 			return [];
 		}
 		this.cancelDeferred = new Deferred();
+
 		const cancellationToken = new vscode.CancellationTokenSource();
 		// eslint-disable-next-line @typescript-eslint/no-floating-promises
 		this.cancelDeferred.promise.then(() => cancellationToken.cancel());
 
 		const projectRootFolders = await this.getProjectRootFolders();
+
 		const promises: Promise<GradleDaemonTreeItem[]>[] =
 			projectRootFolders.map(async (projectRootFolder) => {
 				const daemonInfos =
 					await GradleStatus.getDaemonsStatusList(projectRootFolder);
 
 				let filteredDaemonInfos = daemonInfos;
+
 				if (!getShowStoppedDaemons()) {
 					filteredDaemonInfos = daemonInfos.filter(
 						(daemonInfo) =>
@@ -76,12 +79,14 @@ export class GradleDaemonsTreeDataProvider
 			this.cancelDeferred.promise,
 		]);
 		this.cancelDeferred = undefined;
+
 		const length = this.treeItems.length;
 		await vscode.commands.executeCommand(
 			"setContext",
 			"gradle:hasValidDaemons",
 			length,
 		);
+
 		if (length) {
 			return this.treeItems;
 		}

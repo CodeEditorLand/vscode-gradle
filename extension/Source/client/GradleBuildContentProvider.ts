@@ -20,8 +20,10 @@ export class GradleBuildContentProvider {
 		rootProject: RootProject,
 	): Promise<GradleBuild | undefined> {
 		await lock.acquireAsync();
+
 		try {
 			const projectPath = rootProject.getProjectUri().fsPath;
+
 			if (this.cachedBuild.has(projectPath)) {
 				return this.cachedBuild.get(projectPath);
 			}
@@ -29,6 +31,7 @@ export class GradleBuildContentProvider {
 				rootProject,
 				getGradleConfig(),
 			);
+
 			if (gradleBuild) {
 				await syncGradleBuild(gradleBuild);
 				this.cachedBuild.set(projectPath, gradleBuild);

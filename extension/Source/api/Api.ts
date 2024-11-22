@@ -53,11 +53,14 @@ export class Api {
 
 	public runTask(opts: RunTaskOpts): Promise<void> {
 		const taskArgs = (opts.args || []).filter(Boolean);
+
 		const runBuildArgs = [opts.taskName].concat(taskArgs);
+
 		const runBuildOpts = {
 			...opts,
 			args: runBuildArgs,
 		};
+
 		return this.runBuild(runBuildOpts);
 	}
 
@@ -77,16 +80,19 @@ export class Api {
 
 	public cancelRunTask(opts: CancelTaskOpts): Promise<void> {
 		const args = opts.taskName ? [opts.taskName] : [];
+
 		const cancelBuildOpts = {
 			projectFolder: opts.projectFolder,
 			args,
 			cancellationKey: opts.cancellationKey,
 		};
+
 		return this.cancelRunBuild(cancelBuildOpts);
 	}
 
 	public cancelRunBuild(opts: CancelBuildOpts): Promise<void> {
 		const cancellationKey = this.getRunBuildCancellationKey(opts);
+
 		return this.client.cancelBuild(cancellationKey);
 	}
 

@@ -24,9 +24,11 @@ export class DoubleClickChecker {
 			this.lastItem === item
 		) {
 			this.resetState();
+
 			return true;
 		}
 		this.setState(item);
+
 		return false;
 	}
 }

@@ -5,6 +5,7 @@ import * as vscode from "vscode";
 
 export class ProjectTaskTreeItem extends vscode.TreeItem {
 	private children: vscode.TreeItem[] | undefined;
+
 	constructor(
 		name: string,
 		collapsibleState: vscode.TreeItemCollapsibleState,

@@ -37,7 +37,9 @@ function buildTaskTreeItem(
 	icons: Icons,
 ): RecentTaskTreeItem {
 	const definition = task.definition as GradleTaskDefinition;
+
 	const taskName = task.name;
+
 	const recentTaskTreeItem = new RecentTaskTreeItem(
 		gradleProjectTreeItem,
 		task,
@@ -48,6 +50,7 @@ function buildTaskTreeItem(
 		definition.debuggable,
 	);
 	recentTaskTreeItem.setContext();
+
 	return recentTaskTreeItem;
 }
 
@@ -57,10 +60,12 @@ function buildGradleProjectTreeItem(
 	icons: Icons,
 ): void {
 	const definition = task.definition as GradleTaskDefinition;
+
 	if (isWorkspaceFolder(task.scope) && isGradleTask(task)) {
 		let gradleProjectTreeItem = recentTasksGradleProjectTreeItemMap.get(
 			definition.projectFolder,
 		);
+
 		if (!gradleProjectTreeItem) {
 			gradleProjectTreeItem = new RecentTasksRootProjectTreeItem(
 				path.basename(definition.projectFolder),
@@ -113,11 +118,14 @@ export class RecentTasksTreeDataProvider
 			const taskId = Array.from(
 				this.taskTerminalsStore.getData().keys(),
 			).find((key) => this.taskTerminalsStore.getItem(key) === terminals);
+
 			if (taskId) {
 				const treeItem = recentTasksTreeItemMap.get(taskId);
+
 				if (treeItem) {
 					treeItem.setContext();
 					this.refresh(treeItem);
+
 					return;
 				}
 			}
@@ -152,6 +160,7 @@ export class RecentTasksTreeDataProvider
 		}
 		if (!element) {
 			const treeItems = await this.buildTreeItems();
+
 			if (!treeItems.length) {
 				return [new NoRecentTasksTreeItem()];
 			} else {
@@ -166,6 +175,7 @@ export class RecentTasksTreeDataProvider
 		recentTasksTreeItemMap.clear();
 
 		const gradleProjects = await this.rootProjectsStore.getProjectRoots();
+
 		if (!gradleProjects.length) {
 			return [];
 		}
@@ -175,17 +185,21 @@ export class RecentTasksTreeDataProvider
 		const recentTasks = this.recentTasksStore.getData();
 		Array.from(recentTasks.keys()).forEach((taskId: TaskId) => {
 			const task = this.gradleTaskProvider.findByTaskId(taskId);
+
 			if (!task) {
 				return;
 			}
 			const definition = task.definition as GradleTaskDefinition;
+
 			const rootProject = this.rootProjectsStore.get(
 				definition.projectFolder,
 			);
+
 			if (!rootProject) {
 				return;
 			}
 			const taskArgs = recentTasks.get(taskId) || "";
+
 			if (taskArgs) {
 				Array.from(taskArgs.values()).forEach((args: TaskArgs) => {
 					const recentTask = cloneTask(

@@ -8,6 +8,7 @@ export class PinnedTasksTreeItem extends vscode.TreeItem {
 	public readonly parentTreeItem?: vscode.TreeItem;
 	public readonly iconPath = new vscode.ThemeIcon("star-full");
 	public readonly contextValue = "PinnedTasks";
+
 	constructor(
 		label: string,
 		resourceUri?: vscode.Uri,

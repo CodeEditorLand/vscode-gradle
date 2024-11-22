@@ -27,20 +27,26 @@ export class GradleStatus {
 		projectRoot: string,
 	): Promise<string> {
 		const connectionType = await this.getConnectionType(gradleConfig);
+
 		switch (connectionType) {
 			case GradleConnectionType.WRAPPER:
 				if (await GradleWrapper.hasValidWrapper(projectRoot)) {
 					const wrapper = new GradleWrapper(projectRoot);
+
 					return wrapper.exec(["--status", "quiet"]);
 				}
 				return "";
+
 			case GradleConnectionType.LOCALINSTALLATION:
 				const localInstallation = new GradleLocalInstallation(
 					gradleConfig.getGradleHome(),
 				);
+
 				return localInstallation.exec(["--status", "quiet"]);
+
 			case GradleConnectionType.SPECIFICVERSION:
 				return "";
+
 			default:
 				throw new Error("Unknown connection type");
 		}
@@ -50,6 +56,7 @@ export class GradleStatus {
 		projectRoot: string,
 	): Promise<DaemonInfo[]> {
 		const gradleConfig = getGradleConfig();
+
 		const output = await this.getDaemonsStatusOutput(
 			gradleConfig,
 			projectRoot,
@@ -62,15 +69,19 @@ export class GradleStatus {
 		if (!output) return [];
 
 		const lines = output.split(/\r?\n/);
+
 		const daemonInfos: DaemonInfo[] = [];
 
 		const statusRegex = /^\s*([0-9]+)\s+(\w+)\s+(.+)$/;
 
 		lines.forEach((line) => {
 			const match = line.match(statusRegex);
+
 			if (match) {
 				const pid = match[1];
+
 				const statusString = match[2];
+
 				const info = match[3];
 
 				const status = statusString as DaemonStatus;

@@ -27,6 +27,7 @@ export class SelectScriptDSLStep implements IProjectCreationStep {
 				pickBox.matchOnDescription = true;
 				pickBox.ignoreFocusOut = true;
 				pickBox.items = this.getScriptDSLPickItems();
+
 				if (metadata.steps.length) {
 					pickBox.buttons = [vscode.QuickInputButtons.Back];
 					disposables.push(
@@ -40,18 +41,24 @@ export class SelectScriptDSLStep implements IProjectCreationStep {
 				disposables.push(
 					pickBox.onDidAccept(() => {
 						const selectedScriptDSL = pickBox.selectedItems[0];
+
 						if (selectedScriptDSL) {
 							switch (selectedScriptDSL.label) {
 								case "Groovy":
 									metadata.scriptDSL = "groovy";
+
 									break;
+
 								case "Kotlin":
 									metadata.scriptDSL = "kotlin";
+
 									break;
+
 								default:
 									resolve(StepResult.STOP);
 							}
 							metadata.steps.push(selectScriptDSLStep);
+
 							if (
 								!metadata.isAdvanced ||
 								metadata.projectType ===
@@ -88,6 +95,7 @@ export class SelectScriptDSLStep implements IProjectCreationStep {
 		result.push({
 			label: "Kotlin",
 		});
+
 		return result;
 	}
 }

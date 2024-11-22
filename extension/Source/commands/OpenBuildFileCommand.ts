@@ -18,6 +18,7 @@ export class OpenBuildFileCommand extends Command {
 			return run(item.task.definition.buildFile);
 		} else if (item.uri) {
 			const buildFilePath = await ensureBuildFilePath(item.uri);
+
 			if (buildFilePath) {
 				return run(buildFilePath);
 			}
@@ -29,8 +30,10 @@ export async function ensureBuildFilePath(
 	projectUri: string,
 ): Promise<string | undefined> {
 	const projectFsPath = vscode.Uri.parse(projectUri).fsPath;
+
 	for (const buildFileName of GRADLE_BUILD_FILE_NAMES) {
 		const buildFilePath: string = path.join(projectFsPath, buildFileName);
+
 		if (await fse.pathExists(buildFilePath)) {
 			return buildFilePath;
 		}

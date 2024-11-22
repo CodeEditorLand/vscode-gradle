@@ -7,6 +7,7 @@ export function createDecorator(
 ): Function {
 	return (_target: any, key: string, descriptor: any): void => {
 		let fnKey: string | null = null;
+
 		let fn: Function | null = null;
 
 		if (typeof descriptor.value === "function") {
@@ -32,6 +33,7 @@ export interface DebounceReducer<T> {
 export function debounce(delay: number): Function {
 	return createDecorator((fn, key) => {
 		const timerKey = `$debounce$${key}`;
+
 		return function (this: any, ...args: any[]): void {
 			clearTimeout(this[timerKey]);
 			this[timerKey] = setTimeout(() => {

@@ -14,6 +14,7 @@ export class TreeItemWithTasksOrGroups extends vscode.TreeItem {
 	public readonly parentTreeItem?: vscode.TreeItem;
 	public readonly iconPath = new vscode.ThemeIcon("file-submodule");
 	public readonly contextValue = "folder";
+
 	constructor(
 		name: string,
 		parentTreeItem?: vscode.TreeItem,

@@ -20,6 +20,7 @@ export class StopDaemonCommand extends Command {
 			return;
 		}
 		const pid = treeItem.pid;
+
 		try {
 			await this.stopDaemon(pid);
 			logger.info(`Successfully stopped daemon with PID ${pid}.`);

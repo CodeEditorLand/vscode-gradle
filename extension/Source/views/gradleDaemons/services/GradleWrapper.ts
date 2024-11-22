@@ -20,9 +20,12 @@ export class GradleWrapper implements GradleExecution {
 			throw new Error("No wrapper args supplied");
 		}
 		const quotedArgs = args.map((arg) => `"${arg}"`).join(" ");
+
 		const command = `${this.gradleWrapperPath} ${quotedArgs}`;
+
 		try {
 			const jdkPath = getConfigJavaImportGradleJavaHome();
+
 			const env = jdkPath
 				? { ...process.env, JAVA_HOME: jdkPath }
 				: process.env;
@@ -31,12 +34,14 @@ export class GradleWrapper implements GradleExecution {
 				cwd: this.projectRoot,
 				env,
 			});
+
 			if (stderr) {
 				logger.error(stderr);
 			}
 			return stdout;
 		} catch (error) {
 			logger.error(error.message);
+
 			throw new Error(`Error running gradle wrapper: ${error.message}`);
 		}
 	}
@@ -50,6 +55,7 @@ export class GradleWrapper implements GradleExecution {
 		);
 
 		const hasProperties = await fse.pathExists(propertiesPath);
+
 		return hasProperties;
 	}
 }

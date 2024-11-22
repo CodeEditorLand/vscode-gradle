@@ -50,13 +50,17 @@ export class GradleTaskProvider
 		_task: vscode.Task,
 	): Promise<vscode.Task | undefined> {
 		const { definition } = _task;
+
 		const gradleTaskDefinition = definition as GradleTaskDefinition;
+
 		const workspaceFolder = _task.scope as vscode.WorkspaceFolder;
+
 		if (!workspaceFolder) {
 			logger.error(
 				"Unable to provide Gradle task. Invalid workspace folder: ",
 				gradleTaskDefinition.workspaceFolder,
 			);
+
 			return undefined;
 		}
 		return resolveTaskFromDefinition(
@@ -75,9 +79,12 @@ export class GradleTaskProvider
 		}
 		logger.debug("Refreshing tasks");
 		this._onDidStartRefresh.fire(null);
+
 		const folders = await this.rootProjectsStore.getProjectRoots();
+
 		if (!folders.length) {
 			this.cachedTasks = [];
+
 			return Promise.resolve(this.cachedTasks);
 		}
 

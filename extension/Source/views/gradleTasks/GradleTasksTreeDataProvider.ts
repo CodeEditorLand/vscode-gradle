@@ -27,9 +27,13 @@ import { PinnedTasksTreeItem } from "./PinnedTasksTreeItem";
 import { PinnedTasksRootProjectTreeItem } from "./PinnedTasksRootProjectTreeItem";
 
 const gradleTaskTreeItemMap: Map<string, GradleTaskTreeItem> = new Map();
+
 const gradleProjectTreeItemMap: Map<string, RootProjectTreeItem> = new Map();
+
 const projectTreeItemMap: Map<string, ProjectTreeItem> = new Map();
+
 const groupTreeItemMap: Map<string, GroupTreeItem> = new Map();
+
 const pinnedTaskTreeItemMap: Map<string, GradleTaskTreeItem> = new Map();
 
 export function getGradleTaskTreeItemMap(): Map<string, GradleTaskTreeItem> {
@@ -84,6 +88,7 @@ export class GradleTasksTreeDataProvider implements vscode.TreeDataProvider<vsco
         // using vscode.tasks.fetchTasks({ type: 'gradle' }) is *incredibly slow* which
         // is why we get them directly from the task provider
         const tasks = await this.gradleTaskProvider.loadTasks();
+
         if (tasks.length === 0) {
             return [new NoGradleTasksTreeItem()];
         }
@@ -93,31 +98,40 @@ export class GradleTasksTreeDataProvider implements vscode.TreeDataProvider<vsco
             this.collapsed,
             this.icons
         );
+
         const pinnedTasksItem = new PinnedTasksTreeItem("Pinned Tasks");
+
         const pinnedTasks = this.pinnedTasksStore.getData();
+
         if (!pinnedTasks?.size) {
             return rootProjectTreeItems;
         }
         const pinnedTasksMap: Map<string, GradleTaskTreeItem[]> = new Map();
         Array.from(pinnedTasks.keys()).forEach((taskId: TaskId) => {
             const task = this.gradleTaskProvider.findByTaskId(taskId);
+
             if (!task) {
                 return;
             }
             const definition = task.definition as GradleTaskDefinition;
+
             const rootProject = this.rootProjectStore.get(definition.projectFolder);
+
             if (!rootProject) {
                 return;
             }
             let pinnedTasksArray = pinnedTasksMap.get(definition.projectFolder);
+
             if (!pinnedTasksArray) {
                 pinnedTasksArray = [];
                 pinnedTasksMap.set(definition.projectFolder, pinnedTasksArray);
             }
             const taskArgs = pinnedTasks.get(taskId) || "";
+
             if (taskArgs) {
                 Array.from(taskArgs.values()).forEach((args: TaskArgs) => {
                     const pinnedTask = cloneTask(this.rootProjectStore, task, args, this.client, definition.javaDebug);
+
                     const gradleTaskTreeItem = buildPinnedTaskTreeItem(pinnedTasksItem, pinnedTask, this.icons);
                     pinnedTasksArray!.push(gradleTaskTreeItem);
                     pinnedTaskTreeItemMap.set(definition.id, gradleTaskTreeItem);
@@ -128,6 +142,7 @@ export class GradleTasksTreeDataProvider implements vscode.TreeDataProvider<vsco
                 pinnedTaskTreeItemMap.set(definition.id, gradleTaskTreeItem);
             }
         });
+
         if (pinnedTasksMap.size) {
             if ((await this.rootProjectStore.getProjectRoots()).length === 1) {
                 pinnedTasksItem.setChildren(pinnedTasksMap.values().next().value);
@@ -135,6 +150,7 @@ export class GradleTasksTreeDataProvider implements vscode.TreeDataProvider<vsco
                 const pinnedTasksRootProjects: vscode.TreeItem[] = [];
                 pinnedTasksMap.forEach((value, key) => {
                     const rootProject = this.rootProjectStore.get(key);
+
                     if (rootProject) {
                         const pinnedTasksRootProjectTreeItem = new PinnedTasksRootProjectTreeItem(
                             path.basename(key),
@@ -190,6 +206,7 @@ export class GradleTasksTreeDataProvider implements vscode.TreeDataProvider<vsco
         }
         if (element instanceof ProjectDependencyTreeItem) {
             const rootProject = await findRootProject(this.rootProjectStore, element.projectPath);
+
             if (!rootProject) {
                 return GradleDependencyProvider.getNoDependencies();
             }
@@ -214,8 +231,11 @@ export class GradleTasksTreeDataProvider implements vscode.TreeDataProvider<vsco
     public async getChildrenForProjectTreeItem(element: ProjectTreeItem): Promise<vscode.TreeItem[]> {
         const projectTaskItem = new ProjectTaskTreeItem("Tasks", vscode.TreeItemCollapsibleState.Collapsed, element);
         projectTaskItem.setChildren([...element.tasks, ...element.groups]);
+
         const results: vscode.TreeItem[] = [projectTaskItem];
+
         const resourceUri = element.resourceUri;
+
         if (!resourceUri) {
             return [...results, ...element.subprojects];
         }
@@ -226,6 +246,7 @@ export class GradleTasksTreeDataProvider implements vscode.TreeDataProvider<vsco
             path.dirname(resourceUri.fsPath),
             typeof element.label === "string" ? element.label : resourceUri.fsPath
         );
+
         return [...results, projectDependencyTreeItem, ...element.subprojects];
     }
 
@@ -239,12 +260,15 @@ export class GradleTasksTreeDataProvider implements vscode.TreeDataProvider<vsco
 
         tasks.forEach((task) => {
             const definition = task.definition as GradleTaskDefinition;
+
             if (isWorkspaceFolder(task.scope) && isGradleTask(task)) {
                 const rootProject = rootProjectStore.get(definition.projectFolder);
+
                 if (!rootProject) {
                     return;
                 }
                 gradleProjectTreeItem = gradleProjectTreeItemMap.get(definition.projectFolder);
+
                 if (!gradleProjectTreeItem) {
                     gradleProjectTreeItem = new RootProjectTreeItem(
                         path.basename(definition.projectFolder),
@@ -254,10 +278,14 @@ export class GradleTasksTreeDataProvider implements vscode.TreeDataProvider<vsco
                 }
 
                 const projectPath = definition.script.split(":").slice(0, -1);
+
                 const projectMapKey = definition.projectFolder + "_" + projectPath.join(":");
+
                 let projectTreeItem = projectTreeItemMap.get(projectMapKey);
+
                 if (!projectTreeItem) {
                     const parentProjectPath = projectPath.length == 0 ? null : projectPath.slice(0, -1);
+
                     const parentProject =
                         parentProjectPath === null
                             ? gradleProjectTreeItem
@@ -267,6 +295,7 @@ export class GradleTasksTreeDataProvider implements vscode.TreeDataProvider<vsco
                         parentProject,
                         vscode.Uri.file(definition.buildFile)
                     );
+
                     if (parentProject instanceof ProjectTreeItem) {
                         parentProject.addSubproject(projectTreeItem);
                     } else {
@@ -276,11 +305,14 @@ export class GradleTasksTreeDataProvider implements vscode.TreeDataProvider<vsco
                 }
 
                 const taskName = definition.script.slice(definition.script.lastIndexOf(":") + 1);
+
                 let parentTreeItem: ProjectTreeItem | GroupTreeItem = projectTreeItem;
 
                 if (!collapsed) {
                     const groupId = definition.group + definition.project + definition.projectFolder;
+
                     let groupTreeItem = groupTreeItemMap.get(groupId);
+
                     if (!groupTreeItem) {
                         groupTreeItem = new GroupTreeItem(definition.group, projectTreeItem, undefined);
                         projectTreeItem.addGroup(groupTreeItem);

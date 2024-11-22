@@ -13,7 +13,9 @@ import { isTaskRunning } from "../tasks/taskUtil";
 import { isTest, waitOnTcp } from "../util";
 
 const NL = "\n";
+
 const CR = "\r";
+
 const nlRegExp = new RegExp(`${NL}([^${CR}]|$)`, "g");
 
 export class GradleRunnerTerminal implements vscode.Pseudoterminal {
@@ -72,7 +74,9 @@ export class GradleRunnerTerminal implements vscode.Pseudoterminal {
 			async () => {
 				const definition = this.task
 					?.definition as GradleTaskDefinition;
+
 				const projectName = definition ? definition.project : undefined;
+
 				const debugConfig = {
 					type: "java",
 					name: "Debug (Attach) via Gradle Tasks",
@@ -81,10 +85,12 @@ export class GradleRunnerTerminal implements vscode.Pseudoterminal {
 					port: javaDebugPort,
 					projectName,
 				};
+
 				const startedDebugging = await vscode.debug.startDebugging(
 					this.rootProject.getWorkspaceFolder(),
 					debugConfig,
 				);
+
 				if (!startedDebugging) {
 					throw new Error("The debugger was not started");
 				}
@@ -103,8 +109,10 @@ export class GradleRunnerTerminal implements vscode.Pseudoterminal {
 		const javaDebugEnabled = this.task
 			? this.task.definition.javaDebug
 			: false;
+
 		try {
 			const javaDebugPort = javaDebugEnabled ? await getPort() : 0;
+
 			if (javaDebugEnabled) {
 				this.startJavaDebug(javaDebugPort);
 			}
@@ -136,6 +144,7 @@ export class GradleRunnerTerminal implements vscode.Pseudoterminal {
 
 	private handleOutput = (output: Output): void => {
 		const messageBytes = output.getOutputBytes_asU8();
+
 		if (messageBytes.length) {
 			if (isTest() && this.stdOutLoggerStream) {
 				this.stdOutLoggerStream.write(messageBytes);
@@ -147,6 +156,7 @@ export class GradleRunnerTerminal implements vscode.Pseudoterminal {
 	private handleError(err: ServiceError): void {
 		if (err.code === status.UNKNOWN) {
 			const outputChannel = logger.getChannel();
+
 			if (outputChannel) {
 				this.write(
 					`Unable to run Gradle Task due to server error. View the "${outputChannel.name}" output for details.`,

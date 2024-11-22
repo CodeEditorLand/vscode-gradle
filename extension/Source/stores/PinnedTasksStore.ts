@@ -13,6 +13,7 @@ const toWorkspaceStateTasks = (
 	return Array.from(map.keys()).reduce(
 		(workspaceStateTasks: WorkspaceStateTasks, key: string) => {
 			workspaceStateTasks[key] = Array.from(map.get(key)!.values());
+
 			return workspaceStateTasks;
 		},
 		{},
@@ -22,10 +23,12 @@ const toWorkspaceStateTasks = (
 export class PinnedTasksStore extends TaskStore {
 	constructor(private readonly context: vscode.ExtensionContext) {
 		super();
+
 		const pinnedTasks = this.context.workspaceState.get(
 			"pinnedTasks",
 			{},
 		) as WorkspaceStateTasks;
+
 		if (
 			!pinnedTasks ||
 			Array.isArray(pinnedTasks) ||
@@ -46,6 +49,7 @@ export class PinnedTasksStore extends TaskStore {
 			"pinnedTasks",
 			workspaceStateTasks,
 		);
+
 		super.fireOnDidChange(null);
 	}
 }

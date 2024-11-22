@@ -29,6 +29,7 @@ export async function startLanguageClientAndWaitForConnection(
 ): Promise<void> {
 	if (languageServerPipePath === "") {
 		isLanguageServerStarted = false;
+
 		return;
 	}
 	void vscode.window.withProgress(
@@ -39,14 +40,17 @@ export async function startLanguageClientAndWaitForConnection(
 				progress.report({
 					message: "Initializing Gradle Language Server",
 				});
+
 				const clientOptions: LanguageClientOptions = {
 					documentSelector: [{ scheme: "file", language: "gradle" }],
 					initializationOptions: {
 						settings: getGradleSettings(),
 					},
 				};
+
 				const serverOptions = () =>
 					awaitServerConnection(languageServerPipePath);
+
 				const languageClient = new LanguageClient(
 					"gradle",
 					"Gradle Language Server",
@@ -66,6 +70,7 @@ export async function startLanguageClientAndWaitForConnection(
 						void vscode.window.showErrorMessage(e);
 					},
 				);
+
 				const disposable = languageClient.start();
 
 				context.subscriptions.push(disposable);
@@ -96,6 +101,7 @@ async function awaitServerConnection(pipeName: string): Promise<StreamInfo> {
 		server.listen(pipeName, () => {
 			server.removeListener("error", reject);
 		});
+
 		return server;
 	});
 }
@@ -117,6 +123,7 @@ async function syncSingleProject(project: GradleProject): Promise<void> {
 			project.getProjectpath(),
 			project.getPluginsList(),
 		);
+
 		const closures = project.getPluginclosuresList().map((value) => {
 			const JSONMethod = value.getMethodsList().map((method) => {
 				return {
@@ -125,12 +132,14 @@ async function syncSingleProject(project: GradleProject): Promise<void> {
 					deprecated: method.getDeprecated(),
 				};
 			});
+
 			const JSONField = value.getFieldsList().map((field) => {
 				return {
 					name: field.getName(),
 					deprecated: field.getDeprecated(),
 				};
 			});
+
 			return {
 				name: value.getName(),
 				methods: JSONMethod,
@@ -152,6 +161,7 @@ async function syncSingleProject(project: GradleProject): Promise<void> {
 
 async function syncProject(project: GradleProject): Promise<void> {
 	await syncSingleProject(project);
+
 	for (const subProject of project.getProjectsList()) {
 		await syncProject(subProject);
 	}
@@ -159,6 +169,7 @@ async function syncProject(project: GradleProject): Promise<void> {
 
 export async function syncGradleBuild(gradleBuild: GradleBuild): Promise<void> {
 	const rootProject = gradleBuild.getProject();
+
 	if (rootProject && rootProject.getIsRoot()) {
 		syncProject(rootProject);
 	}
@@ -170,10 +181,13 @@ async function handleLanguageServerStart(
 ): Promise<void> {
 	if (isLanguageServerStarted) {
 		const folders = vscode.workspace.workspaceFolders;
+
 		if (folders?.length) {
 			// TODO: support multiple workspaces
 			const projectPath = folders[0].uri.fsPath;
+
 			const rootProject = rootProjectsStore.get(projectPath);
+
 			if (!rootProject) {
 				return;
 			}
@@ -181,6 +195,7 @@ async function handleLanguageServerStart(
 			// here to asynchronously sync the project content (plugins, closures) with language server
 			const gradleBuild =
 				await contentProvider.getGradleBuild(rootProject);
+
 			if (gradleBuild) {
 				await syncGradleBuild(gradleBuild);
 			}

@@ -176,6 +176,7 @@ export class Extension {
 
         vscode.commands.registerCommand(GRADLE_DEPENDENCY_REVEAL, async (item: DependencyTreeItem) => {
             const omittedTreeItem = item.getOmittedTreeItem();
+
             if (omittedTreeItem) {
                 await this.gradleTasksTreeView.reveal(omittedTreeItem);
             }
@@ -187,11 +188,13 @@ export class Extension {
                 instrumentOperation(GRADLE_COMPLETION, async (operationId: string, ...args: string[]) => {
                     if (args.length === 2) {
                         const completionKind = args[0];
+
                         const completionContent = args[1];
                         sendInfo(operationId, {
                             kind: completionKind,
                             content: completionContent,
                         });
+
                         if (
                             completionKind === CompletionKinds.DEPENDENCY_GROUP ||
                             completionKind === CompletionKinds.DEPENDENCY_ARTIFACT
@@ -240,7 +243,9 @@ export class Extension {
 
     private async activate(): Promise<void> {
         this.registerGradleTestRunner();
+
         const activated = !!(await this.rootProjectsStore.getProjectRoots()).length;
+
         if (!this.server.isReady()) {
             await this.server.start();
         }
@@ -255,6 +260,7 @@ export class Extension {
     private handleTaskTerminals(definition: GradleTaskDefinition, terminal: vscode.Terminal): void {
         // Add this task terminal to the store
         const terminalTaskName = terminal.name.replace("Task - ", "");
+
         if (terminalTaskName === definition.script) {
             this.taskTerminalsStore.addEntry(terminalTaskName, terminal);
         }
@@ -304,11 +310,13 @@ export class Extension {
         this.gradleWrapperWatcher.onDidChange(
             instrumentOperation(GRADLE_PROPERTIES_FILE_CHANGE, async (_operationId: string, uri: vscode.Uri) => {
                 logger.info("Gradle wrapper properties changed:", uri.fsPath);
+
                 const selection = await this.showRestartWindow();
                 sendInfo("", {
                     kind: "wrapperPropertiesChangedReloadRequest",
                     data2: selection === OPT_RESTART ? "true" : "false",
                 });
+
                 if (selection === OPT_RESTART) {
                     await this.restartServer();
                 }
@@ -326,7 +334,9 @@ export class Extension {
 
     private async showRestartWindow(): Promise<string | undefined> {
         const msg = "Please restart the extension to make the change take effect. Restart now?";
+
         const selection = await window.showWarningMessage(msg, OPT_RESTART);
+
         return selection;
     }
 
@@ -347,6 +357,7 @@ export class Extension {
                         kind: "javaHomeChangedReloadRequest",
                         data2: selection === OPT_RESTART ? "true" : "false",
                     });
+
                     if (selection === OPT_RESTART) {
                         await this.restartServer();
                     }
@@ -393,19 +404,24 @@ export class Extension {
         // activate the Java extension before the Test Runner extension if we call activate() for the test extension.
         // Thus here we need to activate the Java extension first.
         const javaLsExtension = vscode.extensions.getExtension("redhat.java");
+
         if (!javaLsExtension) {
             return;
         }
 
         const javaLsApi = await javaLsExtension.activate();
+
         if (!javaLsApi.serverReady) {
             return;
         }
 
         await javaLsApi.serverReady();
+
         const testExtension = vscode.extensions.getExtension("vscjava.vscode-java-test");
+
         if (testExtension) {
             const testRunnerApi = await testExtension.activate();
+
             if (testRunnerApi) {
                 const testRunner: GradleTestRunner = this.buildServerController.getGradleTestRunner(testRunnerApi);
                 testRunnerApi.registerTestProfile("Delegate Test to Gradle", vscode.TestRunProfileKind.Run, testRunner);

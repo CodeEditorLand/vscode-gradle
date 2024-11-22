@@ -5,6 +5,7 @@ import * as vscode from "vscode";
 
 export class DependencyConfigurationTreeItem extends vscode.TreeItem {
 	private children: vscode.TreeItem[];
+
 	constructor(
 		name: string,
 		collapsibleState: vscode.TreeItemCollapsibleState,

@@ -20,10 +20,12 @@ export class RunTasksCommand extends Command {
 				this.gradleTaskProvider,
 				item.uri,
 			);
+
 			if (foundTaskName) {
 				const vscodeTask = this.gradleTaskProvider
 					.getTasks()
 					.find((task) => task.name === foundTaskName);
+
 				if (vscodeTask) {
 					await vscode.tasks.executeTask(vscodeTask);
 				}

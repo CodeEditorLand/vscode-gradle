@@ -22,14 +22,18 @@ export class SpecifySourcePackageNameStep implements IProjectCreationStep {
 			500 /** ms */,
 			metadata.client,
 		);
+
 		const disposables: vscode.Disposable[] = [];
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const specifySourcePackageNamePromise = new Promise<StepResult>(
 			async (resolve, _reject) => {
 				const inputBox = vscode.window.createInputBox();
+
 				const defaultName = metadata.sourcePackageName || "";
+
 				const normalizedName =
 					await getNormalizedPackageNameTrigger(defaultName);
+
 				if (!normalizedName) {
 					return resolve(StepResult.STOP);
 				}
@@ -40,6 +44,7 @@ export class SpecifySourcePackageNameStep implements IProjectCreationStep {
 				inputBox.placeholder = "e.g. " + normalizedName;
 				inputBox.value = normalizedName as string;
 				inputBox.ignoreFocusOut = true;
+
 				if (metadata.steps.length) {
 					inputBox.buttons = [vscode.QuickInputButtons.Back];
 					disposables.push(
@@ -56,6 +61,7 @@ export class SpecifySourcePackageNameStep implements IProjectCreationStep {
 							await getNormalizedPackageNameTrigger(
 								inputBox.value,
 							);
+
 						if (!normalizedName) {
 							return;
 						} else if (normalizedName !== inputBox.value) {
@@ -69,6 +75,7 @@ export class SpecifySourcePackageNameStep implements IProjectCreationStep {
 							await metadata.client.getNormalizedPackageName(
 								inputBox.value,
 							);
+
 						if (!normalizedName) {
 							return;
 						} else if (normalizedName !== inputBox.value) {

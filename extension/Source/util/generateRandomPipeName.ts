@@ -6,6 +6,7 @@ import * as path from "path";
 import { sendInfo } from "vscode-extension-telemetry-wrapper";
 
 const XDG_RUNTIME_DIR = process.env["XDG_RUNTIME_DIR"];
+
 const safeIpcPathLengths: Map<NodeJS.Platform, number> = new Map([
 	["linux", 107],
 	["darwin", 103],
@@ -18,9 +19,13 @@ function generateRandomPipeName(): string {
 	}
 
 	let randomLength = 32;
+
 	const fixedLength = ".sock".length;
+
 	let tmpDir: string = fs.realpathSync(XDG_RUNTIME_DIR ?? os.tmpdir());
+
 	const limit = safeIpcPathLengths.get(process.platform);
+
 	if (limit !== undefined) {
 		randomLength = Math.min(
 			limit - tmpDir.length - fixedLength,
@@ -37,11 +42,13 @@ function generateRandomPipeName(): string {
 	const randomSuffix = randomBytes(Math.floor(randomLength / 2)).toString(
 		"hex",
 	);
+
 	return path.join(tmpDir, `${randomSuffix}.sock`);
 }
 
 export function getRandomPipeName(): string {
 	let pipeName = "";
+
 	try {
 		pipeName = generateRandomPipeName();
 	} catch (error) {
