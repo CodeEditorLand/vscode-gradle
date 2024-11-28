@@ -6,6 +6,7 @@ import { GradleTaskTreeItem } from "../views";
 import { Command } from "./Command";
 
 export const COMMAND_RUN_TASK = "gradle.runTask";
+
 export const COMMAND_RUN_TASK_DOUBLE_CLICK = "gradle.runTaskDoubleClick";
 
 async function run(

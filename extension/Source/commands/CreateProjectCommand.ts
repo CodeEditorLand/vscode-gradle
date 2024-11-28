@@ -21,6 +21,7 @@ import {
 import { Command } from "./Command";
 
 export const COMMAND_CREATE_PROJECT = "gradle.createProject";
+
 export const COMMAND_CREATE_PROJECT_ADVANCED = "gradle.createProjectAdvanced";
 
 export class CreateProjectCommand extends Command {

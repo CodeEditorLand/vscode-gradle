@@ -13,6 +13,7 @@ import {
 } from "./jdkUtils";
 
 type AutoDetect = "on" | "off";
+
 export const REQUIRED_JDK_VERSION = 17;
 
 export function getConfigIsAutoDetectionEnabled(
