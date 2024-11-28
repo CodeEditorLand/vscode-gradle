@@ -36,5 +36,5 @@ await gradleApi.runTask(runTaskOpts);
 ```
 
 Refer to
-[`vscode-spotless-gradle`](https://github.com/badsyntax/vscode-spotless-gradle)
+[`vscode-spotless-gradle`](HTTPS://github.com/badsyntax/vscode-spotless-gradle)
 for example API usage.
