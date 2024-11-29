@@ -14,6 +14,7 @@ export class DebugTaskWithArgsCommand extends Command {
 	) {
 		super();
 	}
+
 	async run(treeItem: GradleTaskTreeItem): Promise<void> {
 		if (treeItem && treeItem.task) {
 			await runTaskWithArgs(

@@ -16,6 +16,7 @@ export class TaskTerminalsStore extends StoreMapSet<TaskId, vscode.Terminal> {
 				});
 			}
 		});
+
 		this.fireOnDidChange(null);
 	}
 }

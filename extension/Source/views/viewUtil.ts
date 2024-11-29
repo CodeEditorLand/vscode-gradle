@@ -45,9 +45,11 @@ export function gradleTaskTreeItemSortCompareFunc(
 	if (isRootProjectTaskA && !isRootProjectTaskB) {
 		return -1;
 	}
+
 	if (isRootProjectTaskB && !isRootProjectTaskA) {
 		return 1;
 	}
+
 	return treeItemSortCompareFunc(a, b);
 }
 
@@ -61,6 +63,7 @@ export function getTreeItemForTask(
 	if (gradleTaskTreeItem && gradleTaskTreeItem.task === task) {
 		return gradleTaskTreeItem;
 	}
+
 	const recentTaskTreeItem = getRecentTaskTreeItemMap().get(
 		definition.id + definition.args,
 	);
@@ -68,6 +71,7 @@ export function getTreeItemForTask(
 	if (recentTaskTreeItem && recentTaskTreeItem.task === task) {
 		return recentTaskTreeItem;
 	}
+
 	return null;
 }
 
@@ -82,20 +86,25 @@ export function updateGradleTreeItemStateForTask(
 
 	if (pinnedTaskTreeItem) {
 		pinnedTaskTreeItem.setContext();
+
 		gradleTasksTreeDataProvider.refresh(pinnedTaskTreeItem);
 	}
+
 	const gradleTaskTreeItem = getGradleTaskTreeItemMap().get(definition.id);
 
 	if (gradleTaskTreeItem) {
 		gradleTaskTreeItem.setContext();
+
 		gradleTasksTreeDataProvider.refresh(gradleTaskTreeItem);
 	}
+
 	const recentTaskTreeItem = getRecentTaskTreeItemMap().get(
 		definition.id + definition.args,
 	);
 
 	if (recentTaskTreeItem) {
 		recentTaskTreeItem.setContext();
+
 		recentTasksTreeDataProvider.refresh(recentTaskTreeItem);
 	}
 }
@@ -159,11 +168,13 @@ function getTreeItemRunningState(task: vscode.Task, args?: TaskArgs): string {
 	if (isTaskCancelling(task, args)) {
 		return state + TREE_ITEM_STATE_TASK_CANCELLING;
 	}
+
 	const isRunning = isTaskRunning(task, args);
 
 	if (definition.isPinned) {
 		state += TREE_ITEM_STATE_TASK_PINNED_PREFIX;
 	}
+
 	if (isRunning) {
 		state += isDebug
 			? TREE_ITEM_STATE_TASK_DEBUG_RUNNING
@@ -171,6 +182,7 @@ function getTreeItemRunningState(task: vscode.Task, args?: TaskArgs): string {
 
 		return state;
 	}
+
 	state += isDebug
 		? TREE_ITEM_STATE_TASK_DEBUG_IDLE
 		: TREE_ITEM_STATE_TASK_IDLE;

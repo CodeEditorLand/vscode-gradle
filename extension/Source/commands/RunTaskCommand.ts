@@ -40,6 +40,7 @@ export class RunTaskDoubleClickCommand extends Command {
 		private client: TaskServerClient,
 	) {
 		super();
+
 		this.doubleClickChecker = new DoubleClickChecker();
 	}
 

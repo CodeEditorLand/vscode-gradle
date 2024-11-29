@@ -19,13 +19,19 @@ export class SelectProjectTypeStep implements IProjectCreationStep {
 			async (resolve, _reject) => {
 				const pickBox =
 					vscode.window.createQuickPick<vscode.QuickPickItem>();
+
 				pickBox.title = `Create Gradle project: Select project type (${metadata.steps.length + 1}/${
 					metadata.totalSteps
 				})`;
+
 				pickBox.placeholder = "Select project type ...";
+
 				pickBox.matchOnDescription = true;
+
 				pickBox.ignoreFocusOut = true;
+
 				pickBox.items = this.getProjectTypePickItems();
+
 				disposables.push(
 					pickBox.onDidAccept(async () => {
 						const selectedType = pickBox.selectedItems[0];
@@ -35,6 +41,7 @@ export class SelectProjectTypeStep implements IProjectCreationStep {
 								case "application":
 									metadata.projectType =
 										ProjectType.JAVA_APPLICATION;
+
 									metadata.totalSteps = 5;
 
 									break;
@@ -42,6 +49,7 @@ export class SelectProjectTypeStep implements IProjectCreationStep {
 								case "library":
 									metadata.projectType =
 										ProjectType.JAVA_LIBRARY;
+
 									metadata.totalSteps = 5;
 
 									break;
@@ -49,14 +57,18 @@ export class SelectProjectTypeStep implements IProjectCreationStep {
 								case "Gradle plugin":
 									metadata.projectType =
 										ProjectType.JAVA_GRADLE_PLUGIN;
+
 									metadata.totalSteps = 4; // when creating gradle plugin, we shouldn't specify test framework
 									break;
 
 								default:
 									resolve(StepResult.STOP);
 							}
+
 							metadata.steps.push(selectProjectTypeStep);
+
 							metadata.nextStep = selectScriptDSLStep;
+
 							resolve(StepResult.NEXT);
 						}
 					}),
@@ -64,7 +76,9 @@ export class SelectProjectTypeStep implements IProjectCreationStep {
 						resolve(StepResult.STOP);
 					}),
 				);
+
 				disposables.push(pickBox);
+
 				pickBox.show();
 			},
 		);
@@ -78,14 +92,17 @@ export class SelectProjectTypeStep implements IProjectCreationStep {
 
 	private getProjectTypePickItems(): vscode.QuickPickItem[] {
 		const result: vscode.QuickPickItem[] = [];
+
 		result.push({
 			label: "application",
 			description: "A command-line application implemented in Java",
 		});
+
 		result.push({
 			label: "library",
 			description: "A Java library",
 		});
+
 		result.push({
 			label: "Gradle plugin",
 			description: "A Gradle plugin implemented in Java",

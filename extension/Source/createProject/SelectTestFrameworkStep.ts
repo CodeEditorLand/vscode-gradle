@@ -19,16 +19,22 @@ export class SelectTestFrameworkStep implements IProjectCreationStep {
 			async (resolve, _reject) => {
 				const pickBox =
 					vscode.window.createQuickPick<vscode.QuickPickItem>();
+
 				pickBox.title = `Create Gradle project: Select test framework (${metadata.steps.length + 1}/${
 					metadata.totalSteps
 				})`;
+
 				pickBox.placeholder = "Select test framework ...";
+
 				pickBox.matchOnDescription = true;
+
 				pickBox.ignoreFocusOut = true;
+
 				pickBox.items = this.getTestFrameworkPickItems();
 
 				if (metadata.steps.length) {
 					pickBox.buttons = [vscode.QuickInputButtons.Back];
+
 					disposables.push(
 						pickBox.onDidTriggerButton((item) => {
 							if (item === vscode.QuickInputButtons.Back) {
@@ -37,6 +43,7 @@ export class SelectTestFrameworkStep implements IProjectCreationStep {
 						}),
 					);
 				}
+
 				disposables.push(
 					pickBox.onDidAccept(() => {
 						const selectedTestFramework = pickBox.selectedItems[0];
@@ -70,8 +77,11 @@ export class SelectTestFrameworkStep implements IProjectCreationStep {
 								default:
 									resolve(StepResult.STOP);
 							}
+
 							metadata.steps.push(selectTestFrameworkStep);
+
 							metadata.nextStep = specifyProjectNameStep;
+
 							resolve(StepResult.NEXT);
 						}
 					}),
@@ -79,7 +89,9 @@ export class SelectTestFrameworkStep implements IProjectCreationStep {
 						resolve(StepResult.STOP);
 					}),
 				);
+
 				disposables.push(pickBox);
+
 				pickBox.show();
 			},
 		);
@@ -93,15 +105,19 @@ export class SelectTestFrameworkStep implements IProjectCreationStep {
 
 	private getTestFrameworkPickItems(): vscode.QuickPickItem[] {
 		const result: vscode.QuickPickItem[] = [];
+
 		result.push({
 			label: "JUnit 4",
 		});
+
 		result.push({
 			label: "TestNG",
 		});
+
 		result.push({
 			label: "Spock",
 		});
+
 		result.push({
 			label: "JUnit Jupiter",
 		});

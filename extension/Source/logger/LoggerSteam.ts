@@ -16,7 +16,9 @@ export class LoggerStream {
 		const formattedMessage = this.buffer.length
 			? message
 			: this.logger.format(message.trimLeft(), this.verbosity);
+
 		this.buffer += message;
+
 		this.append(formattedMessage);
 	}
 

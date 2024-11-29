@@ -16,10 +16,13 @@ export class GradleTaskProvider
 	implements vscode.TaskProvider, vscode.Disposable
 {
 	private cachedTasks: vscode.Task[] = [];
+
 	private readonly _onDidLoadTasks: vscode.EventEmitter<vscode.Task[]> =
 		new vscode.EventEmitter<vscode.Task[]>();
+
 	private readonly _onDidStartRefresh: vscode.EventEmitter<null> =
 		new vscode.EventEmitter<null>();
+
 	private readonly _onDidStopRefresh: vscode.EventEmitter<null> =
 		new vscode.EventEmitter<null>();
 
@@ -31,15 +34,19 @@ export class GradleTaskProvider
 
 	public readonly onDidLoadTasks: vscode.Event<vscode.Task[]> =
 		this._onDidLoadTasks.event;
+
 	public readonly onDidStartRefresh: vscode.Event<null> =
 		this._onDidStartRefresh.event;
+
 	public readonly onDidStopRefresh: vscode.Event<null> =
 		this._onDidStopRefresh.event;
+
 	private loadTasksPromise?: Promise<vscode.Task[]>;
 
 	private readonly _waitForTasksLoad = new EventWaiter<vscode.Task[]>(
 		this.onDidLoadTasks,
 	);
+
 	public readonly waitForTasksLoad = this._waitForTasksLoad.wait;
 
 	public provideTasks(): Promise<vscode.Task[] | undefined> {
@@ -63,6 +70,7 @@ export class GradleTaskProvider
 
 			return undefined;
 		}
+
 		return resolveTaskFromDefinition(
 			gradleTaskDefinition,
 			workspaceFolder,
@@ -74,10 +82,13 @@ export class GradleTaskProvider
 		if (this.loadTasksPromise) {
 			return this.loadTasksPromise;
 		}
+
 		if (this.cachedTasks.length) {
 			return Promise.resolve(this.cachedTasks);
 		}
+
 		logger.debug("Refreshing tasks");
+
 		this._onDidStartRefresh.fire(null);
 
 		const folders = await this.rootProjectsStore.getProjectRoots();
@@ -96,10 +107,12 @@ export class GradleTaskProvider
 			.then(
 				(tasks) => {
 					this.cachedTasks = tasks;
+
 					logger.info(`Found ${this.cachedTasks.length} tasks`);
 				},
 				(err) => {
 					logger.error("Unable to refresh tasks:", err.message);
+
 					this.cachedTasks = [];
 				},
 			)
@@ -107,7 +120,9 @@ export class GradleTaskProvider
 
 		return this.loadTasksPromise.finally(() => {
 			this._onDidLoadTasks.fire(this.cachedTasks);
+
 			this._onDidStopRefresh.fire(null);
+
 			this.loadTasksPromise = undefined;
 		});
 	}
@@ -124,12 +139,15 @@ export class GradleTaskProvider
 
 	public clearTasksCache(): void {
 		this.cachedTasks = [];
+
 		this._waitForTasksLoad.reset();
 	}
 
 	public dispose(): void {
 		this._onDidLoadTasks.dispose();
+
 		this._onDidStartRefresh.dispose();
+
 		this._onDidStopRefresh.dispose();
 	}
 }

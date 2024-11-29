@@ -10,32 +10,47 @@ import { GradleTasksTreeDataProvider } from "../views";
 
 export interface RunTaskOpts {
 	projectFolder: string;
+
 	taskName: string;
+
 	args?: ReadonlyArray<string>;
+
 	input?: string;
+
 	onOutput?: (output: Output) => void;
+
 	showOutputColors: boolean;
+
 	cancellationKey?: string;
 }
 
 export interface RunBuildOpts {
 	projectFolder: string;
+
 	args: ReadonlyArray<string>;
+
 	input?: string;
+
 	onOutput?: (output: Output) => void;
+
 	showOutputColors: boolean;
+
 	cancellationKey?: string;
 }
 
 export interface CancelTaskOpts {
 	projectFolder?: string;
+
 	taskName?: string;
+
 	cancellationKey?: string;
 }
 
 export interface CancelBuildOpts {
 	projectFolder?: string;
+
 	args?: ReadonlyArray<string>;
+
 	cancellationKey?: string;
 }
 
@@ -104,11 +119,13 @@ export class Api {
 		if (opts.cancellationKey) {
 			return opts.cancellationKey;
 		}
+
 		if (!opts.args || !opts.projectFolder) {
 			throw new Error(
 				"args and projectFolder are required to build the cancellation key",
 			);
 		}
+
 		return getRunBuildCancellationKey(opts.projectFolder, opts.args);
 	}
 

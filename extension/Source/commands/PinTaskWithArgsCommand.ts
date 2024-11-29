@@ -13,6 +13,7 @@ export class PinTaskWithArgsCommand extends Command {
 	) {
 		super();
 	}
+
 	async run(treeItem: GradleTaskTreeItem): Promise<void> {
 		if (treeItem && treeItem.task) {
 			const args = await getTaskArgs();
@@ -20,7 +21,9 @@ export class PinTaskWithArgsCommand extends Command {
 			if (args) {
 				const definition = treeItem.task
 					.definition as GradleTaskDefinition;
+
 				this.pinnedTasksStore.addEntry(definition.id, args);
+
 				this.gradleTasksTreeDataProvider.refresh();
 			}
 		}

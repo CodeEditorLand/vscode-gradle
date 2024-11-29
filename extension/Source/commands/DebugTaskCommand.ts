@@ -13,6 +13,7 @@ export class DebugTaskCommand extends Command {
 	) {
 		super();
 	}
+
 	async run(treeItem: GradleTaskTreeItem, args = ""): Promise<void> {
 		if (treeItem && treeItem.task) {
 			await runTask(

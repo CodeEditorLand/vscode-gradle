@@ -17,11 +17,16 @@ export class RefreshCommand extends Command {
 	) {
 		super();
 	}
+
 	async run(): Promise<void> {
 		this.gradleTaskProvider.clearTasksCache();
+
 		this.gradleBuildContentProvider.refresh();
+
 		void this.gradleTaskProvider.loadTasks();
+
 		this.gradleTasksTreeDataProvider.refresh();
+
 		this.recentTasksTreeDataProvider.refresh();
 	}
 }

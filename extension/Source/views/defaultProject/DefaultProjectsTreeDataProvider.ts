@@ -62,6 +62,7 @@ export class DefaultProjectsTreeDataProvider
 		} else if (element instanceof GroupTreeItem) {
 			return element.tasks;
 		}
+
 		return [];
 	}
 
@@ -73,6 +74,7 @@ export class DefaultProjectsTreeDataProvider
 			vscode.TreeItemCollapsibleState.Collapsed,
 			element,
 		);
+
 		projectTaskItem.setChildren([...element.tasks, ...element.groups]);
 
 		const results: vscode.TreeItem[] = [projectTaskItem];
@@ -82,6 +84,7 @@ export class DefaultProjectsTreeDataProvider
 		if (!resourceUri) {
 			return results;
 		}
+
 		const projectDependencyTreeItem: ProjectDependencyTreeItem =
 			new ProjectDependencyTreeItem(
 				"Dependencies",

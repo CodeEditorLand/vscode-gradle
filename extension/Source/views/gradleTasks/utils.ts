@@ -14,6 +14,7 @@ export function buildPinnedTaskTreeItem(
 	icons: Icons,
 ): GradleTaskTreeItem {
 	const definition = task.definition as GradleTaskDefinition;
+
 	definition.isPinned = true;
 
 	const taskName = task.name;
@@ -27,6 +28,7 @@ export function buildPinnedTaskTreeItem(
 		icons,
 		definition.javaDebug,
 	);
+
 	pinnedTaskTreeItem.setContext();
 
 	return pinnedTaskTreeItem;

@@ -11,6 +11,7 @@ export class CancelBuildCommand extends Command {
 	constructor(private client: TaskServerClient) {
 		super();
 	}
+
 	async run(cancellationKey: string, task?: vscode.Task): Promise<void> {
 		try {
 			await cancelBuild(this.client, cancellationKey, task);

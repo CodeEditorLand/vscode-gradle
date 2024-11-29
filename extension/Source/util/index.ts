@@ -29,6 +29,7 @@ function tcpExists(host: string, port: number): Promise<boolean> {
 					resolve(true);
 				});
 			});
+
 		connection.setTimeout(tcpTimeout);
 	});
 }
@@ -54,9 +55,11 @@ async function tryConnect(
 			return;
 		}
 	}
+
 	if (Date.now() - startTime >= maximumTimeout) {
 		throw new Error("Unable to wait on tcp due to maxmium timeout reached");
 	}
+
 	await tryConnect(host, port, startTime);
 }
 

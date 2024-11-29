@@ -25,6 +25,7 @@ export class GradleDependencyProvider {
 		if (this.cachedDependencies.has(projectPath)) {
 			return this.cachedDependencies.get(projectPath)!;
 		}
+
 		const gradleBuild =
 			await this.contentProvider.getGradleBuild(rootProject);
 
@@ -51,7 +52,9 @@ export class GradleDependencyProvider {
 				}
 			}
 		}
+
 		const noDependencies = GradleDependencyProvider.getNoDependencies();
+
 		this.cachedDependencies.set(projectPath, noDependencies);
 
 		return noDependencies;

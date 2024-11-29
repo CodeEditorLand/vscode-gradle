@@ -50,9 +50,13 @@ export function getPinnedTaskTreeItemMap(): Map<string, GradleTaskTreeItem> {
 
 function resetCachedTreeItems(): void {
 	gradleTaskTreeItemMap.clear();
+
 	gradleProjectTreeItemMap.clear();
+
 	projectTreeItemMap.clear();
+
 	groupTreeItemMap.clear();
+
 	pinnedTaskTreeItemMap.clear();
 }
 
@@ -60,8 +64,10 @@ export class GradleTasksTreeDataProvider
 	implements vscode.TreeDataProvider<vscode.TreeItem>
 {
 	private collapsed = true;
+
 	private readonly _onDidChangeTreeData: vscode.EventEmitter<vscode.TreeItem | null> =
 		new vscode.EventEmitter<vscode.TreeItem | null>();
+
 	public readonly onDidChangeTreeData: vscode.Event<vscode.TreeItem | null> =
 		this._onDidChangeTreeData.event;
 
@@ -84,15 +90,18 @@ export class GradleTasksTreeDataProvider
 
 	public async setCollapsed(collapsed: boolean): Promise<void> {
 		this.collapsed = collapsed;
+
 		await this.context.workspaceState.update(
 			"gradleTasksCollapsed",
 			collapsed,
 		);
+
 		await vscode.commands.executeCommand(
 			"setContext",
 			"gradle:gradleTasksCollapsed",
 			collapsed,
 		);
+
 		this.refresh();
 	}
 
@@ -105,6 +114,7 @@ export class GradleTasksTreeDataProvider
 		if (tasks.length === 0) {
 			return [new NoGradleTasksTreeItem()];
 		}
+
 		const rootProjectTreeItems =
 			GradleTasksTreeDataProvider.buildItemsTreeFromTasks(
 				tasks,
@@ -120,13 +130,16 @@ export class GradleTasksTreeDataProvider
 		if (!pinnedTasks?.size) {
 			return rootProjectTreeItems;
 		}
+
 		const pinnedTasksMap: Map<string, GradleTaskTreeItem[]> = new Map();
+
 		Array.from(pinnedTasks.keys()).forEach((taskId: TaskId) => {
 			const task = this.gradleTaskProvider.findByTaskId(taskId);
 
 			if (!task) {
 				return;
 			}
+
 			const definition = task.definition as GradleTaskDefinition;
 
 			const rootProject = this.rootProjectStore.get(
@@ -136,12 +149,15 @@ export class GradleTasksTreeDataProvider
 			if (!rootProject) {
 				return;
 			}
+
 			let pinnedTasksArray = pinnedTasksMap.get(definition.projectFolder);
 
 			if (!pinnedTasksArray) {
 				pinnedTasksArray = [];
+
 				pinnedTasksMap.set(definition.projectFolder, pinnedTasksArray);
 			}
+
 			const taskArgs = pinnedTasks.get(taskId) || "";
 
 			if (taskArgs) {
@@ -159,7 +175,9 @@ export class GradleTasksTreeDataProvider
 						pinnedTask,
 						this.icons,
 					);
+
 					pinnedTasksArray!.push(gradleTaskTreeItem);
+
 					pinnedTaskTreeItemMap.set(
 						definition.id,
 						gradleTaskTreeItem,
@@ -171,7 +189,9 @@ export class GradleTasksTreeDataProvider
 					task,
 					this.icons,
 				);
+
 				pinnedTasksArray.push(gradleTaskTreeItem);
+
 				pinnedTaskTreeItemMap.set(definition.id, gradleTaskTreeItem);
 			}
 		});
@@ -183,6 +203,7 @@ export class GradleTasksTreeDataProvider
 				);
 			} else {
 				const pinnedTasksRootProjects: vscode.TreeItem[] = [];
+
 				pinnedTasksMap.forEach((value, key) => {
 					const rootProject = this.rootProjectStore.get(key);
 
@@ -192,14 +213,18 @@ export class GradleTasksTreeDataProvider
 								path.basename(key),
 								rootProject.getProjectUri(),
 							);
+
 						pinnedTasksRootProjectTreeItem.setChildren(value);
+
 						pinnedTasksRootProjects.push(
 							pinnedTasksRootProjectTreeItem,
 						);
 					}
 				});
+
 				pinnedTasksItem.setChildren(pinnedTasksRootProjects);
 			}
+
 			return [pinnedTasksItem, ...rootProjectTreeItems];
 		} else {
 			return rootProjectTreeItems;
@@ -226,6 +251,7 @@ export class GradleTasksTreeDataProvider
 		) {
 			return element.parentTreeItem || null;
 		}
+
 		return null;
 	}
 
@@ -235,18 +261,22 @@ export class GradleTasksTreeDataProvider
 		if (element instanceof RootProjectTreeItem) {
 			return element.projects;
 		}
+
 		if (element instanceof ProjectTreeItem) {
 			return this.getChildrenForProjectTreeItem(element);
 		}
+
 		if (element instanceof GroupTreeItem) {
 			return element.tasks;
 		}
+
 		if (
 			element instanceof GradleTaskTreeItem ||
 			element instanceof NoGradleTasksTreeItem
 		) {
 			return [];
 		}
+
 		if (element instanceof ProjectDependencyTreeItem) {
 			const rootProject = await findRootProject(
 				this.rootProjectStore,
@@ -256,11 +286,13 @@ export class GradleTasksTreeDataProvider
 			if (!rootProject) {
 				return GradleDependencyProvider.getNoDependencies();
 			}
+
 			return this.gradleDependencyProvider.getDependencies(
 				element,
 				rootProject,
 			);
 		}
+
 		if (
 			element instanceof ProjectTaskTreeItem ||
 			element instanceof DependencyConfigurationTreeItem ||
@@ -268,15 +300,18 @@ export class GradleTasksTreeDataProvider
 		) {
 			return element.getChildren() || [];
 		}
+
 		if (
 			element instanceof PinnedTasksTreeItem ||
 			element instanceof PinnedTasksRootProjectTreeItem
 		) {
 			return element.getChildren();
 		}
+
 		if (!element) {
 			return this.buildTreeItems();
 		}
+
 		return [];
 	}
 
@@ -288,6 +323,7 @@ export class GradleTasksTreeDataProvider
 			vscode.TreeItemCollapsibleState.Collapsed,
 			element,
 		);
+
 		projectTaskItem.setChildren([...element.tasks, ...element.groups]);
 
 		const results: vscode.TreeItem[] = [projectTaskItem];
@@ -297,6 +333,7 @@ export class GradleTasksTreeDataProvider
 		if (!resourceUri) {
 			return [...results, ...element.subprojects];
 		}
+
 		const projectDependencyTreeItem: ProjectDependencyTreeItem =
 			new ProjectDependencyTreeItem(
 				"Dependencies",
@@ -330,6 +367,7 @@ export class GradleTasksTreeDataProvider
 				if (!rootProject) {
 					return;
 				}
+
 				gradleProjectTreeItem = gradleProjectTreeItemMap.get(
 					definition.projectFolder,
 				);
@@ -339,6 +377,7 @@ export class GradleTasksTreeDataProvider
 						path.basename(definition.projectFolder),
 						rootProject.getProjectUri(),
 					);
+
 					gradleProjectTreeItemMap.set(
 						definition.projectFolder,
 						gradleProjectTreeItem,
@@ -366,6 +405,7 @@ export class GradleTasksTreeDataProvider
 										"_" +
 										parentProjectPath.join(":"),
 								);
+
 					projectTreeItem = new ProjectTreeItem(
 						definition.project,
 						parentProject,
@@ -377,6 +417,7 @@ export class GradleTasksTreeDataProvider
 					} else {
 						gradleProjectTreeItem.addProject(projectTreeItem);
 					}
+
 					projectTreeItemMap.set(projectMapKey, projectTreeItem);
 				}
 
@@ -401,9 +442,12 @@ export class GradleTasksTreeDataProvider
 							projectTreeItem,
 							undefined,
 						);
+
 						projectTreeItem.addGroup(groupTreeItem);
+
 						groupTreeItemMap.set(groupId, groupTreeItem);
 					}
+
 					parentTreeItem = groupTreeItem;
 				}
 
@@ -416,9 +460,11 @@ export class GradleTasksTreeDataProvider
 					icons,
 					definition.debuggable,
 				);
+
 				taskTreeItem.setContext();
 
 				gradleTaskTreeItemMap.set(task.definition.id, taskTreeItem);
+
 				parentTreeItem.addTask(taskTreeItem);
 			}
 		});
@@ -426,6 +472,7 @@ export class GradleTasksTreeDataProvider
 		if (gradleProjectTreeItemMap.size === 1) {
 			return gradleProjectTreeItemMap.values().next().value.projects;
 		}
+
 		return [...gradleProjectTreeItemMap.values()];
 	}
 }

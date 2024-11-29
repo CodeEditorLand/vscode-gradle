@@ -5,11 +5,13 @@ import { ICON_GRADLE_TASK, ICON_LOADING } from "../views/constants";
 
 export type IconPath = {
 	light: string | vscode.Uri;
+
 	dark: string | vscode.Uri;
 };
 
 export class Icons {
 	public iconPathRunning?: IconPath;
+
 	public iconPathIdle?: IconPath;
 
 	constructor(private readonly context: vscode.ExtensionContext) {
@@ -21,6 +23,7 @@ export class Icons {
 				path.join("resources", "dark", ICON_LOADING),
 			),
 		};
+
 		this.iconPathIdle = {
 			light: this.context.asAbsolutePath(
 				path.join("resources", "light", ICON_GRADLE_TASK),

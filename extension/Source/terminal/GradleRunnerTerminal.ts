@@ -20,10 +20,15 @@ const nlRegExp = new RegExp(`${NL}([^${CR}]|$)`, "g");
 
 export class GradleRunnerTerminal implements vscode.Pseudoterminal {
 	private readonly writeEmitter = new vscode.EventEmitter<string>();
+
 	private stdOutLoggerStream: LoggerStream | undefined;
+
 	private readonly closeEmitter = new vscode.EventEmitter<number>();
+
 	private task?: vscode.Task;
+
 	public readonly onDidWrite: vscode.Event<string> = this.writeEmitter.event;
+
 	public readonly onDidClose: vscode.Event<number> = this.closeEmitter.event;
 
 	constructor(
@@ -60,6 +65,7 @@ export class GradleRunnerTerminal implements vscode.Pseudoterminal {
 		const closePromise = new Promise((_resolve, reject) => {
 			const disposable = this.onDidClose(() => {
 				disposable.dispose();
+
 				reject(
 					new Error(
 						"The task completed without the debugger being attached",
@@ -67,6 +73,7 @@ export class GradleRunnerTerminal implements vscode.Pseudoterminal {
 				);
 			});
 		});
+
 		Promise.race([
 			waitOnTcp("localhost", javaDebugPort),
 			closePromise,
@@ -98,8 +105,11 @@ export class GradleRunnerTerminal implements vscode.Pseudoterminal {
 			(err) => {
 				const errorMessage =
 					"Unable to start Java debugging: " + err.message;
+
 				logger.error(errorMessage);
+
 				vscode.window.showErrorMessage(errorMessage);
+
 				this.close();
 			},
 		);
@@ -116,6 +126,7 @@ export class GradleRunnerTerminal implements vscode.Pseudoterminal {
 			if (javaDebugEnabled) {
 				this.startJavaDebug(javaDebugPort);
 			}
+
 			const runTask = this.client.runBuild(
 				this.rootProject.getProjectUri().fsPath,
 				this.cancellationKey,
@@ -126,10 +137,13 @@ export class GradleRunnerTerminal implements vscode.Pseudoterminal {
 				this.handleOutput,
 				true,
 			);
+
 			await runTask;
+
 			this.closeEmitter.fire(0);
 		} catch (e) {
 			this.handleError(e);
+
 			this.closeEmitter.fire(1);
 		}
 	}
@@ -149,6 +163,7 @@ export class GradleRunnerTerminal implements vscode.Pseudoterminal {
 			if (isTest() && this.stdOutLoggerStream) {
 				this.stdOutLoggerStream.write(messageBytes);
 			}
+
 			this.write(new util.TextDecoder("utf-8").decode(messageBytes));
 		}
 	};
@@ -178,6 +193,7 @@ export class GradleRunnerTerminal implements vscode.Pseudoterminal {
 		// Note writing `\n` will just move the cursor down 1 row.
 		// We need to write `\r` as well to move the cursor to the left-most cell.
 		const sanitisedMessage = message.replace(nlRegExp, `${NL + CR}$1`);
+
 		this.writeEmitter.fire(sanitisedMessage);
 	}
 }

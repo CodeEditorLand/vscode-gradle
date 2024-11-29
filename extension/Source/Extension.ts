@@ -65,44 +65,75 @@ import { focusTaskInGradleTasksTree } from "./views/viewUtil";
 
 export class Extension {
 	private readonly taskServerClient: TaskServerClient;
+
 	private readonly server: GradleServer;
+
 	private readonly pinnedTasksStore: PinnedTasksStore;
+
 	private readonly recentTasksStore: RecentTasksStore;
+
 	private readonly taskTerminalsStore: TaskTerminalsStore;
+
 	private readonly rootProjectsStore: RootProjectsStore;
+
 	private readonly gradleBuildContentProvider: GradleBuildContentProvider;
+
 	private readonly gradleTaskProvider: GradleTaskProvider;
+
 	private readonly gradleDependencyProvider: GradleDependencyProvider;
+
 	private readonly taskProvider: vscode.Disposable;
+
 	private readonly gradleTaskManager: GradleTaskManager;
+
 	private readonly icons: Icons;
+
 	private readonly buildFileWatcher: FileWatcher;
+
 	private readonly gradleWrapperWatcher: FileWatcher;
+
 	private readonly gradleDaemonsTreeView: vscode.TreeView<vscode.TreeItem>;
+
 	private readonly gradleTasksTreeView: vscode.TreeView<vscode.TreeItem>;
+
 	private readonly gradleDaemonsTreeDataProvider: GradleDaemonsTreeDataProvider;
+
 	private readonly recentTasksTreeDataProvider: RecentTasksTreeDataProvider;
+
 	private readonly recentTasksTreeView: vscode.TreeView<vscode.TreeItem>;
+
 	private readonly gradleTasksTreeDataProvider: GradleTasksTreeDataProvider;
+
 	private readonly defaultProjectsTreeView: vscode.TreeView<vscode.TreeItem>;
+
 	private readonly defaultProjectsTreeDataProvider: DefaultProjectsTreeDataProvider;
+
 	private readonly api: Api;
+
 	private readonly commands: Commands;
+
 	private readonly _onDidTerminalOpen: vscode.EventEmitter<vscode.Terminal> =
 		new vscode.EventEmitter<vscode.Terminal>();
+
 	private readonly onDidTerminalOpen: vscode.Event<vscode.Terminal> =
 		this._onDidTerminalOpen.event;
+
 	private recentTerminal: vscode.Terminal | undefined;
+
 	private readonly buildServerController: BuildServerController;
+
 	public constructor(private readonly context: vscode.ExtensionContext) {
 		const loggingChannel =
 			vscode.window.createOutputChannel("Gradle for Java");
+
 		logger.setLoggingChannel(loggingChannel);
 
 		const clientLogger = new Logger("grpc");
+
 		clientLogger.setLoggingChannel(loggingChannel);
 
 		const serverLogger = new Logger("gradle-server");
+
 		serverLogger.setLoggingChannel(loggingChannel);
 
 		if (getConfigIsDebugEnabled()) {
@@ -110,35 +141,46 @@ export class Extension {
 		}
 
 		const statusBarItem = vscode.window.createStatusBarItem();
+
 		this.server = new GradleServer(
 			{ host: "localhost" },
 			context,
 			serverLogger,
 		);
+
 		this.taskServerClient = new TaskServerClient(
 			this.server,
 			statusBarItem,
 			clientLogger,
 		);
+
 		this.pinnedTasksStore = new PinnedTasksStore(context);
+
 		this.recentTasksStore = new RecentTasksStore();
+
 		this.taskTerminalsStore = new TaskTerminalsStore();
+
 		this.rootProjectsStore = new RootProjectsStore();
+
 		this.gradleBuildContentProvider = new GradleBuildContentProvider(
 			this.taskServerClient,
 		);
+
 		this.gradleTaskProvider = new GradleTaskProvider(
 			this.rootProjectsStore,
 			this.taskServerClient,
 			this.gradleBuildContentProvider,
 		);
+
 		this.gradleDependencyProvider = new GradleDependencyProvider(
 			this.gradleBuildContentProvider,
 		);
+
 		this.taskProvider = vscode.tasks.registerTaskProvider(
 			"gradle",
 			this.gradleTaskProvider,
 		);
+
 		this.icons = new Icons(context);
 
 		this.gradleTasksTreeDataProvider = new GradleTasksTreeDataProvider(
@@ -150,6 +192,7 @@ export class Extension {
 			this.icons,
 			this.taskServerClient,
 		);
+
 		this.gradleTasksTreeView = vscode.window.createTreeView(
 			GRADLE_TASKS_VIEW,
 			{
@@ -157,10 +200,12 @@ export class Extension {
 				showCollapseAll: true,
 			},
 		);
+
 		this.gradleDaemonsTreeDataProvider = new GradleDaemonsTreeDataProvider(
 			this.context,
 			this.rootProjectsStore,
 		);
+
 		this.gradleDaemonsTreeView = vscode.window.createTreeView(
 			GRADLE_DAEMONS_VIEW,
 			{
@@ -168,6 +213,7 @@ export class Extension {
 				showCollapseAll: false,
 			},
 		);
+
 		this.recentTasksTreeDataProvider = new RecentTasksTreeDataProvider(
 			this.recentTasksStore,
 			this.taskTerminalsStore,
@@ -176,6 +222,7 @@ export class Extension {
 			this.taskServerClient,
 			this.icons,
 		);
+
 		this.recentTasksTreeView = vscode.window.createTreeView(
 			RECENT_TASKS_VIEW,
 			{
@@ -183,6 +230,7 @@ export class Extension {
 				showCollapseAll: false,
 			},
 		);
+
 		this.defaultProjectsTreeDataProvider =
 			new DefaultProjectsTreeDataProvider(
 				this.gradleTaskProvider,
@@ -190,6 +238,7 @@ export class Extension {
 				this.taskServerClient,
 				this.icons,
 			);
+
 		this.defaultProjectsTreeView = vscode.window.createTreeView(
 			GRADLE_DEFAULT_PROJECTS_VIEW,
 			{
@@ -199,10 +248,13 @@ export class Extension {
 		);
 
 		this.gradleTaskManager = new GradleTaskManager(context);
+
 		this.buildFileWatcher = new FileWatcher("**/*.{gradle,gradle.kts}");
+
 		this.gradleWrapperWatcher = new FileWatcher(
 			"**/gradle/wrapper/gradle-wrapper.properties",
 		);
+
 		this.api = new Api(
 			this.taskServerClient,
 			this.gradleTasksTreeDataProvider,
@@ -228,9 +280,13 @@ export class Extension {
 		this.buildServerController = new BuildServerController(context);
 
 		this.storeSubscriptions();
+
 		this.registerCommands();
+
 		this.handleTaskEvents();
+
 		this.handleWatchEvents();
+
 		this.handleEditorEvents();
 
 		vscode.commands.registerCommand(
@@ -254,6 +310,7 @@ export class Extension {
 							const completionKind = args[0];
 
 							const completionContent = args[1];
+
 							sendInfo(operationId, {
 								kind: completionKind,
 								content: completionContent,
@@ -276,18 +333,22 @@ export class Extension {
 		);
 
 		this.taskServerClient.onDidConnect(() => this.refresh());
+
 		void startLanguageClientAndWaitForConnection(
 			this.context,
 			this.gradleBuildContentProvider,
 			this.rootProjectsStore,
 			this.server.getLanguageServerPipePath(),
 		);
+
 		void this.activate();
+
 		void vscode.commands.executeCommand(
 			"setContext",
 			"allowParallelRun",
 			getAllowParallelRun(),
 		);
+
 		void vscode.commands.executeCommand(
 			"setContext",
 			Context.ACTIVATION_CONTEXT_KEY,
@@ -327,11 +388,13 @@ export class Extension {
 		if (!this.server.isReady()) {
 			await this.server.start();
 		}
+
 		await vscode.commands.executeCommand(
 			"setContext",
 			"gradle:activated",
 			activated,
 		);
+
 		await vscode.commands.executeCommand(
 			"setContext",
 			"gradle:defaultView",
@@ -353,6 +416,7 @@ export class Extension {
 		if (terminalTaskName === definition.script) {
 			this.taskTerminalsStore.addEntry(terminalTaskName, terminal);
 		}
+
 		terminal.show();
 	}
 
@@ -364,12 +428,15 @@ export class Extension {
 			// in different vscode versions.
 			if (this.recentTerminal) {
 				this.handleTaskTerminals(definition, this.recentTerminal);
+
 				this.recentTerminal = undefined;
 			} else {
 				const disposable = this.onDidTerminalOpen(
 					(terminal: vscode.Terminal) => {
 						disposable.dispose();
+
 						this.handleTaskTerminals(definition, terminal);
+
 						this.recentTerminal = undefined;
 					},
 				);
@@ -385,9 +452,12 @@ export class Extension {
 					this.gradleTasksTreeView,
 				);
 			}
+
 			this.recentTasksStore.addEntry(definition.id, definition.args);
+
 			await vscode.commands.executeCommand(COMMAND_RENDER_TASK, task);
 		});
+
 		this.gradleTaskManager.onDidEndTask(async (task: vscode.Task) => {
 			await vscode.commands.executeCommand(COMMAND_RENDER_TASK, task);
 		});
@@ -399,10 +469,12 @@ export class Extension {
 				GRADLE_BUILD_FILE_CHANGE,
 				async (_operationId: string, uri: vscode.Uri) => {
 					logger.info("Build file changed:", uri.fsPath);
+
 					await this.refresh();
 				},
 			),
 		);
+
 		this.buildFileWatcher.onDidOpen(
 			instrumentOperation(
 				GRADLE_BUILD_FILE_OPEN,
@@ -411,6 +483,7 @@ export class Extension {
 				},
 			),
 		);
+
 		this.gradleWrapperWatcher.onDidChange(
 			instrumentOperation(
 				GRADLE_PROPERTIES_FILE_CHANGE,
@@ -421,6 +494,7 @@ export class Extension {
 					);
 
 					const selection = await this.showRestartWindow();
+
 					sendInfo("", {
 						kind: "wrapperPropertiesChangedReloadRequest",
 						data2: selection === OPT_RESTART ? "true" : "false",
@@ -429,6 +503,7 @@ export class Extension {
 					if (selection === OPT_RESTART) {
 						await this.restartServer();
 					}
+
 					if (isLanguageServerStarted) {
 						void vscode.commands.executeCommand(
 							"gradle.distributionChanged",
@@ -441,6 +516,7 @@ export class Extension {
 
 	private async restartServer(): Promise<void> {
 		await this.taskServerClient.cancelBuilds();
+
 		await commands.executeCommand("workbench.action.restartExtensionHost");
 	}
 
@@ -469,6 +545,7 @@ export class Extension {
 						)
 					) {
 						const selection = await this.showRestartWindow();
+
 						sendInfo("", {
 							kind: "javaHomeChangedReloadRequest",
 							data2: selection === OPT_RESTART ? "true" : "false",
@@ -484,7 +561,9 @@ export class Extension {
 						event.affectsConfiguration("gradle.nestedProjects")
 					) {
 						this.rootProjectsStore.clear();
+
 						await this.refresh();
+
 						await this.activate();
 					} else if (
 						event.affectsConfiguration("gradle.reuseTerminals")
@@ -492,6 +571,7 @@ export class Extension {
 						await this.refresh();
 					} else if (event.affectsConfiguration("gradle.debug")) {
 						const debug = getConfigIsDebugEnabled();
+
 						Logger.setLogVerbosity(
 							debug ? LogVerbosity.DEBUG : LogVerbosity.INFO,
 						);
@@ -522,6 +602,7 @@ export class Extension {
 			vscode.workspace.onDidChangeWorkspaceFolders(() => this.refresh()),
 			vscode.window.onDidOpenTerminal((terminal: vscode.Terminal) => {
 				this.recentTerminal = terminal;
+
 				this._onDidTerminalOpen.fire(terminal);
 			}),
 		);
@@ -562,11 +643,13 @@ export class Extension {
 					this.buildServerController.getGradleTestRunner(
 						testRunnerApi,
 					);
+
 				testRunnerApi.registerTestProfile(
 					"Delegate Test to Gradle",
 					vscode.TestRunProfileKind.Run,
 					testRunner,
 				);
+
 				testRunnerApi.registerTestProfile(
 					"Delegate Test to Gradle (Debug)",
 					vscode.TestRunProfileKind.Debug,

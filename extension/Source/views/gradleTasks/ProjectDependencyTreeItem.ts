@@ -15,6 +15,7 @@ export class ProjectDependencyTreeItem extends vscode.TreeItem {
 		iconPath: vscode.ThemeIcon = new vscode.ThemeIcon("folder-library"),
 	) {
 		super(name, collapsibleState);
+
 		this.iconPath = iconPath;
 	}
 

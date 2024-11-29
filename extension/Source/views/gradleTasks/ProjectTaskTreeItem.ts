@@ -13,6 +13,7 @@ export class ProjectTaskTreeItem extends vscode.TreeItem {
 		iconPath: vscode.ThemeIcon = new vscode.ThemeIcon("file-submodule"),
 	) {
 		super(name, collapsibleState);
+
 		this.iconPath = iconPath;
 	}
 

@@ -23,6 +23,7 @@ export async function unsetDefault(): Promise<void> {
 
 export function generateDefaultTaskDefinitions(): DefaultTaskDefinition[] {
 	const result = [];
+
 	result.push(
 		getDefaultTaskDefinition(
 			"init",
@@ -30,6 +31,7 @@ export function generateDefaultTaskDefinitions(): DefaultTaskDefinition[] {
 			"Initializes a new Gradle build.",
 		),
 	);
+
 	result.push(
 		getDefaultTaskDefinition(
 			"wrapper",
@@ -37,6 +39,7 @@ export function generateDefaultTaskDefinitions(): DefaultTaskDefinition[] {
 			"Generates Gradle wrapper files.",
 		),
 	);
+
 	result.push(
 		getDefaultTaskDefinition(
 			"buildEnvironment",
@@ -44,6 +47,7 @@ export function generateDefaultTaskDefinitions(): DefaultTaskDefinition[] {
 			"Displays all buildscript dependencies declared in root project.",
 		),
 	);
+
 	result.push(
 		getDefaultTaskDefinition(
 			"dependencies",
@@ -51,6 +55,7 @@ export function generateDefaultTaskDefinitions(): DefaultTaskDefinition[] {
 			"Displays all dependencies declared in root project.",
 		),
 	);
+
 	result.push(
 		getDefaultTaskDefinition(
 			"dependencyInsight",
@@ -58,9 +63,11 @@ export function generateDefaultTaskDefinitions(): DefaultTaskDefinition[] {
 			"Displays the insight into a specific dependency in root project.",
 		),
 	);
+
 	result.push(
 		getDefaultTaskDefinition("help", "help", "Displays a help message."),
 	);
+
 	result.push(
 		getDefaultTaskDefinition(
 			"javaToolchains",
@@ -68,6 +75,7 @@ export function generateDefaultTaskDefinitions(): DefaultTaskDefinition[] {
 			"Displays the detected java toolchains.",
 		),
 	);
+
 	result.push(
 		getDefaultTaskDefinition(
 			"outgoingVariants",
@@ -75,6 +83,7 @@ export function generateDefaultTaskDefinitions(): DefaultTaskDefinition[] {
 			"Displays the outgoing variants of root project.",
 		),
 	);
+
 	result.push(
 		getDefaultTaskDefinition(
 			"projects",
@@ -82,6 +91,7 @@ export function generateDefaultTaskDefinitions(): DefaultTaskDefinition[] {
 			"Displays the sub-projects of root project.",
 		),
 	);
+
 	result.push(
 		getDefaultTaskDefinition(
 			"properties",
@@ -89,6 +99,7 @@ export function generateDefaultTaskDefinitions(): DefaultTaskDefinition[] {
 			"Displays the properties of root project.",
 		),
 	);
+
 	result.push(
 		getDefaultTaskDefinition(
 			"tasks",

@@ -8,6 +8,7 @@ export function asyncDebounce(func: any, wait: any, bind: any) {
 	const debounced = debounce(async (resolve, reject, bindSelf, args) => {
 		try {
 			const result = await func.bind(bindSelf)(...args);
+
 			resolve(result);
 		} catch (error) {
 			reject(error);

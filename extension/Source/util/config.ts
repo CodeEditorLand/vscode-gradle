@@ -84,6 +84,7 @@ export async function findValidJavaHome(): Promise<string | undefined> {
 
 	// Search java.configuration.runtimes if still not found
 	javaHome = await findDefaultRuntimeFromSettings();
+
 	javaVersion = await getMajorVersion(javaHome);
 
 	if (javaVersion >= REQUIRED_JDK_VERSION) {
@@ -120,6 +121,7 @@ export function getRedHatJavaEmbeddedJRE(): string | undefined {
 			}
 		}
 	}
+
 	return undefined;
 }
 
@@ -129,6 +131,7 @@ export function checkEnvJavaExecutable(): boolean {
 	} catch (e) {
 		return false;
 	}
+
 	return true;
 }
 
@@ -174,6 +177,7 @@ export function getConfigReuseTerminals(): ReuseTerminalsValue {
 	if (getAllowParallelRun()) {
 		return "off";
 	}
+
 	return vscode.workspace
 		.getConfiguration("gradle")
 		.get<ReuseTerminalsValue>("reuseTerminals", "task");
@@ -269,18 +273,23 @@ export function getGradleConfig(): GradleConfig {
 	if (gradleHome !== null) {
 		gradleConfig.setGradleHome(gradleHome);
 	}
+
 	if (gradleUserHome !== null) {
 		gradleConfig.setUserHome(gradleUserHome);
 	}
+
 	if (gradleJvmArguments !== null) {
 		gradleConfig.setJvmArguments(gradleJvmArguments);
 	}
+
 	if (gradleVersion !== null) {
 		gradleConfig.setVersion(gradleVersion);
 	}
+
 	if (javaHome !== null) {
 		gradleConfig.setJavaHome(javaHome);
 	}
+
 	gradleConfig.setWrapperEnabled(getConfigJavaImportGradleWrapperEnabled());
 
 	const javaExtension = vscode.extensions.getExtension("redhat.java");
@@ -292,5 +301,6 @@ export function getGradleConfig(): GradleConfig {
 			gradleConfig.setJavaExtensionVersion(version);
 		}
 	}
+
 	return gradleConfig;
 }

@@ -9,6 +9,7 @@ export class ExplorerFlatCommand extends Command {
 	) {
 		super();
 	}
+
 	async run(): Promise<void> {
 		await this.gradleTasksTreeDataProvider.setCollapsed(true);
 	}

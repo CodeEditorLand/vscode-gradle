@@ -16,7 +16,9 @@ import { JdtlsImporterConnector } from "./JdtlsImporterConnector";
  */
 export class BspProxy {
 	private buildServerConnector: BuildServerConnector;
+
 	private jdtlsImporterConnector: JdtlsImporterConnector;
+
 	private buildServerStart: boolean;
 
 	constructor(
@@ -24,6 +26,7 @@ export class BspProxy {
 		private readonly logger: Logger,
 	) {
 		this.buildServerConnector = new BuildServerConnector();
+
 		this.jdtlsImporterConnector = new JdtlsImporterConnector(context);
 	}
 	/**
@@ -41,6 +44,7 @@ export class BspProxy {
 	 */
 	public async start(): Promise<void> {
 		await this.jdtlsImporterConnector.waitForImporterPipePath();
+
 		await this.jdtlsImporterConnector.setupImporterPipeStream();
 
 		if (this.buildServerStart) {
@@ -49,6 +53,7 @@ export class BspProxy {
 				this.buildServerConnector.getServerConnection(),
 			);
 		}
+
 		this.jdtlsImporterConnector.startListening();
 	}
 
@@ -63,10 +68,12 @@ export class BspProxy {
 		if (!importerConnection || !buildServerConnection) {
 			return;
 		}
+
 		importerConnection.onRequest((method, params) => {
 			if (params !== null) {
 				return buildServerConnection.sendRequest(method, params);
 			}
+
 			return buildServerConnection.sendRequest(method);
 		});
 
@@ -74,11 +81,13 @@ export class BspProxy {
 			if (params !== null) {
 				return importerConnection.sendNotification(method, params);
 			}
+
 			importerConnection.sendNotification(method);
 		});
 
 		importerConnection.onError(([error]) => {
 			this.logger.error(`Error on importerConnection: ${error.message}`);
+
 			sendInfo("", {
 				kind: "bspProxy-importerConnectionError",
 				message: error.message,
@@ -91,6 +100,7 @@ export class BspProxy {
 			this.logger.error(
 				`Error on buildServerConnection: ${error.message}`,
 			);
+
 			sendInfo("", {
 				kind: "bspProxy-buildServerConnectionError",
 				message: error.message,
@@ -99,6 +109,7 @@ export class BspProxy {
 			// TODO: Implement more specific error handling logic here
 		});
 	}
+
 	public setBuildServerStarted(started: boolean): void {
 		this.buildServerStart = started;
 	}
@@ -106,10 +117,12 @@ export class BspProxy {
 	public closeConnection(): void {
 		try {
 			this.buildServerConnector.close();
+
 			this.jdtlsImporterConnector.close();
 		} catch (error) {
 			// Error when pipe server not started. Ignore it.
 		}
+
 		this.logger.info("Build Server connection closed");
 	}
 }

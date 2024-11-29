@@ -32,10 +32,12 @@ function generateRandomPipeName(): string {
 			randomLength,
 		);
 	}
+
 	if (randomLength < 16) {
 		sendInfo("", {
 			kind: "tempDirTooLongWhenGenerateRandomPipeName",
 		});
+
 		tmpDir = "/tmp/";
 	}
 
@@ -56,5 +58,6 @@ export function getRandomPipeName(): string {
 			kind: "generateRandomPipeNameError",
 		});
 	}
+
 	return pipeName;
 }

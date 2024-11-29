@@ -38,5 +38,6 @@ export async function ensureBuildFilePath(
 			return buildFilePath;
 		}
 	}
+
 	return undefined;
 }

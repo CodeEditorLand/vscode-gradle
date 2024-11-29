@@ -17,6 +17,7 @@ export class SpecifySourcePackageNameStep implements IProjectCreationStep {
 		if (!metadata.client) {
 			return StepResult.STOP;
 		}
+
 		const getNormalizedPackageNameTrigger = asyncDebounce(
 			metadata.client.getNormalizedPackageName,
 			500 /** ms */,
@@ -37,16 +38,22 @@ export class SpecifySourcePackageNameStep implements IProjectCreationStep {
 				if (!normalizedName) {
 					return resolve(StepResult.STOP);
 				}
+
 				inputBox.title = `Create Gradle project: Specify package name (${metadata.steps.length + 1}/${
 					metadata.totalSteps
 				})`;
+
 				inputBox.prompt = "Input source package name of your project.";
+
 				inputBox.placeholder = "e.g. " + normalizedName;
+
 				inputBox.value = normalizedName as string;
+
 				inputBox.ignoreFocusOut = true;
 
 				if (metadata.steps.length) {
 					inputBox.buttons = [vscode.QuickInputButtons.Back];
+
 					disposables.push(
 						inputBox.onDidTriggerButton((item) => {
 							if (item === vscode.QuickInputButtons.Back) {
@@ -55,6 +62,7 @@ export class SpecifySourcePackageNameStep implements IProjectCreationStep {
 						}),
 					);
 				}
+
 				disposables.push(
 					inputBox.onDidChangeValue(async () => {
 						const normalizedName =
@@ -82,7 +90,9 @@ export class SpecifySourcePackageNameStep implements IProjectCreationStep {
 							inputBox.validationMessage = `Invalid source package name, suggest name: ${normalizedName}`;
 						} else {
 							metadata.sourcePackageName = inputBox.value;
+
 							metadata.nextStep = undefined;
+
 							resolve(StepResult.NEXT);
 						}
 					}),
@@ -90,7 +100,9 @@ export class SpecifySourcePackageNameStep implements IProjectCreationStep {
 						resolve(StepResult.STOP);
 					}),
 				);
+
 				disposables.push(inputBox);
+
 				inputBox.show();
 			},
 		);

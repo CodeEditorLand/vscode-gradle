@@ -13,6 +13,7 @@ export class ReloadJavaProjectsCommand extends Command {
 	constructor() {
 		super();
 	}
+
 	async run(): Promise<void> {
 		const projectsMap = getProjectTreeItemMap();
 

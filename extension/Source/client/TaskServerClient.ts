@@ -43,20 +43,28 @@ function logBuildEnvironment(environment: Environment): void {
 	const javaEnv = environment.getJavaEnvironment()!;
 
 	const gradleEnv = environment.getGradleEnvironment()!;
+
 	logger.info("Java Home:", javaEnv.getJavaHome());
+
 	logger.info("JVM Args:", javaEnv.getJvmArgsList().join(","));
+
 	logger.info("Gradle User Home:", gradleEnv.getGradleUserHome());
+
 	logger.info("Gradle Version:", gradleEnv.getGradleVersion());
 }
 
 export class TaskServerClient implements vscode.Disposable {
 	private readonly connectDeadline = 30; // seconds
 	private grpcClient: GrpcClient | null = null;
+
 	private readonly _onDidConnect: vscode.EventEmitter<null> =
 		new vscode.EventEmitter<null>();
+
 	private readonly _onDidConnectFail: vscode.EventEmitter<null> =
 		new vscode.EventEmitter<null>();
+
 	public readonly onDidConnect: vscode.Event<null> = this._onDidConnect.event;
+
 	public readonly onDidConnectFail: vscode.Event<null> =
 		this._onDidConnectFail.event;
 
@@ -68,6 +76,7 @@ export class TaskServerClient implements vscode.Disposable {
 		private readonly clientLogger: Logger,
 	) {
 		this.server.onDidStart(this.handleServerStart);
+
 		this.server.onDidStop(this.handleServerStop);
 	}
 
@@ -88,15 +97,18 @@ export class TaskServerClient implements vscode.Disposable {
 				return new Promise((resolve) => {
 					const disposableConnectHandler = this.onDidConnect(() => {
 						disposableConnectHandler.dispose();
+
 						resolve();
 					});
 
 					const disposableConnectFailHandler = this.onDidConnectFail(
 						() => {
 							disposableConnectFailHandler.dispose();
+
 							resolve();
 						},
 					);
+
 					this.connectToServer();
 				});
 			},
@@ -110,6 +122,7 @@ export class TaskServerClient implements vscode.Disposable {
 			await this.handleConnectError(err);
 		} else {
 			logger.info("Gradle client connected to server");
+
 			this._onDidConnect.fire(null);
 		}
 	};
@@ -124,13 +137,17 @@ export class TaskServerClient implements vscode.Disposable {
 					"grpc.max_receive_message_length": -1,
 				},
 			);
+
 			grpc.setLogger(this.clientLogger);
 
 			const deadline = new Date();
+
 			deadline.setSeconds(deadline.getSeconds() + this.connectDeadline);
+
 			this.grpcClient.waitForReady(deadline, this.handleClientReady);
 		} catch (err) {
 			logger.error("Unable to construct the gRPC client:", err.message);
+
 			this.statusBarItem.hide();
 		}
 	}
@@ -141,6 +158,7 @@ export class TaskServerClient implements vscode.Disposable {
 		showOutputColors = false,
 	): Promise<GradleBuild | undefined> {
 		await this.waitForConnect();
+
 		this.statusBarItem.hide();
 
 		return vscode.window.withProgress(
@@ -177,9 +195,13 @@ export class TaskServerClient implements vscode.Disposable {
 				);
 
 				const request = new GetBuildRequest();
+
 				request.setProjectDir(rootProject.getProjectUri().fsPath);
+
 				request.setCancellationKey(cancellationKey);
+
 				request.setGradleConfig(gradleConfig);
+
 				request.setShowOutputColors(showOutputColors);
 
 				const getBuildStream = this.grpcClient!.getBuild(request);
@@ -227,6 +249,7 @@ export class TaskServerClient implements vscode.Disposable {
 
 													break;
 											}
+
 											break;
 
 										case GetBuildReply.KindCase.CANCELLED:
@@ -239,6 +262,7 @@ export class TaskServerClient implements vscode.Disposable {
 										case GetBuildReply.KindCase
 											.GET_BUILD_RESULT:
 											void unsetDefault();
+
 											build = getBuildReply
 												.getGetBuildResult()!
 												.getBuild();
@@ -248,10 +272,13 @@ export class TaskServerClient implements vscode.Disposable {
 										case GetBuildReply.KindCase.ENVIRONMENT:
 											const environment =
 												getBuildReply.getEnvironment()!;
+
 											rootProject.setEnvironment(
 												environment,
 											);
+
 											logBuildEnvironment(environment);
+
 											await vscode.commands.executeCommand(
 												COMMAND_REFRESH_DAEMON_STATUS,
 											);
@@ -267,6 +294,7 @@ export class TaskServerClient implements vscode.Disposable {
 												"Open Gradle Settings",
 												"Learn More",
 											];
+
 											await vscode.window
 												.showErrorMessage(
 													message,
@@ -301,11 +329,15 @@ export class TaskServerClient implements vscode.Disposable {
 					});
 				} catch (err) {
 					void setDefault();
+
 					logger.error(
 						`Error getting build for ${rootProject.getProjectUri().fsPath}: ${err.details || err.message}`,
 					);
+
 					this.statusBarItem.command = COMMAND_SHOW_LOGS;
+
 					this.statusBarItem.text = "$(warning) Gradle: Build Error";
+
 					this.statusBarItem.show();
 				} finally {
 					process.nextTick(() =>
@@ -314,6 +346,7 @@ export class TaskServerClient implements vscode.Disposable {
 						),
 					);
 				}
+
 				return undefined;
 			},
 		);
@@ -332,6 +365,7 @@ export class TaskServerClient implements vscode.Disposable {
 		location?: vscode.ProgressLocation,
 	): Promise<void> {
 		await this.waitForConnect();
+
 		this.statusBarItem.hide();
 
 		return vscode.window.withProgress(
@@ -353,6 +387,7 @@ export class TaskServerClient implements vscode.Disposable {
 				);
 
 				const progressHandler = new ProgressHandler(progress);
+
 				progressHandler.onDidProgressStart(async () => {
 					await vscode.commands.executeCommand(
 						COMMAND_REFRESH_DAEMON_STATUS,
@@ -362,12 +397,19 @@ export class TaskServerClient implements vscode.Disposable {
 				const gradleConfig = getGradleConfig();
 
 				const request = new RunBuildRequest();
+
 				request.setProjectDir(projectFolder);
+
 				request.setCancellationKey(cancellationKey);
+
 				request.setArgsList(args as string[]);
+
 				request.setGradleConfig(gradleConfig);
+
 				request.setShowOutputColors(showOutputColors);
+
 				request.setJavaDebugPort(javaDebugPort);
+
 				request.setInput(input);
 
 				if (javaDebugPort > 0) {
@@ -405,6 +447,7 @@ export class TaskServerClient implements vscode.Disposable {
 												runBuildReply.getOutput()!,
 											);
 										}
+
 										break;
 
 									case RunBuildReply.KindCase.CANCELLED:
@@ -420,6 +463,7 @@ export class TaskServerClient implements vscode.Disposable {
 							.on("error", reject)
 							.on("end", resolve);
 					});
+
 					logger.info("Completed build:", args.join(" "));
 				} catch (err) {
 					logger.error(
@@ -447,9 +491,11 @@ export class TaskServerClient implements vscode.Disposable {
 		task?: vscode.Task,
 	): Promise<void> {
 		await this.waitForConnect();
+
 		this.statusBarItem.hide();
 
 		const request = new CancelBuildRequest();
+
 		request.setCancellationKey(cancellationKey);
 
 		try {
@@ -524,9 +570,11 @@ export class TaskServerClient implements vscode.Disposable {
 		await this.waitForConnect();
 
 		const request = new ExecuteCommandRequest();
+
 		request.setCommand(
 			SpecifySourcePackageNameStep.GET_NORMALIZED_PACKAGE_NAME,
 		);
+
 		request.addArguments(name);
 
 		try {
@@ -577,7 +625,9 @@ export class TaskServerClient implements vscode.Disposable {
 	 */
 	private handleConnectError = async (e: Error): Promise<void> => {
 		logger.error("Error connecting to gradle server:", e.message);
+
 		this.close();
+
 		this._onDidConnectFail.fire(null);
 
 		if (this.server.isReady()) {
@@ -585,7 +635,9 @@ export class TaskServerClient implements vscode.Disposable {
 				this.grpcClient!.getChannel().getConnectivityState(true);
 
 			const enumKey = ConnectivityState[connectivityState];
+
 			logger.error("The client has state:", enumKey);
+
 			await this.showRestartMessage();
 		} else {
 			await this.server.showRestartMessage();
@@ -607,11 +659,13 @@ export class TaskServerClient implements vscode.Disposable {
 
 	public close(): void {
 		this.statusBarItem.hide();
+
 		this.grpcClient?.close();
 	}
 
 	public dispose(): void {
 		this.close();
+
 		this._onDidConnect.dispose();
 	}
 }

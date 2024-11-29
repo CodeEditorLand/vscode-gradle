@@ -16,6 +16,7 @@ export class GradleDaemonTreeItem extends vscode.TreeItem {
 		super(label, vscode.TreeItemCollapsibleState.None);
 
 		const iconName = DAEMON_ICON_MAP[daemonInfo.getStatus()];
+
 		this.iconPath = {
 			light: this.context.asAbsolutePath(
 				path.join("resources", "light", iconName),
@@ -24,9 +25,13 @@ export class GradleDaemonTreeItem extends vscode.TreeItem {
 				path.join("resources", "dark", iconName),
 			),
 		};
+
 		this.status = DaemonStatus[daemonInfo.getStatus()];
+
 		this.description = this.status;
+
 		this.contextValue = this.status.toLowerCase();
+
 		this.tooltip = `${this.status} - ${daemonInfo.getInfo()}`;
 	}
 

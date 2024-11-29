@@ -16,6 +16,7 @@ export class GradleTaskTreeItem extends vscode.TreeItem {
 		protected readonly debuggable: boolean,
 	) {
 		super(label, vscode.TreeItemCollapsibleState.None);
+
 		this.command = {
 			title: "Run Task",
 			command: COMMAND_RUN_TASK_DOUBLE_CLICK,
@@ -28,6 +29,7 @@ export class GradleTaskTreeItem extends vscode.TreeItem {
 			this.task,
 			this.task.definition.args,
 		);
+
 		this.setIconState();
 	}
 

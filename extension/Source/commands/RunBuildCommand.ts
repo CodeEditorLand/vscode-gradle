@@ -17,12 +17,14 @@ export class RunBuildCommand extends Command {
 	) {
 		super();
 	}
+
 	async run(): Promise<void> {
 		const rootProject = await getRootProjectFolder(this.rootProjectsStore);
 
 		if (!rootProject) {
 			return;
 		}
+
 		const gradleCommand = await getGradleCommand();
 
 		if (!gradleCommand) {
@@ -55,6 +57,7 @@ export class RunBuildCommand extends Command {
 			),
 			["$gradle"],
 		);
+
 		task.presentationOptions = {
 			showReuseMessage: false,
 			clear: true,
@@ -63,6 +66,7 @@ export class RunBuildCommand extends Command {
 			panel: vscode.TaskPanelKind.Shared,
 			reveal: vscode.TaskRevealKind.Always,
 		};
+
 		await vscode.tasks.executeTask(task);
 	}
 }

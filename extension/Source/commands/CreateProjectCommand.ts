@@ -33,6 +33,7 @@ export class CreateProjectCommand extends Command {
 		if (!params || params[0] === undefined) {
 			return;
 		}
+
 		const folders = vscode.workspace.workspaceFolders;
 
 		const targetFolderUri = await vscode.window.showOpenDialog({
@@ -100,6 +101,7 @@ export class CreateProjectCommand extends Command {
 						openProjectBehaviour = choice;
 					}
 				}
+
 				if (openProjectBehaviour === ProjectOpenBehaviourValue.OPEN) {
 					vscode.commands.executeCommand(
 						"vscode.openFolder",
@@ -124,6 +126,7 @@ export class CreateProjectCommand extends Command {
 				}
 			}
 		}
+
 		return;
 	}
 
@@ -145,6 +148,7 @@ export class CreateProjectCommand extends Command {
 					if (metadata.steps.length === 0) {
 						return false;
 					}
+
 					step = metadata.steps.pop();
 
 					break;
@@ -155,6 +159,7 @@ export class CreateProjectCommand extends Command {
 					throw new Error("invalid StepResult returned.");
 			}
 		}
+
 		return true;
 	}
 
@@ -177,22 +182,31 @@ export class CreateProjectCommand extends Command {
 		) {
 			return;
 		}
+
 		args.push("--dsl");
+
 		args.push(metadata.scriptDSL);
+
 		args.push("--type");
+
 		args.push(metadata.projectType);
 
 		if (metadata.testFramework) {
 			args.push("--test-framework");
+
 			args.push(metadata.testFramework);
 		}
+
 		args.push("--project-name");
+
 		args.push(metadata.projectName);
 
 		if (metadata.sourcePackageName) {
 			args.push("--package");
+
 			args.push(metadata.sourcePackageName);
 		}
+
 		await this.client.runBuild(
 			metadata.targetFolder,
 			cancellationKey,

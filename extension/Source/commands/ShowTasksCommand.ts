@@ -9,6 +9,7 @@ export class ShowTasksCommand extends Command {
 	constructor(private gradleTasksTreeView: vscode.TreeView<vscode.TreeItem>) {
 		super();
 	}
+
 	async run(uri: vscode.Uri): Promise<void> {
 		await focusProjectInGradleTasksTree(uri, this.gradleTasksTreeView);
 	}

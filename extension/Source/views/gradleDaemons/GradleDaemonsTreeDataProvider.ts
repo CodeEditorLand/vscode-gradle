@@ -15,10 +15,14 @@ export class GradleDaemonsTreeDataProvider
 	implements vscode.TreeDataProvider<vscode.TreeItem>
 {
 	private cancelDeferred?: Deferred<vscode.TreeItem[]>;
+
 	private treeItems: vscode.TreeItem[] = [];
+
 	private specificVersion = false;
+
 	private readonly _onDidChangeTreeData: vscode.EventEmitter<vscode.TreeItem | null> =
 		new vscode.EventEmitter<vscode.TreeItem | null>();
+
 	public readonly onDidChangeTreeData: vscode.Event<vscode.TreeItem | null> =
 		this._onDidChangeTreeData.event;
 
@@ -29,6 +33,7 @@ export class GradleDaemonsTreeDataProvider
 
 	public refresh(): void {
 		this.cancelDeferred?.resolve(this.treeItems);
+
 		this._onDidChangeTreeData.fire(null);
 	}
 
@@ -42,6 +47,7 @@ export class GradleDaemonsTreeDataProvider
 		if (element || !vscode.workspace.workspaceFolders?.length) {
 			return [];
 		}
+
 		this.cancelDeferred = new Deferred();
 
 		const cancellationToken = new vscode.CancellationTokenSource();
@@ -78,9 +84,11 @@ export class GradleDaemonsTreeDataProvider
 			Promise.all(promises).then((items) => items.flat()),
 			this.cancelDeferred.promise,
 		]);
+
 		this.cancelDeferred = undefined;
 
 		const length = this.treeItems.length;
+
 		await vscode.commands.executeCommand(
 			"setContext",
 			"gradle:hasValidDaemons",
@@ -90,6 +98,7 @@ export class GradleDaemonsTreeDataProvider
 		if (length) {
 			return this.treeItems;
 		}
+
 		return this.specificVersion
 			? [
 					new HintItem(
@@ -107,11 +116,13 @@ export class GradleDaemonsTreeDataProvider
 
 	public showStoppedDaemons(): void {
 		setShowStoppedDaemons(true);
+
 		this.refresh();
 	}
 
 	public hideStoppedDaemons(): void {
 		setShowStoppedDaemons(false);
+
 		this.refresh();
 	}
 }

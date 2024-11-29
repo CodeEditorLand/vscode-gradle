@@ -12,9 +12,11 @@ export function createDecorator(
 
 		if (typeof descriptor.value === "function") {
 			fnKey = "value";
+
 			fn = descriptor.value;
 		} else if (typeof descriptor.get === "function") {
 			fnKey = "get";
+
 			fn = descriptor.get;
 		}
 
@@ -36,6 +38,7 @@ export function debounce(delay: number): Function {
 
 		return function (this: any, ...args: any[]): void {
 			clearTimeout(this[timerKey]);
+
 			this[timerKey] = setTimeout(() => {
 				fn.apply(this, args);
 			}, delay);

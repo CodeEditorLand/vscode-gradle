@@ -3,6 +3,7 @@ import * as vscode from "vscode";
 export class ProgressHandler {
 	private readonly _onDidProgressStart: vscode.EventEmitter<null> =
 		new vscode.EventEmitter<null>();
+
 	public readonly onDidProgressStart: vscode.Event<null> =
 		this._onDidProgressStart.event;
 
@@ -18,7 +19,9 @@ export class ProgressHandler {
 	public report(message: string): void {
 		if (message.trim()) {
 			this.progress.report({ message });
+
 			this._onDidProgressStart.fire(null);
+
 			this._onDidProgressStart.dispose();
 		}
 	}

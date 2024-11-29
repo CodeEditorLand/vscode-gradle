@@ -12,6 +12,7 @@ export class GradleWrapper implements GradleExecution {
 	constructor(private projectRoot: string) {
 		const wrapperName =
 			process.platform === "win32" ? "gradlew.bat" : "gradlew";
+
 		this.gradleWrapperPath = `"${path.join(projectRoot, wrapperName)}"`;
 	}
 
@@ -19,6 +20,7 @@ export class GradleWrapper implements GradleExecution {
 		if (args.length === 0) {
 			throw new Error("No wrapper args supplied");
 		}
+
 		const quotedArgs = args.map((arg) => `"${arg}"`).join(" ");
 
 		const command = `${this.gradleWrapperPath} ${quotedArgs}`;
@@ -38,6 +40,7 @@ export class GradleWrapper implements GradleExecution {
 			if (stderr) {
 				logger.error(stderr);
 			}
+
 			return stdout;
 		} catch (error) {
 			logger.error(error.message);

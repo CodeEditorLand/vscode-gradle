@@ -12,6 +12,7 @@ export class EventWaiter<T = null> {
 	public waitForEvent = (callback?: callback): void => {
 		const disposable = this.event(() => {
 			disposable.dispose();
+
 			this.eventRun = true;
 
 			if (callback) {
@@ -24,11 +25,13 @@ export class EventWaiter<T = null> {
 		if (this.eventRun) {
 			return Promise.resolve();
 		}
+
 		return new Promise(this.waitForEvent);
 	};
 
 	public reset(): void {
 		this.eventRun = false;
+
 		this.waitForEvent();
 	}
 }

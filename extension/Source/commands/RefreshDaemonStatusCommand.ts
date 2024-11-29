@@ -9,6 +9,7 @@ export class RefreshDaemonStatusCommand extends Command {
 	) {
 		super();
 	}
+
 	async run(): Promise<void> {
 		this.gradleDaemonsTreeDataProvider.refresh();
 	}

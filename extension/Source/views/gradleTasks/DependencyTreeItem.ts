@@ -5,6 +5,7 @@ import * as vscode from "vscode";
 
 export class DependencyTreeItem extends vscode.TreeItem {
 	private children: vscode.TreeItem[] | undefined;
+
 	private omittedTreeItem: vscode.TreeItem | undefined;
 
 	constructor(
@@ -14,6 +15,7 @@ export class DependencyTreeItem extends vscode.TreeItem {
 		iconPath: vscode.ThemeIcon = new vscode.ThemeIcon("library"),
 	) {
 		super(name, collapsibleState);
+
 		this.iconPath = iconPath;
 	}
 

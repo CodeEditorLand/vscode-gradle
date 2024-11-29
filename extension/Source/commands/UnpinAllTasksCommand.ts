@@ -12,6 +12,7 @@ export class UnpinAllTasksCommand extends Command {
 	) {
 		super();
 	}
+
 	async run(): Promise<void> {
 		if (
 			this.pinnedTasksStore.getData().size &&
@@ -20,6 +21,7 @@ export class UnpinAllTasksCommand extends Command {
 			))
 		) {
 			this.pinnedTasksStore.clear();
+
 			this.gradleTasksTreeDataProvider.refresh();
 		}
 	}

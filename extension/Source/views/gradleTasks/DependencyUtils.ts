@@ -22,6 +22,7 @@ export function getDependencyConfigurationTreeItems(
 		if (child.getType() !== GradleDependencyType.CONFIGURATION) {
 			continue;
 		}
+
 		const configurationItem = protocolItem2DependencyConfigurationTreeItem(
 			child,
 			parent,
@@ -31,9 +32,11 @@ export function getDependencyConfigurationTreeItems(
 			configItems.push(configurationItem);
 		}
 	}
+
 	if (!configItems.length) {
 		return undefined;
 	}
+
 	return configItems;
 }
 
@@ -60,6 +63,7 @@ function protocolItem2DependencyConfigurationTreeItem(
 		if (child.getType() !== GradleDependencyType.DEPENDENCY) {
 			continue;
 		}
+
 		treeChildren.push(
 			protocolItem2DependencyTreeItem(
 				child,
@@ -68,9 +72,11 @@ function protocolItem2DependencyConfigurationTreeItem(
 			),
 		);
 	}
+
 	if (!treeChildren.length) {
 		return undefined;
 	}
+
 	configurationItem.setChildren(treeChildren);
 
 	return configurationItem;
@@ -95,9 +101,13 @@ function protocolItem2DependencyTreeItem(
 		if (omittedTreeItem) {
 			dependencyItem.setOmittedTreeItem(omittedTreeItem);
 		}
+
 		dependencyItem.contextValue = "omitted";
+
 		dependencyItem.label = dependencyItem.label + " (*)";
+
 		dependencyItem.collapsibleState = vscode.TreeItemCollapsibleState.None;
+
 		dependencyItem.tooltip =
 			'Dependency omitted. Click "Go to Dependency" to reveal the previously listed dependency.';
 	} else {
@@ -111,6 +121,7 @@ function protocolItem2DependencyTreeItem(
 			if (child.getType() !== GradleDependencyType.DEPENDENCY) {
 				continue;
 			}
+
 			treeChildren.push(
 				protocolItem2DependencyTreeItem(
 					child,
@@ -119,11 +130,14 @@ function protocolItem2DependencyTreeItem(
 				),
 			);
 		}
+
 		dependencyItem.collapsibleState =
 			treeChildren.length > 0
 				? vscode.TreeItemCollapsibleState.Collapsed
 				: vscode.TreeItemCollapsibleState.None;
+
 		dependencyItem.setChildren(treeChildren);
 	}
+
 	return dependencyItem;
 }

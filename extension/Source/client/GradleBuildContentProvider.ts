@@ -27,6 +27,7 @@ export class GradleBuildContentProvider {
 			if (this.cachedBuild.has(projectPath)) {
 				return this.cachedBuild.get(projectPath);
 			}
+
 			const gradleBuild = await this.client.getBuild(
 				rootProject,
 				getGradleConfig(),
@@ -34,8 +35,10 @@ export class GradleBuildContentProvider {
 
 			if (gradleBuild) {
 				await syncGradleBuild(gradleBuild);
+
 				this.cachedBuild.set(projectPath, gradleBuild);
 			}
+
 			return gradleBuild;
 		} finally {
 			lock.release();

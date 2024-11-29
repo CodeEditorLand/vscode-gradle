@@ -12,10 +12,13 @@ export class PinTaskCommand extends Command {
 	) {
 		super();
 	}
+
 	async run(treeItem: GradleTaskTreeItem): Promise<void> {
 		if (treeItem && treeItem.task) {
 			const definition = treeItem.task.definition as GradleTaskDefinition;
+
 			this.pinnedTasksStore.addEntry(definition.id, definition.args);
+
 			this.gradleTasksTreeDataProvider.refresh();
 		}
 	}

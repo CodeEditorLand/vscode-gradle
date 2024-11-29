@@ -5,15 +5,23 @@ import { TaskServerClient } from "../client";
 
 export interface IProjectCreationMetadata {
 	isAdvanced: boolean;
+
 	totalSteps: number;
+
 	projectType?: ProjectType;
+
 	scriptDSL?: string;
+
 	testFramework?: TestFramework;
+
 	projectName: string; // default: folderName
 	sourcePackageName?: string; //default: folderName
 	targetFolder: string;
+
 	steps: IProjectCreationStep[];
+
 	nextStep?: IProjectCreationStep;
+
 	client: TaskServerClient;
 }
 

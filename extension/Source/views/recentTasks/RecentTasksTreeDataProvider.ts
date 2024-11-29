@@ -49,6 +49,7 @@ function buildTaskTreeItem(
 		taskTerminalsStore,
 		definition.debuggable,
 	);
+
 	recentTaskTreeItem.setContext();
 
 	return recentTaskTreeItem;
@@ -70,6 +71,7 @@ function buildGradleProjectTreeItem(
 			gradleProjectTreeItem = new RecentTasksRootProjectTreeItem(
 				path.basename(definition.projectFolder),
 			);
+
 			recentTasksGradleProjectTreeItemMap.set(
 				definition.projectFolder,
 				gradleProjectTreeItem,
@@ -82,6 +84,7 @@ function buildGradleProjectTreeItem(
 			taskTerminalsStore,
 			icons,
 		);
+
 		recentTasksTreeItemMap.set(
 			definition.id + definition.args,
 			recentTaskTreeItem,
@@ -96,6 +99,7 @@ export class RecentTasksTreeDataProvider
 {
 	private readonly _onDidChangeTreeData: vscode.EventEmitter<vscode.TreeItem | null> =
 		new vscode.EventEmitter<vscode.TreeItem | null>();
+
 	public readonly onDidChangeTreeData: vscode.Event<vscode.TreeItem | null> =
 		this._onDidChangeTreeData.event;
 
@@ -108,6 +112,7 @@ export class RecentTasksTreeDataProvider
 		private readonly icons: Icons,
 	) {
 		this.recentTasksStore.onDidChange(() => this.refresh());
+
 		this.taskTerminalsStore.onDidChange(this.handleTerminalsStoreChange);
 	}
 
@@ -124,12 +129,14 @@ export class RecentTasksTreeDataProvider
 
 				if (treeItem) {
 					treeItem.setContext();
+
 					this.refresh(treeItem);
 
 					return;
 				}
 			}
 		}
+
 		this.refresh();
 	};
 
@@ -149,6 +156,7 @@ export class RecentTasksTreeDataProvider
 		if (element instanceof GradleTaskTreeItem) {
 			return element.parentTreeItem || null;
 		}
+
 		return null;
 	}
 
@@ -158,6 +166,7 @@ export class RecentTasksTreeDataProvider
 		if (element instanceof RecentTasksRootProjectTreeItem) {
 			return [...element.tasks];
 		}
+
 		if (!element) {
 			const treeItems = await this.buildTreeItems();
 
@@ -167,11 +176,13 @@ export class RecentTasksTreeDataProvider
 				return treeItems;
 			}
 		}
+
 		return [];
 	}
 
 	private async buildTreeItems(): Promise<vscode.TreeItem[]> {
 		recentTasksGradleProjectTreeItemMap.clear();
+
 		recentTasksTreeItemMap.clear();
 
 		const gradleProjects = await this.rootProjectsStore.getProjectRoots();
@@ -179,16 +190,20 @@ export class RecentTasksTreeDataProvider
 		if (!gradleProjects.length) {
 			return [];
 		}
+
 		const isMultiRoot = gradleProjects.length > 1;
+
 		await this.gradleTaskProvider.waitForTasksLoad();
 
 		const recentTasks = this.recentTasksStore.getData();
+
 		Array.from(recentTasks.keys()).forEach((taskId: TaskId) => {
 			const task = this.gradleTaskProvider.findByTaskId(taskId);
 
 			if (!task) {
 				return;
 			}
+
 			const definition = task.definition as GradleTaskDefinition;
 
 			const rootProject = this.rootProjectsStore.get(
@@ -198,6 +213,7 @@ export class RecentTasksTreeDataProvider
 			if (!rootProject) {
 				return;
 			}
+
 			const taskArgs = recentTasks.get(taskId) || "";
 
 			if (taskArgs) {
@@ -209,6 +225,7 @@ export class RecentTasksTreeDataProvider
 						this.client,
 						definition.debuggable,
 					);
+
 					buildGradleProjectTreeItem(
 						recentTask,
 						this.taskTerminalsStore,

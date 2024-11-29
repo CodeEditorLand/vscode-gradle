@@ -16,6 +16,7 @@ export function findGradleProjectFromBuild(
 	if (!rootProject || !rootProject.getIsRoot()) {
 		return undefined;
 	}
+
 	return findGradleProject(projectPath, rootProject);
 }
 
@@ -26,6 +27,7 @@ function findGradleProject(
 	if (vscode.Uri.file(project.getProjectpath()).fsPath === projectPath) {
 		return project;
 	}
+
 	for (const subProject of project.getProjectsList()) {
 		const result = findGradleProject(projectPath, subProject);
 
@@ -33,6 +35,7 @@ function findGradleProject(
 			return result;
 		}
 	}
+
 	return undefined;
 }
 
@@ -45,5 +48,6 @@ export async function findRootProject(
 			return rootProject;
 		}
 	}
+
 	return undefined;
 }

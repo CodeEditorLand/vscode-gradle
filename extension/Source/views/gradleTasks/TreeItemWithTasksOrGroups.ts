@@ -9,10 +9,15 @@ import {
 
 export class TreeItemWithTasksOrGroups extends vscode.TreeItem {
 	private readonly _tasks: GradleTaskTreeItem[] = [];
+
 	private readonly _groups: GroupTreeItem[] = [];
+
 	private readonly _subprojects: ProjectTreeItem[] = [];
+
 	public readonly parentTreeItem?: vscode.TreeItem;
+
 	public readonly iconPath = new vscode.ThemeIcon("file-submodule");
+
 	public readonly contextValue = "folder";
 
 	constructor(
@@ -22,7 +27,9 @@ export class TreeItemWithTasksOrGroups extends vscode.TreeItem {
 		collapsibleState = vscode.TreeItemCollapsibleState.Expanded,
 	) {
 		super(name, collapsibleState);
+
 		this.resourceUri = resourceUri;
+
 		this.parentTreeItem = parentTreeItem;
 	}
 

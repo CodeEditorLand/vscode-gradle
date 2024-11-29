@@ -39,11 +39,13 @@ function getGradleProjectFoldersOutsideRoot(
 			return path.join(workspaceFolder.uri.fsPath, nestedfolder);
 		});
 	}
+
 	return [];
 }
 
 export class RootProjectsStore extends StoreMap<string, RootProject> {
 	private isPopulated = false;
+
 	private populatePromise: Promise<void> | undefined = undefined;
 
 	public async populate(): Promise<void> {
@@ -70,6 +72,7 @@ export class RootProjectsStore extends StoreMap<string, RootProject> {
 					this.setRootProjectFolder(rootProject);
 				}
 			}
+
 			gradleProjectFoldersOutsideRoot
 				.map((folder) => buildRootFolder(vscode.Uri.file(folder)))
 				.forEach((project) => {
@@ -85,7 +88,9 @@ export class RootProjectsStore extends StoreMap<string, RootProject> {
 				this.setRootProjectFolder(buildRootFolder(workspaceFolder.uri));
 			}
 		}
+
 		this.isPopulated = true;
+
 		this.fireOnDidChange(null);
 	}
 
@@ -108,6 +113,7 @@ export class RootProjectsStore extends StoreMap<string, RootProject> {
 		) {
 			return true;
 		}
+
 		return false;
 	}
 
@@ -116,9 +122,12 @@ export class RootProjectsStore extends StoreMap<string, RootProject> {
 			if (!this.populatePromise) {
 				this.populatePromise = this.populate();
 			}
+
 			await this.populatePromise;
+
 			this.populatePromise = undefined;
 		}
+
 		return [...this.getData().values()];
 	}
 
@@ -134,17 +143,20 @@ export class RootProjectsStore extends StoreMap<string, RootProject> {
 			if (version === undefined) {
 				return false;
 			}
+
 			if (!gradleVersionIds.includes(version)) {
 				gradleVersionIds.push(version);
 
 				return true;
 			}
+
 			return false;
 		});
 	}
 
 	public clear(fireOnDidChange = true): void {
 		super.clear(fireOnDidChange);
+
 		this.isPopulated = false;
 	}
 }

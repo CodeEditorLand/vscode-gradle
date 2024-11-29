@@ -10,6 +10,7 @@ export enum LogVerbosity {
 
 export class Logger {
 	private channel?: vscode.OutputChannel;
+
 	protected static verbosity: LogVerbosity = LogVerbosity.INFO;
 
 	constructor(private readonly prefix?: string) {}
@@ -22,6 +23,7 @@ export class Logger {
 		if (!this.channel) {
 			throw new Error("No extension output channel defined.");
 		}
+
 		this.appendLine(this.format(message, verbosity), verbosity);
 	}
 
@@ -55,7 +57,9 @@ export class Logger {
 
 	public error(...messages: string[]): void {
 		const error = messages.join(" ");
+
 		this.log(error, LogVerbosity.ERROR);
+
 		sendInfo("", {
 			kind: "gradleTaskServerError",
 			data2: error,
@@ -74,6 +78,7 @@ export class Logger {
 		if (this.channel) {
 			throw new Error("Output channel already defined.");
 		}
+
 		this.channel = channel;
 	}
 

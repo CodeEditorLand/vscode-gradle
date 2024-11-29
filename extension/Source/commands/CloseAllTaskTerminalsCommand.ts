@@ -8,6 +8,7 @@ export class CloseAllTaskTerminalsCommand extends Command {
 	constructor(private taskTerminalsStore: TaskTerminalsStore) {
 		super();
 	}
+
 	async run(): Promise<void> {
 		if (
 			this.taskTerminalsStore.getData().size &&
@@ -26,6 +27,7 @@ export class CloseAllTaskTerminalsCommand extends Command {
 					}
 				},
 			);
+
 			this.taskTerminalsStore.clear();
 		}
 	}

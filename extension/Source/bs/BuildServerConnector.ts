@@ -10,7 +10,9 @@ import { getRandomPipeName } from "../util/generateRandomPipeName";
  */
 export class BuildServerConnector {
 	private serverConnection: rpc.MessageConnection | null = null;
+
 	private serverPipeServer: net.Server;
+
 	private serverPipePath: string;
 
 	/**
@@ -23,13 +25,16 @@ export class BuildServerConnector {
 		if (this.serverPipePath === "") {
 			return false;
 		}
+
 		this.serverPipeServer = net.createServer((socket: net.Socket) => {
 			this.serverConnection = rpc.createMessageConnection(
 				new rpc.StreamMessageReader(socket),
 				new rpc.StreamMessageWriter(socket),
 			);
+
 			this.serverConnection.listen();
 		});
+
 		this.serverPipeServer.on("error", (error) => {
 			sendInfo("", {
 				kind: "BuildServerConnectorError",
@@ -37,6 +42,7 @@ export class BuildServerConnector {
 				proxyErrorStack: error.stack ? error.stack.toString() : "",
 			});
 		});
+
 		this.serverPipeServer.listen(this.serverPipePath);
 
 		return true;
@@ -52,7 +58,9 @@ export class BuildServerConnector {
 
 	public close(): void {
 		this.serverConnection?.end();
+
 		this.serverConnection?.dispose();
+
 		this.serverPipeServer.close();
 	}
 }

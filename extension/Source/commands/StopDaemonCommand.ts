@@ -13,16 +13,19 @@ export class StopDaemonCommand extends Command {
 	constructor() {
 		super();
 	}
+
 	async run(treeItem: GradleDaemonTreeItem): Promise<void> {
 		if (
 			!(await confirmModal("Are you sure you want to stop the daemon?"))
 		) {
 			return;
 		}
+
 		const pid = treeItem.pid;
 
 		try {
 			await this.stopDaemon(pid);
+
 			logger.info(`Successfully stopped daemon with PID ${pid}.`);
 		} catch (error) {
 			logger.error(
@@ -40,7 +43,9 @@ export class StopDaemonCommand extends Command {
 			process.platform === "win32"
 				? `taskkill /PID ${pid} /F`
 				: `kill ${pid}`;
+
 		await execAsync(command);
+
 		await vscode.commands.executeCommand(COMMAND_REFRESH_DAEMON_STATUS);
 	}
 }

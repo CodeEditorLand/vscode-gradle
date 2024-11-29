@@ -33,6 +33,7 @@ export class GradleBuildLinkProvider implements DocumentLinkProvider {
 				const endOffset = startOffset + match[0].length;
 
 				const end = document.positionAt(endOffset);
+
 				searchPosition += endOffset;
 
 				const file = match[1];
@@ -40,10 +41,12 @@ export class GradleBuildLinkProvider implements DocumentLinkProvider {
 				const line = parseInt(match[2]);
 
 				const uri = Uri.file(file).with({ fragment: `L${line}` });
+
 				links.push(new DocumentLink(new Range(start, end), uri));
 				// TODO: support column recognition
 			}
 		}
+
 		return links;
 	}
 }

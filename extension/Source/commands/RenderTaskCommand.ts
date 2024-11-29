@@ -16,6 +16,7 @@ export class RenderTaskCommand extends Command {
 	) {
 		super();
 	}
+
 	async run(task: vscode.Task): Promise<void> {
 		updateGradleTreeItemStateForTask(
 			task,

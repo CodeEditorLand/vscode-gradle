@@ -5,8 +5,11 @@ import * as vscode from "vscode";
 
 export class PinnedTasksTreeItem extends vscode.TreeItem {
 	private children: vscode.TreeItem[] = [];
+
 	public readonly parentTreeItem?: vscode.TreeItem;
+
 	public readonly iconPath = new vscode.ThemeIcon("star-full");
+
 	public readonly contextValue = "PinnedTasks";
 
 	constructor(
@@ -15,6 +18,7 @@ export class PinnedTasksTreeItem extends vscode.TreeItem {
 		collapsibleState = vscode.TreeItemCollapsibleState.Expanded,
 	) {
 		super(label, collapsibleState);
+
 		this.resourceUri = resourceUri;
 	}
 

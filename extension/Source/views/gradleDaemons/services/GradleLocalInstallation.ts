@@ -31,6 +31,7 @@ export class GradleLocalInstallation implements GradleExecution {
 			if (stderr) {
 				logger.error(stderr);
 			}
+
 			return stdout;
 		} catch (error) {
 			logger.error(error.message);

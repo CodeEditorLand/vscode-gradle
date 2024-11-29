@@ -36,6 +36,7 @@ export class PinnedTasksStore extends TaskStore {
 		) {
 			return;
 		}
+
 		Object.keys(pinnedTasks).forEach((taskId: TaskId) => {
 			this.setItem(taskId, new Set(pinnedTasks[taskId]), false);
 		});
@@ -45,6 +46,7 @@ export class PinnedTasksStore extends TaskStore {
 		const workspaceStateTasks: WorkspaceStateTasks = toWorkspaceStateTasks(
 			this.getData(),
 		);
+
 		await this.context.workspaceState.update(
 			"pinnedTasks",
 			workspaceStateTasks,

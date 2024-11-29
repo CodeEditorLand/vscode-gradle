@@ -5,6 +5,7 @@ import * as vscode from "vscode";
 
 export function prepareLanguageServerParams(): string[] {
 	const params = [];
+
 	params.push("-Dfile.encoding=" + getJavaEncoding());
 
 	return params;
@@ -20,8 +21,10 @@ function getJavaEncoding(): string {
 	if (languageConfig) {
 		javaEncoding = languageConfig["files.encoding"];
 	}
+
 	if (!javaEncoding) {
 		javaEncoding = config.get<string>("files.encoding", "UTF-8");
 	}
+
 	return javaEncoding;
 }

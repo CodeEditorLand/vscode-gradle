@@ -6,6 +6,7 @@ import { isTest } from "../util";
 
 export class RootProject {
 	private environment?: Environment;
+
 	private gradleVersion?: string;
 
 	constructor(

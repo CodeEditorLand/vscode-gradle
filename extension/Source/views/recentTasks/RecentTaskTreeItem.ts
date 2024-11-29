@@ -39,6 +39,7 @@ export class RecentTaskTreeItem extends GradleTaskTreeItem {
 
 	public setContext(): void {
 		const definition = this.task.definition as GradleTaskDefinition;
+
 		this.tooltip =
 			(definition.args ? `(args: ${definition.args}) ` : "") +
 			(definition.description || this.label);
@@ -48,11 +49,14 @@ export class RecentTaskTreeItem extends GradleTaskTreeItem {
 		);
 
 		const numTerminals = taskTerminalsStore ? taskTerminalsStore.size : 0;
+
 		this.description = `(${numTerminals})`;
+
 		this.contextValue = getRecentTaskTreeItemState(
 			getTreeItemState(this.task, definition.args),
 			numTerminals,
 		);
+
 		this.setIconState();
 	}
 }

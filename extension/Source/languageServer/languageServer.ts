@@ -32,6 +32,7 @@ export async function startLanguageClientAndWaitForConnection(
 
 		return;
 	}
+
 	void vscode.window.withProgress(
 		{ location: vscode.ProgressLocation.Window },
 		(progress) => {
@@ -57,13 +58,16 @@ export async function startLanguageClientAndWaitForConnection(
 					serverOptions,
 					clientOptions,
 				);
+
 				void languageClient.onReady().then(
 					() => {
 						isLanguageServerStarted = true;
+
 						void handleLanguageServerStart(
 							contentProvider,
 							rootProjectsStore,
 						);
+
 						resolve();
 					},
 					(e) => {
@@ -74,6 +78,7 @@ export async function startLanguageClientAndWaitForConnection(
 				const disposable = languageClient.start();
 
 				context.subscriptions.push(disposable);
+
 				context.subscriptions.push(
 					vscode.workspace.onDidChangeConfiguration((e) => {
 						if (e.affectsConfiguration("java.import.gradle")) {
@@ -95,9 +100,12 @@ async function awaitServerConnection(pipeName: string): Promise<StreamInfo> {
 	return new Promise((resolve, reject) => {
 		const server = net.createServer((stream) => {
 			server.close();
+
 			resolve({ reader: stream, writer: stream });
 		});
+
 		server.on("error", reject);
+
 		server.listen(pipeName, () => {
 			server.removeListener("error", reject);
 		});
@@ -118,6 +126,7 @@ function getGradleSettings(): unknown {
 async function syncSingleProject(project: GradleProject): Promise<void> {
 	if (isLanguageServerStarted) {
 		const projectPath = vscode.Uri.file(project.getProjectpath()).fsPath;
+
 		await vscode.commands.executeCommand(
 			"gradle.setPlugins",
 			project.getProjectpath(),
@@ -146,11 +155,13 @@ async function syncSingleProject(project: GradleProject): Promise<void> {
 				fields: JSONField,
 			};
 		});
+
 		await vscode.commands.executeCommand(
 			"gradle.setClosures",
 			projectPath,
 			closures,
 		);
+
 		await vscode.commands.executeCommand(
 			"gradle.setScriptClasspaths",
 			projectPath,

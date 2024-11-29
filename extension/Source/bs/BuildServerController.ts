@@ -27,8 +27,11 @@ const SEND_TELEMETRY_CMD = "_java.gradle.buildServer.sendTelemetry";
 
 export class BuildServerController implements Disposable {
 	private disposable: Disposable;
+
 	private buildOutputChannel: OutputChannel;
+
 	private logOutputChannel: OutputChannel;
+
 	private gradleTestRunner: GradleTestRunner | undefined;
 
 	public constructor(readonly context: ExtensionContext) {
@@ -36,9 +39,11 @@ export class BuildServerController implements Disposable {
 			"Build Server for Gradle (Build)",
 			"gradle-build",
 		);
+
 		this.logOutputChannel = window.createOutputChannel(
 			"Build Server for Gradle (Log)",
 		);
+
 		this.disposable = Disposable.from(
 			this.buildOutputChannel,
 			languages.registerDocumentLinkProvider(
@@ -151,6 +156,7 @@ export class BuildServerController implements Disposable {
 							"Please reload to make the change of 'java.gradle.buildServer.enabled' take effect. Reload now?";
 
 						const action = "Reload";
+
 						window
 							.showWarningMessage(msg, action)
 							.then(async (selection) => {
@@ -163,13 +169,16 @@ export class BuildServerController implements Disposable {
 										"redhat.java",
 										"jdt_ws",
 									);
+
 									await fse.ensureDir(jlsWorkspacePath);
 
 									const flagFile = path.resolve(
 										jlsWorkspacePath,
 										".cleanWorkspace",
 									);
+
 									await fse.writeFile(flagFile, "");
+
 									commands.executeCommand(
 										"workbench.action.reloadWindow",
 									);
@@ -179,6 +188,7 @@ export class BuildServerController implements Disposable {
 				},
 			),
 		);
+
 		this.checkMachineStatus();
 	}
 
@@ -186,6 +196,7 @@ export class BuildServerController implements Disposable {
 		if (!this.gradleTestRunner) {
 			this.gradleTestRunner = new GradleTestRunner(testRunnerApi);
 		}
+
 		return this.gradleTestRunner;
 	}
 
@@ -199,17 +210,21 @@ export class BuildServerController implements Disposable {
 		if (this.isGradleExecutableOnPath()) {
 			machineStatus.gradleExecutableFound = "true";
 		}
+
 		if (this.hasProxy()) {
 			machineStatus.hasProxy = "true";
 		}
+
 		const gradleVersionInWrapper = await this.gradleVersionInWrapper();
 
 		if (gradleVersionInWrapper) {
 			machineStatus.gradleVersionInWrapper = gradleVersionInWrapper;
 		}
+
 		machineStatus.hasProjectAtWorkspaceRoot = (
 			await this.hasProjectAtWorkspaceRoot()
 		).toString();
+
 		sendInfo("", {
 			kind: "machineStatus",
 			data2: JSON.stringify(machineStatus),
@@ -231,6 +246,7 @@ export class BuildServerController implements Disposable {
 				}
 			}
 		}
+
 		return false;
 	}
 
@@ -264,6 +280,7 @@ export class BuildServerController implements Disposable {
 		if (versionMatch) {
 			return versionMatch[1];
 		}
+
 		return "";
 	}
 

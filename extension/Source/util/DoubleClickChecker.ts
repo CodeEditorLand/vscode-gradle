@@ -5,15 +5,18 @@ import * as vscode from "vscode";
 
 export class DoubleClickChecker {
 	private lastDate: Date | undefined;
+
 	private lastItem: vscode.TreeItem | undefined;
 
 	private resetState(): void {
 		this.lastDate = undefined;
+
 		this.lastItem = undefined;
 	}
 
 	private setState(item: vscode.TreeItem): void {
 		this.lastDate = new Date();
+
 		this.lastItem = item;
 	}
 
@@ -27,6 +30,7 @@ export class DoubleClickChecker {
 
 			return true;
 		}
+
 		this.setState(item);
 
 		return false;

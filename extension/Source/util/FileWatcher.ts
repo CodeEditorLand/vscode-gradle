@@ -4,14 +4,21 @@ import * as vscode from "vscode";
 export class FileWatcher implements vscode.Disposable {
 	private readonly _onDidChange: vscode.EventEmitter<vscode.Uri> =
 		new vscode.EventEmitter<vscode.Uri>();
+
 	private readonly _onDidOpen: vscode.EventEmitter<vscode.Uri> =
 		new vscode.EventEmitter<vscode.Uri>();
+
 	public readonly onDidChange: vscode.Event<vscode.Uri> =
 		this._onDidChange.event;
+
 	public readonly onDidOpen: vscode.Event<vscode.Uri> = this._onDidOpen.event;
+
 	private onDidSaveDisposable: vscode.Disposable;
+
 	private onDidDeleteDisposable: vscode.Disposable;
+
 	private onDidCreateDisposable: vscode.Disposable;
+
 	private onDidOpenDisposable: vscode.Disposable;
 
 	constructor(protected readonly fileGlob: string) {
@@ -22,6 +29,7 @@ export class FileWatcher implements vscode.Disposable {
 				}
 			},
 		);
+
 		this.onDidDeleteDisposable = vscode.workspace.onDidDeleteFiles(
 			(event: vscode.FileDeleteEvent) => {
 				const fileDeleted = event.files.find((file) =>
@@ -33,6 +41,7 @@ export class FileWatcher implements vscode.Disposable {
 				}
 			},
 		);
+
 		this.onDidCreateDisposable = vscode.workspace.onDidCreateFiles(
 			(event: vscode.FileDeleteEvent) => {
 				const fileCreated = event.files.find((file) =>
@@ -44,6 +53,7 @@ export class FileWatcher implements vscode.Disposable {
 				}
 			},
 		);
+
 		this.onDidOpenDisposable = vscode.workspace.onDidOpenTextDocument(
 			(e: vscode.TextDocument) => {
 				if (this.isFileMatching(e.uri)) {
@@ -57,6 +67,7 @@ export class FileWatcher implements vscode.Disposable {
 		if (uri.scheme !== "file") {
 			return false;
 		}
+
 		return minimatch(uri.fsPath, this.fileGlob);
 	}
 
@@ -70,10 +81,15 @@ export class FileWatcher implements vscode.Disposable {
 
 	public dispose(): void {
 		this.onDidSaveDisposable.dispose();
+
 		this.onDidDeleteDisposable.dispose();
+
 		this.onDidCreateDisposable.dispose();
+
 		this.onDidOpenDisposable.dispose();
+
 		this._onDidChange.dispose();
+
 		this._onDidOpen.dispose();
 	}
 }

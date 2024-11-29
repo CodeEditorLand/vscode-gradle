@@ -18,6 +18,7 @@ export class CancelTreeItemTaskCommand extends Command {
 			if (!runningTask) {
 				return;
 			}
+
 			const definition = runningTask.definition as GradleTaskDefinition;
 
 			const cancellationKey = getRunTaskCommandCancellationKey(

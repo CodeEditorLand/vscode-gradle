@@ -18,6 +18,7 @@ export class GradleStatus {
 			} else if (gradleConfig.getGradleHome()) {
 				return GradleConnectionType.LOCALINSTALLATION;
 			}
+
 			return GradleConnectionType.WRAPPER;
 		}
 	}
@@ -35,6 +36,7 @@ export class GradleStatus {
 
 					return wrapper.exec(["--status", "quiet"]);
 				}
+
 				return "";
 
 			case GradleConnectionType.LOCALINSTALLATION:

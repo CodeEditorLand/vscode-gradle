@@ -78,8 +78,10 @@ export async function cancelBuild(
 ): Promise<void> {
 	if (task && isTaskRunning(task)) {
 		cancellingTasks.set(task.definition.id, task);
+
 		await vscode.commands.executeCommand(COMMAND_RENDER_TASK, task);
 	}
+
 	await client.cancelBuild(cancellationKey, task);
 }
 
@@ -136,6 +138,7 @@ export function removeCancellingTask(task: vscode.Task): void {
 
 	if (cancellingTask) {
 		cancellingTasks.delete(cancellingTask.definition.id);
+
 		vscode.commands.executeCommand(COMMAND_RENDER_TASK, task);
 	}
 }
@@ -146,6 +149,7 @@ export async function queueRestartTask(
 ): Promise<void> {
 	if (isTaskRunning(task)) {
 		const definition = task.definition as GradleTaskDefinition;
+
 		restartingTasks.set(definition.id, task);
 
 		const cancellationKey = getRunTaskCommandCancellationKey(
@@ -182,6 +186,7 @@ export function createTaskFromDefinition(
 		definition.id =
 			definition.id + Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
 	}
+
 	const args = [definition.script]
 		.concat(parseArgsStringToArgv(definition.args.trim()))
 		.filter(Boolean);
@@ -220,6 +225,7 @@ export function createTaskFromDefinition(
 	} else if (reuseTerminals === "all") {
 		panelKind = vscode.TaskPanelKind.Shared;
 	}
+
 	task.presentationOptions = {
 		showReuseMessage: false,
 		clear: true,
@@ -228,6 +234,7 @@ export function createTaskFromDefinition(
 		panel: panelKind,
 		reveal: vscode.TaskRevealKind.Always,
 	};
+
 	terminal.setTask(task);
 
 	return task;
@@ -281,6 +288,7 @@ export function resolveTaskFromDefinition(
 					cancellationKey,
 					client,
 				);
+
 				executeTerminal.setTask(task);
 
 				return executeTerminal;
@@ -298,6 +306,7 @@ export function resolveTaskFromDefinition(
 	} else if (reuseTerminals === "all") {
 		panelKind = vscode.TaskPanelKind.Shared;
 	}
+
 	task.presentationOptions = {
 		showReuseMessage: false,
 		clear: true,
@@ -363,6 +372,7 @@ export function getVSCodeTasksFromGradleProject(
 				createVSCodeTaskFromGradleTask(gradleTask, rootProject, client),
 			);
 		}
+
 		projects = projects.concat(project!.getProjectsList());
 	}
 
@@ -389,6 +399,7 @@ export async function loadTasksForProjectRoots(
 					gradleProject,
 					client,
 				);
+
 				allTasks = allTasks.concat(vsCodeTasks);
 			}
 		}
@@ -420,6 +431,7 @@ export async function loadTasksForProjectRoots(
 			}
 		}
 	}
+
 	return allTasks;
 }
 
@@ -437,6 +449,7 @@ export async function runTask(
 
 		return;
 	}
+
 	if (debug) {
 		const INSTALL_EXTENSIONS = "Install Missing Extensions";
 
@@ -452,6 +465,7 @@ export async function runTask(
 					[JAVA_LANGUAGE_EXTENSION_ID, JAVA_DEBUGGER_EXTENSION_ID],
 				);
 			}
+
 			return;
 		} else if (!isJavaLanguageSupportExtensionActivated()) {
 			await vscode.window.showErrorMessage(
@@ -461,6 +475,7 @@ export async function runTask(
 			return;
 		}
 	}
+
 	try {
 		if (debug || args || getAllowParallelRun()) {
 			const clonedTask = cloneTask(
@@ -471,6 +486,7 @@ export async function runTask(
 				debug,
 				isRunning,
 			);
+
 			await vscode.tasks.executeTask(clonedTask);
 		} else {
 			await vscode.tasks.executeTask(task);

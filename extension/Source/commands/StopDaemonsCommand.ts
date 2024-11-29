@@ -17,6 +17,7 @@ export class StopDaemonsCommand extends Command {
 	constructor(private rootProjectsStore: RootProjectsStore) {
 		super();
 	}
+
 	async run(): Promise<void> {
 		if (
 			!vscode.workspace.workspaceFolders ||
@@ -25,6 +26,7 @@ export class StopDaemonsCommand extends Command {
 		) {
 			return;
 		}
+
 		const gradleRootFolders =
 			await this.rootProjectsStore.getProjectRootsWithUniqueVersions();
 
@@ -33,8 +35,11 @@ export class StopDaemonsCommand extends Command {
 				(rootProject) =>
 					this.stopDaemons(rootProject.getProjectUri().fsPath),
 			);
+
 			await Promise.all(promises);
+
 			logger.info(`Successfully stopped all daemons.`);
+
 			await vscode.commands.executeCommand(COMMAND_REFRESH_DAEMON_STATUS);
 		} catch (error) {
 			logger.error(`Failed to stop daemons: ${error.message}.`);
@@ -48,11 +53,13 @@ export class StopDaemonsCommand extends Command {
 
 		if (connectType === GradleConnectionType.WRAPPER) {
 			const gradleExecution = new GradleWrapper(projectFolder);
+
 			await gradleExecution.exec(["--stop"]);
 		} else if (connectType === GradleConnectionType.LOCALINSTALLATION) {
 			const gradleExecution = new GradleLocalInstallation(
 				gradleConfig.getGradleHome(),
 			);
+
 			await gradleExecution.exec(["--stop"]);
 		} else {
 			logger.info("No daemons to stop.");

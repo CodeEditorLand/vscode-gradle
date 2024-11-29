@@ -15,19 +15,25 @@ import { waitOnTcp } from "../util";
 export class GradleTestRunner implements TestRunner {
 	private readonly _onDidChangeTestItemStatus =
 		new vscode.EventEmitter<TestItemStatusChangeEvent>();
+
 	private readonly _onDidFinishTestRun =
 		new vscode.EventEmitter<TestFinishEvent>();
+
 	private context: IRunTestContext;
+
 	private testRunnerApi: any;
+
 	private testInitScriptPath: string;
 
 	public onDidChangeTestItemStatus: vscode.Event<TestItemStatusChangeEvent> =
 		this._onDidChangeTestItemStatus.event;
+
 	public onDidFinishTestRun: vscode.Event<TestFinishEvent> =
 		this._onDidFinishTestRun.event;
 
 	constructor(testRunnerApi: any) {
 		this.testRunnerApi = testRunnerApi;
+
 		this.testInitScriptPath = path.join(
 			os.tmpdir(),
 			"testInitScript.gradle",
@@ -38,6 +44,7 @@ export class GradleTestRunner implements TestRunner {
 		this.context = context;
 
 		const tests: Map<string, string[]> = new Map();
+
 		context.testItems.forEach((testItem) => {
 			const id = testItem.id;
 
@@ -47,6 +54,7 @@ export class GradleTestRunner implements TestRunner {
 			if (!parts.class) {
 				return;
 			}
+
 			const testMethods = tests.get(parts.class) || [];
 
 			if (parts.invocations?.length) {
@@ -55,8 +63,10 @@ export class GradleTestRunner implements TestRunner {
 				if (methodId.includes("(")) {
 					methodId = methodId.slice(0, methodId.indexOf("(")); // gradle test task doesn't support method with parameters
 				}
+
 				testMethods.push(methodId);
 			}
+
 			tests.set(parts.class, testMethods);
 		});
 
@@ -74,12 +84,15 @@ export class GradleTestRunner implements TestRunner {
 			debugPort = await getPort();
 
 			const initScriptContent = this.getInitScriptContent(debugPort);
+
 			await vscode.workspace.fs.writeFile(
 				vscode.Uri.file(this.testInitScriptPath),
 				Buffer.from(initScriptContent),
 			);
+
 			agrs.unshift("--init-script", this.testInitScriptPath);
 		}
+
 		const env = context.testConfig?.env;
 
 		try {
@@ -111,11 +124,13 @@ export class GradleTestRunner implements TestRunner {
 		if (message) {
 			message = this.filterStackTrace(message);
 		}
+
 		const testId = this.testRunnerApi.parseTestIdFromParts({
 			project: this.context.projectName,
 			class: testParts[0],
 			invocations: testParts.slice(1),
 		});
+
 		this._onDidChangeTestItemStatus.fire({
 			testId,
 			state,

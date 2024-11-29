@@ -22,10 +22,12 @@ export class DefaultProjectProvider {
 
 	constructor() {
 		this.defaultTasks = [];
+
 		this.defaultDependencies = new Map();
 	}
 
 	private defaultTasks: vscode.Task[];
+
 	private defaultDependencies: Map<string, vscode.TreeItem[]>;
 
 	public refresh(): void {
@@ -39,6 +41,7 @@ export class DefaultProjectProvider {
 		if (this.defaultTasks.length) {
 			return this.defaultTasks;
 		}
+
 		const tasks = [];
 
 		for (const rootProject of rootProjects) {
@@ -62,6 +65,7 @@ export class DefaultProjectProvider {
 				);
 			}
 		}
+
 		this.defaultTasks = tasks;
 
 		return tasks;
@@ -111,6 +115,7 @@ export class DefaultProjectProvider {
 		if (!isLanguageServerStarted) {
 			return [new HintItem("No dependencies")];
 		}
+
 		const dependencyItems = await vscode.commands.executeCommand<
 			DefaultDependencyItem[]
 		>("gradle.getDependencies", buildFileUri.toString());
@@ -118,6 +123,7 @@ export class DefaultProjectProvider {
 		if (!dependencyItems) {
 			return [new HintItem("No dependencies")];
 		}
+
 		for (const dependencyItem of dependencyItems) {
 			const configuration = dependencyItem.configuration;
 
@@ -128,19 +134,23 @@ export class DefaultProjectProvider {
 						vscode.TreeItemCollapsibleState.Collapsed,
 						element,
 					);
+
 				configurationMap.set(configuration, configItem);
 			}
+
 			const configurationItem = configurationMap.get(configuration);
 
 			if (!configurationItem) {
 				continue;
 			}
+
 			const dependencyTreeItem: DependencyTreeItem =
 				new DependencyTreeItem(
 					dependencyItem.name,
 					vscode.TreeItemCollapsibleState.None,
 					configurationItem,
 				);
+
 			dependencyTreeItem.command = {
 				title: "Show Dependency",
 				command: "vscode.open",
@@ -151,8 +161,10 @@ export class DefaultProjectProvider {
 					} as vscode.TextDocumentShowOptions,
 				],
 			};
+
 			configurationItem.getChildren().push(dependencyTreeItem);
 		}
+
 		this.defaultDependencies.set(
 			buildFileUri.toString(),
 			Array.from(configurationMap.values()),

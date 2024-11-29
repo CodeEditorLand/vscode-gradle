@@ -14,6 +14,7 @@ export class FindTaskCommand extends Command {
 	) {
 		super();
 	}
+
 	async run(): Promise<void> {
 		const foundTaskName = await getFindTask(this.gradleTaskProvider);
 

@@ -9,6 +9,7 @@ export class RestartTaskCommand extends Command {
 	constructor(private client: TaskServerClient) {
 		super();
 	}
+
 	async run(treeItem: GradleTaskTreeItem): Promise<void> {
 		if (treeItem && treeItem.task) {
 			const taskExecution = getTaskExecution(treeItem.task);

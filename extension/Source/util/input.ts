@@ -11,6 +11,7 @@ function returnTrimmedInput(value: string | undefined): string | undefined {
 	if (value !== undefined) {
 		return value.trim();
 	}
+
 	return undefined;
 }
 
@@ -74,6 +75,7 @@ export function getRunTasks(
 							return true;
 						}
 					}
+
 					return false;
 				})
 				.map((task) => task.name),
@@ -94,6 +96,7 @@ export async function getRootProjectFolder(
 	if (rootProjects.length === 1) {
 		return Promise.resolve(rootProjects[0]);
 	}
+
 	const rootProjectPaths = rootProjects.map(
 		(rootProject) => rootProject.getProjectUri().fsPath,
 	);
@@ -109,6 +112,7 @@ export async function getRootProjectFolder(
 	if (selectedRootProjectPath) {
 		return rootProjects[rootProjectPaths.indexOf(selectedRootProjectPath)];
 	}
+
 	return undefined;
 }
 
@@ -116,6 +120,7 @@ export async function confirmModal(message: string): Promise<boolean> {
 	if (getDisableConfirmations()) {
 		return true;
 	}
+
 	const CONFIRM = "Yes";
 
 	const result = await vscode.window.showWarningMessage(
