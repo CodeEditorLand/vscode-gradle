@@ -922,7 +922,7 @@
 	},
 	"description": "Manage Gradle Projects, run Gradle tasks and provide better Gradle file authoring experience in VS Code",
 	"devDependencies": {
-		"@grpc/grpc-js": "1.12.3",
+		"@grpc/grpc-js": "1.12.4",
 		"@types/fs-extra": "11.0.4",
 		"@types/glob": "8.1.0",
 		"@types/google-protobuf": "3.15.12",
