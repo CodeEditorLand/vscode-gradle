@@ -416,7 +416,7 @@
 		"jsonValidation": [
 			{
 				"fileMatch": "package.json",
-				"url": "https://schemastore.azurewebsites.net/schemas/json/package.json"
+				"url": "HTTPS://schemastore.azurewebsites.net/schemas/json/package.json"
 			}
 		],
 		"languages": [
