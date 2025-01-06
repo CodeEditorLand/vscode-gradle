@@ -930,12 +930,12 @@
 		"tree-kill": "1.2.2"
 	},
 	"devDependencies": {
-		"@grpc/grpc-js": "1.12.4",
+		"@grpc/grpc-js": "1.12.5",
 		"@types/fs-extra": "11.0.4",
 		"@types/glob": "8.1.0",
 		"@types/google-protobuf": "3.15.12",
-		"@types/lodash": "4.17.13",
-		"@types/node": "22.10.1",
+		"@types/lodash": "4.17.14",
+		"@types/node": "22.10.5",
 		"@types/sinon": "17.0.3",
 		"google-protobuf": "3.21.4",
 		"grpc-tools": "1.12.4",
