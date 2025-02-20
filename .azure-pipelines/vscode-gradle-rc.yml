@@ -1,0 +1,173 @@
+name: $(Date:yyyyMMdd).$(Rev:r)
+schedules:
+  - cron: 0 2 * * *
+    branches:
+      include:
+        - develop
+resources:
+  repositories:
+    - repository: self
+      type: git
+      ref: refs/heads/main
+    - repository: 1esPipelines
+      type: git
+      name: 1ESPipelineTemplates/1ESPipelineTemplates
+      ref: refs/tags/release
+trigger: none
+pr: none
+extends:
+  template: v1/1ES.Official.PipelineTemplate.yml@1esPipelines
+  parameters:
+    pool:
+      name: 1ES_JavaTooling_Pool
+      image: 1ES_JavaTooling_Ubuntu-2004
+      os: linux
+    sdl:
+      sourceAnalysisPool:
+        name: 1ES_JavaTooling_Pool
+        image: 1ES_JavaTooling_Windows_2022
+        os: windows
+      spotBugs:
+        enabled: false
+    stages:
+      - stage: Build
+        jobs:
+          - job: Job_1
+            displayName: VSCode-Gradle-RC
+            templateContext:
+              outputs:
+                - output: pipelineArtifact
+                  artifactName: extension
+                  targetPath: '$(Build.ArtifactStagingDirectory)/extension'
+                  displayName: "Publish Artifact: extension"
+            steps:
+              - checkout: self
+                fetchTags: true
+              - task: UsePythonVersion@0
+                displayName: 'Use Python 3.11.x'
+                inputs:
+                  versionSpec: 3.11.x
+              - task: UseDotNet@2
+                displayName: 'Use .NET Core 3.1.x'
+                inputs:
+                  packageType: 'sdk'
+                  version: '3.1.x'
+              - task: JavaToolInstaller@0
+                displayName: Install Java 21
+                inputs:
+                  versionSpec: '21'
+                  jdkArchitectureOption: 'x64'
+                  jdkSourceOption: 'PreInstalled'
+              - task: NodeTool@0
+                displayName: Install Node 18.x
+                inputs:
+                  versionSpec: 18.x
+              - task: MicroBuildSigningPlugin@4
+                displayName: 'Install Signing Plugin'
+                inputs:
+                  signType: real
+                  azureSubscription: 'MicroBuild Signing Task (MSEng)'
+                  feedSource: 'https://mseng.pkgs.visualstudio.com/DefaultCollection/_packaging/MicroBuildToolset/nuget/v3/index.json'
+                env:
+                  SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+              - task: DownloadBuildArtifacts@1
+                displayName: 'Download Build Server Artifacts'
+                inputs:
+                  buildType: specific
+                  project: 'a4d27ce2-a42d-4b71-8eef-78cee9a9728e'
+                  pipeline: 16493
+                  downloadType: specific
+                  extractTars: false
+              - task: CopyFiles@2
+                displayName: 'Copy Build Server Plugin Artifacts'
+                inputs:
+                  SourceFolder: '$(System.ArtifactsDirectory)/build-server/server/build/libs/plugins'
+                  Contents: '**'
+                  TargetFolder: $(Build.SourcesDirectory)/extension/server/plugins
+              - task: CopyFiles@2
+                displayName: 'Copy Build Server Artifacts'
+                inputs:
+                  SourceFolder: '$(System.ArtifactsDirectory)/build-server/server/build/libs'
+                  Contents: 'server.jar'
+                  TargetFolder: $(Build.SourcesDirectory)/gradle-server/build/libs
+              - task: CopyFiles@2
+                displayName: 'Copy Build Server Runtime Artifacts'
+                inputs:
+                  SourceFolder: '$(System.ArtifactsDirectory)/build-server/server/build/libs/runtime'
+                  Contents: '**'
+                  TargetFolder: $(Build.SourcesDirectory)/gradle-server/build/libs/runtime
+              - task: Gradle@3
+                displayName: Build
+                inputs:
+                  gradleWrapperFile: 'gradlew'
+                  gradleOptions: '-Xmx3072m'
+                  tasks: 'build'
+              - task: Gradle@3
+                displayName: PrepareForRelease
+                inputs:
+                  gradleWrapperFile: 'gradlew'
+                  gradleOptions: '-Xmx3072m'
+                  tasks: 'prepareForRelease'
+              - bash: chmod +x gradle-server
+                workingDirectory: $(Build.SourcesDirectory)/extension/lib
+                displayName: Set permission
+              - task: CmdLine@2
+                displayName: Sign jars
+                inputs:
+                  script: dotnet "$MBSIGN_APPFOLDER/DDSignFiles.dll" -- /file:gradle-server.jar /certs:100010171
+                  workingDirectory: 'extension/lib'
+              - bash: npx json@latest -I -f package.json -e "this.aiKey=\"$(AI_KEY)\""
+                workingDirectory: $(Build.SourcesDirectory)/extension
+                displayName: Replace AI Key
+              - task: ComponentGovernanceComponentDetection@0
+                inputs:
+                  scanType: 'Register'
+                  verbosity: 'Verbose'
+                  alertWarningLevel: 'High'
+              - task: notice@0
+                displayName: 'NOTICE File Generator'
+                inputs:
+                  outputformat: 'text'
+              - task: DownloadPipelineArtifact@2
+                displayName: Download NOTICE file
+                inputs:
+                  artifact: 'NOTICE.txt'
+                  path: $(Build.SourcesDirectory)/extension
+              - task: Gradle@3
+                displayName: Build Gradle Build Server Importer
+                inputs:
+                  gradleWrapperFile: 'gradlew'
+                  gradleOptions: '-Xmx3072m'
+                  tasks: ':extension:copyJdtlsPluginJar'
+              - task: CmdLine@2
+                displayName: Sign jars
+                inputs:
+                  script: |
+                    files=$(find . -type f -name "com.microsoft.gradle.bs.importer-*.jar")
+                    for file in $files; do
+                        fileName=$(basename "$file")
+                        dotnet "$MBSIGN_APPFOLDER/DDSignFiles.dll" -- /file:"$fileName" /certs:100010171
+                    done
+                  workingDirectory: 'extension/server'
+              - bash: npx @vscode/vsce@latest package -o extension.vsix
+                workingDirectory: $(Build.SourcesDirectory)/extension
+                displayName: Package VSIX
+              - bash: npx @vscode/vsce@latest generate-manifest -i extension.vsix -o extension.manifest
+                workingDirectory: $(Build.SourcesDirectory)/extension
+                displayName: 'Generate extension manifest'
+              - bash: cp extension.manifest extension.signature.p7s
+                workingDirectory: $(Build.SourcesDirectory)/extension
+                displayName: 'Prepare manifest for signing'
+              - task: CmdLine@2
+                displayName: Sign extension
+                inputs:
+                  script: dotnet "$MBSIGN_APPFOLDER/DDSignFiles.dll" -- /file:extension.signature.p7s /certs:4014052
+                  workingDirectory: 'extension'
+              - task: CopyFiles@2
+                displayName: Copy VSIX
+                inputs:
+                  Contents: |
+                    extension/extension.vsix
+                    extension/extension.manifest
+                    extension/extension.signature.p7s
+                  TargetFolder: '$(Build.ArtifactStagingDirectory)/extension'
